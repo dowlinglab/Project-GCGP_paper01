@@ -1,0 +1,153 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% This is a (brief) model paper using the achemso class
+%% The document class accepts keyval options, which should include
+%% the target journal and optionally the manuscript type.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[journal=jacsat,manuscript=article]{achemso}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Place any additional packages needed here.  Only include packages
+%% which are essential, to avoid problems later.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{multirow}
+\usepackage{chemformula} % Formula subscripts using \ch{}
+\usepackage[T1]{fontenc} % Use modern font encodings
+\usepackage{verbatim}
+%% The amssymb package provides various useful mathematical symbols
+\usepackage{amssymb}
+%% The amsthm package provides extended theorem environments
+%% \usepackage{amsthm}
+
+%% The lineno packages adds line numbers. Start line numbering with
+%% \begin{linenumbers}, end it with \end{linenumbers}. Or switch it on
+%% for the whole article with \linenumbers.
+%% \usepackage{lineno}
+
+%\usepackage{graphicx}
+%\graphicspath{ {./SI_images/} }
+
+\usepackage{tabularx}
+
+\usepackage{float} 
+\usepackage{tikz}
+\usepackage{longtable}
+\usepackage{bm}
+\usepackage{caption}
+\usepackage{arydshln}
+
+
+
+
+% for cross reference
+\newcommand*\mycommand[1]{\texttt{\emph{#1}}}
+\renewcommand{\thefigure}{S\arabic{figure}}
+\renewcommand{\thetable}{S\arabic{table}} 
+\renewcommand{\thepage}{S\arabic{page}}  
+
+\usepackage[symbol]{footmisc}
+\author{Barnabas P. Agbodekhe}
+\author{Dinis O. Abranches}
+\author{Montana N. Carlozo}
+\author{Kyla D. Jones}
+\author{Alexander W.~Dowling}
+\author{Edward J. Maginn}
+\email{ed@nd.edu}
+%\phone{+123 (0)123 4445556}
+%\fax{+123 (0)123 4445557}
+\affiliation[University of Notre Dame]
+{Department of Chemical and Biomolecular Engineering, University of Notre Dame, Notre Dame, IN 46556, USA}
+%\alsoaffiliation[Second University]{Department of Chemistry, Second University, Nearby Town}
+
+
+\title{Supporting Information for \\ Integrating Group Contribution Models with Gaussian Process Regression for Simple, Generalizable, and Accurate Thermophysical Property Prediction}
+
+\begin{document}
+\newpage
+
+\section{Methods}
+
+
+
+\subsection{GP Model Screening}
+%Talk about 3 model forms
+We implemented three separate GP model structures to improve the results of JR GC predictions. All three models require both the GC property predictions $\mathbf{y_{GC}}$ and molecular weights ($\mathbf{M.W}$) as inputs but make different assumptions about the relationship between the input features and experimental property data $\mathbf{y_{\text{exp}}}$. We denote $\mathbf{X} = [\mathbf{y_{GC}}, \mathbf{M.W}]$
+
+The first model shown in \eqref{Method_3} attempts to model the discrepancy between the GC predictions and experimental data using a GP. This method form is well-suited for properties where there is a clear correlation between the bias of the GC predictions and the experimental data. For a more robust implementation of this method, a mean function describing the bias with respect to input parameters should be added when clear. This model uses $m=0$, which reflects our belief that for GC models which are fairly accurate, bias should be negligible. 
+
+\begin{equation}
+    \mathbf{y_{\text{exp}}} - \mathbf{y_{GC}} = GP \sim \mathcal{N}\left(0, K(\mathbf{X}) \right)
+    \label{Method_3}
+\end{equation}
+
+The second GP model implementation in \eqref{Method_1} is the final model implementation which assumes $m = \mathbf{y_{GC}}$. This method is most suitable for property prediction data where $\mathbf{y_{GC}}$ is at least a somewhat faithful representation of $\mathbf{y_{\text{exp}}}$ and the relationship between $M.W$ and $\mathbf{y_{\text{exp}}}$ is unknown.
+
+\begin{equation}
+    \mathbf{y_{\text{exp}}} \sim  GP = \mathcal{N}\left(\mathbf{y_{GC}}, K(\mathbf{X}) \right)
+    \label{Method_1}
+\end{equation}
+
+The third GP model form in \eqref{Method_5} is a generalization of \eqref{Method_1} which includes tunable hyperparameters $A$ and $b$ in the mean function such that $m(\mathbf{x} \vert \mathbf{A},\mathbf{b}) = \mathbf{A}\mathbf{x} + \mathbf{b}$. This model is well suited for property predictions where the correlation of $M.W$ and $\mathbf{y_{\text{exp}}}$ is linear or when $\mathbf{y_{GC}}$ is a poor estimator of $\mathbf{y_{\text{exp}}}$.
+
+\begin{equation}
+    \mathbf{y_{\text{exp}}} \sim GP = \mathcal{N}\left( \beta_{0} \mathbf{M.W} + \beta_{1} \mathbf{y_{GC}} +\beta_{2} , K(\mathbf{X}) \right)
+    \label{Method_5}
+\end{equation}
+
+
+% The five methods (4 above and the final method) were implemented to predict heat of vaporization ($H_{vap}$  $\frac{kJ}{mol}$), melting temperature ($T_m$ (K)), boiling temperature ($T_b$ ($K$)), and critical volume ($V_c$ ($\frac{cm^3}{mol}$), temperature ($T_c$ ($K$)), and pressure ($P_c$ ($bar$)). For the initial implementation a SE kernel with an isotropic length scale and a white kernel was used. The set of hyperparameters with the lowest log likelihood was used to make predictions. From our analysis, we concluded that \eqref{Method_2} was not very useful as molecular weight alone was not informative enough to describe the discrepancy. This was indicated by high MAPD values. \eqref{Method_4} and \eqref{Method_5} often performed similarly with \eqref{Method_1} performing marginally worse. In the case where there was a strong correlation between discrepancy and the input features, \eqref{Method_3} yielded the lowest MAPD values. A table of the preliminary results can be found in the SI.
+
+\subsection{Kernel Function Screening}
+
+Section XX in the main text are the results of examining the effect of different kernels. Here, we elaborate on the different kernels. For this section, $d(\mathbf{x}, \mathbf{x}^{\prime})$ is the euclidean distance between data $\mathbf{x}$ and $\mathbf{x}^{\prime}$.
+
+The squared exponential kernel, also known as the radial basis function (RBF) is described by \eqref{se} and well-suited for modeling infinitely differentiable functions.
+
+\begin{equation}
+    k(\mathbf{x}, \mathbf{x}^{\prime}) = \exp\left(-\frac{d(\mathbf{x}, \mathbf{x}^{\prime})^2}{2\ell^2} \right)
+    \label{se}
+\end{equation}
+
+The Mat\`ern kernels are defined by their smoothness, $\nu$, and length scale $\ell$. As $\nu \rightarrow \infty$ the Mat\`ern kernel becomes equivalent to the RBF kernel and is thus a generalization of the RBF kernel. The general form of the Mat\`ern kernel is provided in \eqref{Matern} where $K_\nu(\cdot)$ is the modified Bessel function and $\Gamma(\cdot)$ is the gamma function. This kernel is a particularly good choice for functions which are differentiable a certain number of times.
+
+\begin{equation}
+    k_\nu(\mathbf{x}, \mathbf{x}^{\prime}, \nu) = \frac{2^{1-\nu}}{\Gamma(\nu)} \left( \sqrt{2\nu} \frac{d(\mathbf{x}, \mathbf{x}^{\prime})}{\ell} \right)^\nu K_\nu \left( \sqrt{2\nu} \frac{d(\mathbf{x}, \mathbf{x}^{\prime})}{\ell} \right)
+    \label{Matern}
+\end{equation}
+
+The power exponential kernels are popular due to good numerical stability from better covariance matrix condition numbers. Particularly common is the Gaussian kernel, in which hyperparameter $\alpha$ is set to $\alpha = 2$ \cite{Gramacy2020Surrogates:Sciences}. 
+
+\begin{equation}
+    k_{\alpha}(\mathbf{x}, \mathbf{x}^{\prime}, \nu) = \exp \Biggl\{- \left( \frac{d(\mathbf{x}, \mathbf{x}^{\prime})}{\sqrt{\ell}} \right)^\alpha \Biggl\} \text{for $0<\alpha \leq 2$,}
+    \label{Exp_kernel}
+\end{equation}
+
+The rational quadratic kernel described by \eqref{rq_kernel} is a hybrid between the $\alpha = 1$ and $\alpha =2$ power exponential kernels and has the advantage of being infinitely mean-square differentiable \cite{Gramacy2020Surrogates:Sciences}. This is the kernel function implemented in out final model.
+
+\begin{equation}
+    k(\mathbf{x}, \mathbf{x}^{\prime}) = \left(1 + \frac{d(\mathbf{x}, \mathbf{x}^{\prime})^2}{2\alpha l^2}\right)^{-\alpha}
+    \label{rq_kernel}
+\end{equation}
+
+Note, hyperparameters $\alpha$ and $\ell$ in these equations must be optimized based on the training data. We also note that any kernel listed can be either isotropic or anisotropic meaning that length scale $\ell$ is either a scalar or a vector with the same number of dimensions as $\mathbf{x}$.
+
+\subsection{Data Preprocessing}
+
+\subsubsection{Outlier Analysis Identifies Faulty Data (Barnabas)} 
+
+\subsubsection{Analysis of feature vs label data (Montana and Kyla) }
+% All extra 2D-only plots Montana made except Y_gc vs Y_exp plots go here with a brief discussion. (Y_gc vs Y_exp plots here will be duplicating 2D color-coded results in subsection 1 of results)  
+
+
+\section{Results and Discussion}
+
+\subsection{GC-GP hybrid models accurately predict properties and correct systematic bias (Barnabas)}
+% Discussion and table showing effect of white noise kernel settings on Tm model training 
+% Discussion on effects of train-test splits (and 'problematic data') on results
+
+\subsection{GC-GP hybrid model performance is robust across kernel and structure choices (Barnabas) }
+% Six big tables showing model performance metrics across all model-kernel (50 in total) combinations for all properties - one per property
+
+
+%\bibliography{refs}
+
+\end{document}
