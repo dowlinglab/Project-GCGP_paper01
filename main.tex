@@ -63,6 +63,8 @@
 \newcommand{\alltodo}[1]{{\color{cyan} (#1)}}
 \newcommand{\reals}{\ensuremath{\mathbb{R}}}
 \newcommand{\xvec}{\ensuremath{\mathbf{x}}}
+\usepackage{setspace}
+\doublespacing % needed for proper spacing of piecewise functions
 
 % this is for cross reference 
 \makeatletter
@@ -228,7 +230,7 @@ The mean function represents our prior beliefs on how the system behaves. In the
     \label{Method_final}
 \end{equation}
 
-The covariance matrix, often called the kernel, indicates how GP features relate to each other and the smoothness of the feature. In this work, the rational quadratic (RQ) kernel is used since it accounts for varying amounts of smoothness in each dataset through its hyperparameter $\alpha$. We also add a white kernel to account for uncertainty in the experimental data. The full kernel function for any two data points is defined by \eqref{kernel_final}. Mat\`ern $\frac{1}{2}$, Mat\`ern $\frac{3}{2}$, Mat\`ern $\frac{5}{2}$, and the squared exponential kernels are examined in section \ref{sec:kern_sweep} and are defined in SI section (reference SI section).
+The covariance matrix, often called the kernel, indicates how GP features relate to each other and the smoothness of the feature. In this work, the rational quadratic (RQ) kernel is used since it accounts for varying amounts of smoothness in each dataset through its hyperparameter $\alpha$. We also add a white kernel to account for uncertainty in the experimental data. The full kernel function for any two data points is defined by \eqref{kernel_final}. Mat\`ern $\frac{1}{2}$, Mat\`ern $\frac{3}{2}$, Mat\`ern $\frac{5}{2}$, and the SE kernels are examined in section \ref{sec:kern_sweep} and are defined in SI section (reference SI section).
 
 \begin{equation}
     k(\mathbf{x},\mathbf{x}^{\prime}) = \sigma_{rq}^2 \left(1 + \frac{d(\mathbf{x}, \mathbf{x}^{\prime})^2}{2\alpha \ell^2}\right)^{-\alpha} + \sigma_w^2\delta(\mathbf{x}, \mathbf{x}^{\prime})
@@ -261,8 +263,9 @@ GP models were implemented using GPflow \cite{Matthews2017GPflow:TensorFlow}. In
 
 We use the condition number to determine the numerical stability of our models. The condition number is an indication of how small perturbations in the inputs can affect the outputs \cite{Foster2009}. As a rule of thumb, the number of significant digits lost in addition to those from machine precision is proportional to the logarithmic scaled value of a condition number \cite{NumMathComput}. Ideally, a condition number should be as close to one as possible and a condition number that is much greater than one (in this case we used 500 as a cutoff) is ill-conditioned. That is, a small change in the inputs has significant impact on the output.
 
-%%% proprosed rewrite
-\kjnote{
+\alltodo{Do the primary authors think the reader knows what Baysian inference is? Maybe a paragraph long section before GP basics that says what it is on a high level followed by Bayes law would be helpful for vocab like likelihood, prior, evidence, etc.}
+\\
+\kjnote{Begin KJ proposal for explaining GPs
 \subsubsection{Gaussian Process Basics}
 A stochastic process is a (infinite) collection of random variables indexed by a set $\{\xvec\}$. A Gaussian process (GP) is a stochastic process where any finite number of random variables have a joint Gaussian distribution. We use $\xvec_i \in \reals^d$ to denote the index and $f: \reals^d \rightarrow \reals$ as a the random variable that is indexed by $\xvec$ (i.e., the stochastic process). A GP is specified by a mean function
 \begin{gather}
@@ -272,15 +275,15 @@ and a covariance function
 \begin{gather}
     k(\xvec, \xvec') := \text{Cov}\,[f(\xvec), f(\mathbf{x'})]. \label{eq: cov}
 \end{gather}
-We write the GP as
-\begin{gather}
-    f(\xvec)\sim \mathcal{GP}(m(\xvec), \, k(\xvec,\xvec')).
-\end{gather}
-By the definition of a GP, for any finite set $\xvec_1, \dots, \xvec_n$, we have
-\begin{gather}
-     \mathbf{f} \sim \mathcal{N}(\boldsymbol{\mu}, \mathbf{K})
-\end{gather}
-where $\mathbf{f}=(f(\xvec_1),  \dots, f(\xvec_n))^\intercal$ and $\boldsymbol{\mu} = (m(\xvec_1),  \dots, m(\xvec_n))^\intercal$ are a vectors of the latent function and the mean function, respectively, evaluated at the training inputs and
+We introduce the notation 
+\begin{gather*}
+    f(\xvec)\sim \mathcal{GP}(m(\xvec), \, k(\xvec,\xvec'))
+\end{gather*}
+to denote that $f(\cdot)$ follows a GP distribution with mean function $m(\cdot)$ and covariance function $k(\cdot,\cdot)$. Equivalently, by the definition of a GP, for any finite subset $\xvec_1, \dots, \xvec_n$ of the random variables, $\mathbf{f}=(f(\xvec_1),  \dots, f(\xvec_n))^\intercal$ follows a multivariate normal distribution with a mean vector and covariance matrix governed elementwise by \eqref{eq: mean} and \eqref{eq: cov}, respectively. That is,
+\begin{gather*}
+     \mathbf{f} \sim \mathcal{N}(\boldsymbol{\mu}, \mathbf{K}),
+\end{gather*}
+where $\boldsymbol{\mu} = (m(\xvec_n), \dots, m(\xvec_n))^\intercal$ and 
 \begin{gather}
     \mathbf{K} = 
     \left(
@@ -290,59 +293,57 @@ where $\mathbf{f}=(f(\xvec_1),  \dots, f(\xvec_n))^\intercal$ and $\boldsymbol{\
         k(\xvec_n,\xvec_1) & \dots & k(\xvec_n,\xvec_n)
     \end{matrix}\right).
 \end{gather}
-That is, any finite subset of the random variables $\mathbf{f}$ follows a multivariate normal distribution, with a mean vector and covariance matrix governed elementwise by \eqref{eq: mean} and \eqref{eq: cov}, respectively.
+
 
 In Bayesian nonparametrics, a GP is used as a prior for a random variable indexed by an infinite set. Upon observing a finite subset of these random variables, the posterior is another GP. This is commonly applied in regression settings to recover latent functions.
 
 \subsubsection{Model Selection and Kernels}
 \alltodo{other authors please confirm all kernel functions used in the models were covered here} \\
-Covariance functions often has some free parameters $\boldsymbol{\theta}$. We can choose different families of covariance functions. For example, the squared exponential (SE) (i.e., Gaussian) kernel is given by
+When modeling with GPs, the mean and covariance functions allows the modeler to encode their (lack or) prior information on the latent function. In mathematics, a \texit{kernel} refers to a function that defines a similarity measure between pairs of points. In the context of GPs, a kernel is a positive-definite function that defines the covariance structure. For example, the squared exponential (SE) (i.e., Gaussian) kernel is given by
 \begin{gather}
-    k_{\text{SE}}(\xvec_i,\xvec_j) = \sigma_f^2 \exp \left(-\frac{1}{2}\, \mathbf{r}^\intercal \,\boldsymbol{\Lambda}^{-1} \,\mathbf{r} \right)
+    k_{\text{SE}}(\xvec_i,\xvec_j) = \sigma_f^2 \exp \left(-\frac{1}{2}\, \mathbf{r}^\intercal \,\boldsymbol{\Lambda}^{-1} \,\mathbf{r} \right), \label{eq: sekernel}
 \end{gather}
-where $\mathbf{r} = \xvec_i - \xvec_j$, $\sigma_f^2 > 0$ is the amplitude (variance) of the process, and $\boldsymbol{\Lambda}$ is a matrix of lengthscales that control the smoothness of the function. The structure of $\boldsymbol{\Lambda}$ is used to model prior information about the process. 
+where $\mathbf{r} = \xvec_i - \xvec_j$, $\sigma_f^2$ is the amplitude (variance) of the process, and $\boldsymbol{\Lambda}$ is a matrix of length scales that control the smoothness of the function. We specify how a modeler can structure the length scale matrix to encode prior knowledge of the process at the end of this section. The SE kernel assumes the underlying function is infinitely differentiable. Thus, the SE kernel is widely used due to ability to model smooth functions \alltodo{advice needed: does this last sentence require a citation?}.
 
-A more general form of the SE kernel is the rational quadratic (RQ) kernel given by
+A more general form of \eqref{eq: sekernel} is the rational quadratic (RQ) kernel given by
 \begin{gather}
-    k_{\text{RQ}}(\xvec_i,\xvec_j) = \sigma_f^2 \left(1 +\frac{1}{2 \alpha} \,\mathbf{r}^\intercal \,\boldsymbol{\Lambda}^{-1} \,\mathbf{r} \right)^{-\alpha}.
+    k_{\text{RQ}}(\xvec_i,\xvec_j) = \sigma_f^2 \left(1 +\frac{1}{2 \alpha} \,\mathbf{r}^\intercal \,\boldsymbol{\Lambda}^{-1} \,\mathbf{r} \right)^{-\alpha}. \label{eq: rationalquadkernel}
 \end{gather}
-In the limit $\alpha \rightarrow \infty$, the RQ kernel is approximately the squared exponential kernel. Thus, RQ kernel is more flexible and can model a wider range of functions by adjusting the parameter $\alpha$.
-Finally, we review the Mat\'ern kernel.
+The RQ kernel can model a wider range of functions by adjusting the parameter $\alpha$. In the limit $\alpha \rightarrow \infty$, it is approximately the SE kernel \eqref{eq: sekernel}. Thus, the RQ kernel is more flexible than the SE kernel. If the modeler wishes the function to exhibit variations at multiple length scales, the RQ kernel is more suitable than the SE kernel.
 
+Finally, we review the Mat\'ern kernel governed by
 \begin{gather}
-    k_{\text{Mat\'ern}}(\xvec_i,\xvec_j) = \sigma_f^2 \,\frac{2^{1-\nu}}{\Gamma(\nu)} \, \left(\sqrt{2\nu} \, \mathbf{r}^\intercal \,\boldsymbol{\Lambda}^{-1} \,\mathbf{r} \right)^{\nu}\, K_\nu  \left(\sqrt{2\nu} \, \mathbf{r}^\intercal \,\boldsymbol{\Lambda}^{-1} \,\mathbf{r} \right)
+    k_{\text{Mat\'ern}}(\xvec_i,\xvec_j) = \sigma_f^2 \,\frac{2^{1-\nu}}{\Gamma(\nu)} \, \left(\sqrt{2\nu} \, \mathbf{r}^\intercal \,\boldsymbol{\Lambda}^{-1} \,\mathbf{r} \right)^{\nu}\, K_\nu  \left(\sqrt{2\nu} \, \mathbf{r}^\intercal \,\boldsymbol{\Lambda}^{-1} \,\mathbf{r} \right). \label{eq: maternkern}
 \end{gather}
-where $\nu$ is a smoothness parameter typically chosen by the modeler, $\Gamma(\cdot)$ is the Gamma function, and $K_\nu(\cdot)$ is the modified Bessel function of the second kind. 
+Here, $\nu$ is a smoothness parameter, $\Gamma(\cdot)$ is the Gamma function, and $K_\nu(\cdot)$ is the modified Bessel function of the second kind. Like the RQ kernel \eqref{eq: rationalquadkernel}, Matérn kernels are a generalization of the SE kernel. It can be shown that in the limit $\nu \rightarrow \infty$, the Mat\'ern kernel becomes the SE kernel. Moreover, the SE kernel assumes infinitely differentiable (smooth) functions, while the Matérn kernel allows for varying degrees of smoothness through $\nu$. These kernels can be useful when modeling real-world phenomena with unknown or varying smoothness, providing more flexibility. Common choices for $\nu$ in machine learning and GP regresison applications literature include 3/2 and 5/2 \alltodo{GP modeling authors: please include the citations here that motivated the decision to include these kernels}. 
 
-Like the RQ kernel, Matérn kernels are a generalization of the SE kernel. It can be shown that in the limit $\nu \rightarrow \infty$, the Mat\'ern kernel becomes the SE kernel. Moreover, the SE kernel assumes infinitely differentiable (smooth) functions, while the Matérn kernel allows for varying degrees of smoothness through $\nu$. These kernels can be useful when modeling real-world phenomena with unknown or varying smoothness, providing more flexibility. Common choices for $\nu$ in machine learning and GP regresison applications literature include 3/2 and 5/2 \alltodo{GP modeling authors: please include the citations here that motivated the decision to include these kernels}. 
+In principled inference, the structure of of the length scale matrix $\boldsymbol{\Lambda}$ is used to model (lack of) prior information about the function. In an isotropic GP, a single length scale is used for all input dimensions. Mathematically, this means the length scale matrix is written as $\boldsymbol{\Lambda} = \lambda^2 \, \mathbf{I}$. This modeling choice enforces that all input dimensions are equally important and have the same effect on the output. Alternatively, if one wanted to use separate length scales for each input dimension, one could elect to use an anisotropic kernel function with automatic relevance detection. This allows the kernel to capture the varying relevance of different dimensions, meaning some dimensions can be more influential than others in predicting the output. Mathematically, this means the length scale matrix is written as $\boldsymbol{\Lambda} = \text{diag}(\lambda_1^2,\dots,\lambda_d^2)$.
 
-In an isotropic GP, a single length scale is used for all input dimensions. Mathematically, this means $\boldsymbol{\Lambda} = \lambda^2 \, \mathbf{I}$. This modeling choice enforces that the kernel function assumes that all input dimensions are equally important and have the same effect on the output. Alternatively, if one wanted to use separate length scales are used for each input dimension, one could elect the SE kernel with automatic relevance detection. This allows the kernel to capture the varying relevance of different dimensions, meaning some dimensions can be more influential than others in predicting the output. Mathematically, this means the smoothing parameter matrix is $\boldsymbol{\Lambda} = \text{diag}(\lambda_1^2,\dots,\lambda_d^2)$.
-
-Covered in this section are common stationary GPs used in application literature. For a more generalized take on classes of kernel functions, we refer the interested reader to the perspective piece from \citeauthor{Genton} \cite{Genton}.
+In this section, we covered stationary kernel functions that are common in application literature for GPs \alltodo{citation needed?}. For a more generalized perspective on classes of kernel functions, we refer the interested reader to \citeauthor{Genton} \cite{Genton}.
 
 \subsubsection{Gaussian Processes for Regression}
 Consider the regression setting where we are supplied with a dataset $\mathcal{D} = \{(\xvec_i, y_i)\}_{i=1}^n$ composed of $n$ pairs of regressors $\xvec_i \in \reals^d$ and observations $y_i \in \reals$. The objective is to recover the latent data generating process $f(\cdot)$. In most practical settings, the underlying process is perturbed by noise $\varepsilon_i$. That is,
-\begin{gather}
+\begin{gather*}
     y_i = f(\xvec_i) + \varepsilon_i, \quad i \in \{1,\dots, n\},
-\end{gather}
-where $\varepsilon_i \stackrel{\text{i.i.d.}}{\sim} \mathcal{N}(0,\sigma^2)$. We assume that $f(\cdot)\sim \mathcal{GP}(m(\cdot),k(\cdot,\cdot))$. This is called the prior. By linearity of expectation,
-\begin{gather}
-    \mathbb{E}\,[y_i] = m(\xvec_i)
-\end{gather}
+\end{gather*}
+where $\varepsilon_i \stackrel{\text{i.i.d.}}{\sim} \mathcal{N}(0,\sigma^2)$. In GP regression (GPR), it is assumed that $f(\cdot)\sim \mathcal{GP}(m(\cdot),k(\cdot,\cdot))$. This assumption is called the prior. By linearity of expectation,
+\begin{gather*}
+    \mathbb{E}\,[y_i\,|\,\xvec_i] = m(\xvec_i)
+\end{gather*}
 and
-\begin{gather}
-    \text{Cov}\,[y_i, y_j] = k(\xvec_i, \xvec_j) + \sigma^2 \,\delta_{i,j},
-\end{gather}
-where $\delta_{i,j}$ is the Kronecker delta
-\begin{gather}
+\begin{gather*}
+    \text{Cov}\,[y_i\, | \,\xvec_i, y_j \, | \,\xvec_j] = k(\xvec_i, \xvec_j) + \sigma^2 \,\delta_{i,j},
+\end{gather*}
+where $\delta_{i,j}$ is the Kronecker delta function
+\begin{gather*}
     \delta_{i,j} = 
     \begin{cases}
-        1, & i=j,\\
-        0, & \text{otherwise}.
+        0, & i\neq j,\\
+        1, & i= j.
     \end{cases}
-\end{gather}
-We want to predict $f(\xvec^*)$ where $\xvec^*$ denotes a test set. By the GP prior on $f(\cdot)$, the finite set of training and test outputs follow a joint multivariate normal distribution. That is,
-\begin{gather}
+\end{gather*}
+The goal in the regression setting is to predict $f(\cdot)$ over a test set $\xvec^*$. By the GP prior on $f(\cdot)$, the finite set of training and test outputs follow a joint multivariate normal distribution. That is,
+\begin{gather*}
     \begin{bmatrix}
         \mathbf{y} \\
         \mathbf{f}_*
@@ -357,12 +358,12 @@ We want to predict $f(\xvec^*)$ where $\xvec^*$ denotes a test set. By the GP pr
         \mathbf{K}_{nn} +\sigma^2\,\mathbf{I} & \mathbf{K}_{n*} \\
         \mathbf{K}_{*n} & \mathbf{K}_{**}
     \end{bmatrix} \right).
-\end{gather}
+\end{gather*}
 Here, $\mathbf{K}_{nn}$ is the $n\times n$ covariance matrix defined on the training data,  $\mathbf{K}_{n*}$ is the $n \times |\text{test}|$ covariance matrix, etc. 
 
-To make predictions at new test points $\xvec^*$, we compute the conditional distribution of the test outputs given the training data. We can do so by computing the finite-dimensional conditional distribution. The conditional distribution is given by,
+\kjtodo{Left off here} To make predictions at new test points $\xvec_*$, one computes the conditional distribution of the test outputs given the training data $\mathbf{f}_* \,|\, \xvec, \mathbf{y}$. This is done by computing the finite-dimensional conditional distribution
 \begin{gather}
-    \mathbf{f}_* \,|\, \mathbf{y} \sim \mathcal{N}(\boldsymbol{\mu}_* + \mathbf{K}_{*n}\,(\mathbf{K}_{nn} +\sigma^2\,\mathbf{I})^{-1}\,(\mathbf{y}-\boldsymbol{\mu}), \mathbf{K}_{**} - \mathbf{K}_{∗n} \,(\mathbf{K}_{nn}+\sigma^2\,\mathbf{I})^{-1}\,\mathbf{K}_{n*}).   
+    \mathbf{f}_* \,|\, \xvec, \mathbf{y} \sim \mathcal{N}(\boldsymbol{\mu}_* + \mathbf{K}_{*n}\,(\mathbf{K}_{nn} +\sigma^2\,\mathbf{I})^{-1}\,(\mathbf{y}-\boldsymbol{\mu}), \mathbf{K}_{**} - \mathbf{K}_{∗n} \,(\mathbf{K}_{nn}+\sigma^2\,\mathbf{I})^{-1}\,\mathbf{K}_{n*}).   
 \end{gather}
 \subsubsection{Hyperparameter Estimation and Criteria for Model Selection}
 As shown in the kernel section \kjtodo{reference later}, the behavior of mean and kernel functions are somewhat dictated by their parameters $\boldsymbol{\theta}$ \kjtodo{retype with theta subscript}. If these are not chosen by the practitioner, they must be inferred from data. Furthermore, one might be interested in comparing the performance of several GP models and selecting the best performing model (i.e., model selection). The evidence (i.e., marginal likelihood) allows us to accomplish both.
@@ -403,10 +404,12 @@ Typically, $\delta(\cdot)$ is modeled using a Gaussian Process (GP), although an
 \end{gather}
 
 In this application, we do not have parameters $\boldsymbol{\theta}$ to estimate in the low-fidelity model. Moreover, estimation of $\zeta(\cdot)$ is accomplished by estimating the parameters in the GP mean and covariance functions.
-\alltodo{please confirm Jobac model has no parameters that are being fit}.}
+\alltodo{please confirm Jobac model has no parameters that are being fit}.
+}
 
 
 \subsection{Error Metrics}
+\alltodo{Do we need both MAPE and MAPD? They appear to be the same thing with one just multiplied by 100\%. Also, it's not anymore or less a prediction than the terms used in MAE or RMSE, so calling it prediciton error seems misleading. We also should change deviation to error with MADE because deviation and error are defined the same way mathematically in these equations.}
 We use mean absolute error (MAE), mean absolute prediction error (MAPE), mean absolute percent deviation (MAPD), coefficient of determination ($R^2$), and root mean squared error (RMSE) to quantify and critically analyze the error of our GP models. This section gives an overview of the definition of these error metrics. Note that in \eqref{eq:COD}, $\overline{y_{\text{exp}}}$ is the average value of $\mathbf{y}_{\text{exp}}$. 
 
 \begin{equation}
@@ -415,12 +418,12 @@ We use mean absolute error (MAE), mean absolute prediction error (MAPE), mean ab
 \end{equation}
 
 \begin{equation}
-    \text{MAPE} = \frac{1}{N} \sum_{i=1}^{N} \left| \frac{y_{\text{exp}_i} - \mu(\mathbf{x}_i)}{y_{\text{exp}_i}} \right|
+    \alltodo{\text{MAPE}} = \frac{1}{N} \sum_{i=1}^{N} \left| \frac{y_{\text{exp}_i} - \mu(\mathbf{x}_i)}{y_{\text{exp}_i}} \right|
     \label{eq:MAPE}
 \end{equation}
 
 \begin{equation}
-    \text{MAPD} = \frac{100\%}{N} \sum_{i=1}^{N} \left| \frac{y_{\text{exp}_i} - \mu(\mathbf{x}_i)}{y_{\text{exp}_i}} \right|
+    \text{MAP\alltodo{D}} = \frac{1}{N} \sum_{i=1}^{N} \left| \frac{y_{\text{exp}_i} - \mu(\mathbf{x}_i)}{y_{\text{exp}_i}} \right| \times 100\%
     \label{eq:MAPD}
 \end{equation}
 
