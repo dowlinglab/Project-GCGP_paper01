@@ -100,7 +100,7 @@ The third GP model form in \eqref{Method_5} is a generalization of \eqref{Method
 
 Section XX in the main text are the results of examining the effect of different kernels. Here, we elaborate on the different kernels. For this section, $d(\mathbf{x}, \mathbf{x}^{\prime})$ is the euclidean distance between data $\mathbf{x}$ and $\mathbf{x}^{\prime}$.
 
-The squared exponential kernel, also known as the radial basis function (RBF) is described by \eqref{se} and well-suited for modeling infinitely differentiable functions.
+The squared exponential kernel, also known as the radial basis function (RBF) is described by \eqref{se}. It assumes the underlying function is infinitely differentiable and is most useful for smooth functions.
 
 \begin{equation}
     k(\mathbf{x}, \mathbf{x}^{\prime}) = \exp\left(-\frac{d(\mathbf{x}, \mathbf{x}^{\prime})^2}{2\ell^2} \right)
@@ -114,19 +114,21 @@ The Mat\`ern kernels are defined by their smoothness, $\nu$, and length scale $\
     \label{Matern}
 \end{equation}
 
-The power exponential kernels are popular due to good numerical stability from better covariance matrix condition numbers. Particularly common is the Gaussian kernel, in which hyperparameter $\alpha$ is set to $\alpha = 2$ \cite{Gramacy2020Surrogates:Sciences}. 
-
-\begin{equation}
-    k_{\alpha}(\mathbf{x}, \mathbf{x}^{\prime}, \nu) = \exp \Biggl\{- \left( \frac{d(\mathbf{x}, \mathbf{x}^{\prime})}{\sqrt{\ell}} \right)^\alpha \Biggl\} \text{for $0<\alpha \leq 2$,}
-    \label{Exp_kernel}
-\end{equation}
-
-The rational quadratic kernel described by \eqref{rq_kernel} is a hybrid between the $\alpha = 1$ and $\alpha =2$ power exponential kernels and has the advantage of being infinitely mean-square differentiable \cite{Gramacy2020Surrogates:Sciences}. This is the kernel function implemented in out final model.
+The rational quadratic kernel described by \eqref{rq_kernel} is a hybrid is infinitely mean-square differentiable \cite{Gramacy2020Surrogates:Sciences} and is a more general form of the RBF kernel. Because the parameter $\alpha$ can be tuned, this function is equipped to handle functions with varying levels of smoothness. This is the kernel function implemented in our final model.
 
 \begin{equation}
     k(\mathbf{x}, \mathbf{x}^{\prime}) = \left(1 + \frac{d(\mathbf{x}, \mathbf{x}^{\prime})^2}{2\alpha l^2}\right)^{-\alpha}
     \label{rq_kernel}
 \end{equation}
+
+
+% The power exponential kernels are popular due to good numerical stability from better covariance matrix condition numbers. Particularly common is the Gaussian kernel, in which hyperparameter $\alpha$ is set to $\alpha = 2$ \cite{Gramacy2020Surrogates:Sciences}. 
+
+% \begin{equation}
+%     k_{\alpha}(\mathbf{x}, \mathbf{x}^{\prime}, \nu) = \exp \Biggl\{- \left( \frac{d(\mathbf{x}, \mathbf{x}^{\prime})}{\sqrt{\ell}} \right)^\alpha \Biggl\} \text{for $0<\alpha \leq 2$,}
+%     \label{Exp_kernel}
+% \end{equation}
+
 
 Note, hyperparameters $\alpha$ and $\ell$ in these equations must be optimized based on the training data. We also note that any kernel listed can be either isotropic or anisotropic meaning that length scale $\ell$ is either a scalar or a vector with the same number of dimensions as $\mathbf{x}$.
 
