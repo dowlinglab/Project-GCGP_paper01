@@ -203,7 +203,7 @@ Abstract
 \subsection{Joback and Reid GC Method}
 \subsection{Data Pre-processing} \label{sec:preprocess}
 %Analysis of feature vs label data and standardization (Montana and Kyla)
-To tailor a model capable of fitting multiple different properties with only one molecular descriptor and model form, the available data were analyzed for trends. Figures \ref{fig:Data_Vis_Disc} and \ref{fig:Data_Vis_Prop} demonstrate that the GC predictions and molecular weight are correlated with the experimental data for all properties of interest. Figure \ref{fig:Data_Vis_Disc} shows that the discrepancy between GC predictions and experimental data are zero and thus, linearly correlated for $H_{vap}$, $P_c$, $V_c$. This is desirable behavior as we would ideally like our GC model to be relatively unbiased. The GC models for $T_m$, $T_b$ and $T_c$ are much worse predictors of the experimental data and thus we observe a nonlinear trend indicated by nonzero trends in the discrepancy. Figure \ref{fig:Data_Vis_Prop} demonstrates correlation between molecular weight and the experimental data and GC predictions for $V_c$, $T_b$, and $T_m$. However the two-tail trend that we observe for the molecular weight correlations suggests that another descriptor should be added to fully explain the data. We observe that $H_{vap}$ does not have a strong correlation with molecular weight, and that $P_c$ exhibits a strong nonlinear trend suggesting that molecular weight is an excellent molecular descriptor for $P_c$ and subpar for $H_{vap}$. However, we note that multiple studies list a relationship between $H_{vap}$ and molecular weight and therefore conclude that molecular weight is an adequate molecular descriptor for all properties of interest. (todo: Barnabas add the studies you mentioned which support this)
+We begin the modeling creation process by thoroughly analyzing the trends in the data. Figures \ref{fig:Data_Vis_Disc} and \ref{fig:Data_Vis_Prop} demonstrate that the GC predictions and molecular weight are correlated with the experimental data for all properties of interest. Figure \ref{fig:Data_Vis_Disc} shows that the discrepancy between GC predictions and experimental data are zero and thus, linearly correlated for $H_{vap}$, $P_c$, $V_c$. This is desirable behavior as we would ideally like our GC model to be relatively unbiased. The GC models for $T_m$, $T_b$ and $T_c$ are much worse predictors of the experimental data and thus we observe a nonlinear trend indicated by nonzero trends in the discrepancy. Figure \ref{fig:Data_Vis_Prop} demonstrates correlation between molecular weight and the experimental data and GC predictions for $V_c$, $T_b$, and $T_m$. However the two-tail trend that we observe for the molecular weight correlations suggests that another descriptor should be added to fully explain the data. We observe that $H_{vap}$ does not have a strong correlation with molecular weight, and that $P_c$ exhibits a strong nonlinear trend suggesting that molecular weight is an excellent molecular descriptor for $P_c$ and subpar for $H_{vap}$. However, we note that multiple studies list a relationship between $H_{vap}$ and molecular weight and therefore conclude that molecular weight is an adequate molecular descriptor for all properties of interest. (todo: Barnabas add the studies you mentioned which support this)
 
 \begin{figure}[H]
     \centering
@@ -223,50 +223,75 @@ To tailor a model capable of fitting multiple different properties with only one
 
 \subsection{GP Modeling}
 %Stratified sampling (Dinis)
-When splitting data into training and testing sets, an 80/20 split was used and all features and labels were standardized to have zero mean and unit variance using the scikit-learn StandardScaler \cite{scikit-learn} . Stratified sampling was used to split the data. (Dinis to add more details).
+When splitting data into training and testing sets, an 80/20 split was used and all features and labels were standardized to have zero mean and unit variance using the scikit-learn StandardScaler \cite{scikit-learn} . Stratified sampling was used to split the data. (Dinis to add more details). Additionally, we standardize all feature and label data by removing the mean and scaling to unit variance.
 
 %Introduction to a kernel function and mean and variance predictions
-To describe a Gaussian Process (GP), consider a dataset $D = \{(\mathbf{x}_i, y_{\text{exp}_i}) \vert \mathbf{x}_i \in \mathbb{R}^d, \text{ and } y_{\text{exp}_i} \in \mathbb{R}, \forall \, i \in \{1,. . ., n\}$ with inputs $\mathbf{X}$ and outputs $\mathbf{y_{\text{exp}}}$. Here $\mathbf{x}$ represents a GC model prediction ($y_{GC}$) and molecular weight ($M.W$) for a given molecule, and $y_{\text{exp}}$ represents experimental prediction for any property. If we assume that experimental data noise is independent and identically distributed with zero mean and constant variance, $\sigma_{y_{\text{exp}_i}}^2$,it follows that $y_{\text{exp}_i} = f(\mathbf{x}_i) + \epsilon$ where the noise is defined by $\epsilon \sim \mathbb{N}(0,\sigma_{y_{\text{exp}_i}}^2)$. The GP then seeks to estimate $y_{\text{exp}_i} = f(\mathbf{x}_i) + \epsilon$ \cite{Frazier2018AOptimization}. A GP is defined as a multivariate normal distribution with mean function, $m(\mathbf{x}\vert \mathbf{h})$ for $m(\mathbf{x}\vert \mathbf{h}): \mathbb{R}^d \rightarrow \mathbb{R}$, and covariance matrix, $\Sigma(\mathbf{x}_i, \mathbf{x}^{\prime} \vert \mathbf{h})$ for $\Sigma: \mathbb{R}^d \times \mathbb{R}^d \rightarrow \mathbb{R}$ with respect to GP hyperparameters, $\mathbf{h}$.
+\mcnote{GP Introduction. A short alternative to KJ's description below. Can be updated to match KJ notation and "GPs in the context of this work" if wanted}
 
-The mean function represents our prior beliefs on how the system behaves. In the context of using GC predictions to train a GP model, we determined that the discrepancy of the JR GC model and experimental data is a function of molecular weight but that the relationship between the two was not always immediately obvious. However in all cases we expect that JR GC model and the experimental property data to be linearly proportional. As such, while we use both molecular weight and JR GC predictions as training data features, we implement a linear mean function which relies solely on the original JR GC predictions. We fix the hyperparameters associated with the mean function such that $m(\mathbf{x}\vert \mathbf{h}) = \mathbf{y_{GC}}$. We note that from a purely modeling perspective, the best accuracy will be achieved by modeling each property separately with a different GP mean function and covariance matrix given the trends in the available data. However, this requires modeling expertise and given that much of the data range for each property with regards to molecular weight has already been explored, we opt to use one general model framework which is likely to capture all properties under study in this work and any future properties of interest. Other model forms which were considered can be found in SI section XX. We then define our GP model for any given property as indicated by \eqref{Method_final}. Note that we denote the full kernel matrix $K(\cdot)$ instead of $K(\cdot, \cdot^{\prime})$ for convenience when $\cdot = \cdot^{\prime}$ .
+\mcnote{To describe a Gaussian Process (GP), consider a dataset $D = \{(\xvec_i, \yexp[i]\}) \vert \xvec_i \in \mathbb{R}^d, \text{ and } \yexp[i] \in \mathbb{R}, \forall \, i \in \{1,. . ., n\}$ with inputs $\mathbf{X}$ and outputs $\yexpvec[]$. Here $\xvec$ represents the GC model predictions ($\Ygcvec$) and molecular weight ($\textbf{M.W}$) for all molecules $n$, and $\yexpvec$ represents the experimental predictions for any property $y$. If we assume that experimental data noise is independent and identically distributed with zero mean and constant variance, $\sigma_{\yexp[i]}^2$,it follows that $\yexp[i] = f(\xvec_i) + \epsilon$ where the noise is defined by $\epsilon \sim \mathcal{N}(0,\sigma_{\yexp[i]}^2)$. The GP then seeks to estimate $\yexp[i] = f(\xvec_i) + \epsilon$ as a normal distribution with mean function, $m(\xvec_i)$ for $m(\xvec_i): \mathbb{R}^d \rightarrow \mathbb{R}$, and covariance matrix, $k(\xvec_i, \xvec_i^{\prime})$ for $k: \mathbb{R}^d \times \mathbb{R}^d \rightarrow \mathbb{R}$ \cite{Frazier2018AOptimization}. We then define our GP model for all $\mathbf{X}$:
+\begin{gather*}
+     \yexpvec \sim \mathcal{GP} = \mathcal{N}(\boldsymbol{\mu}, \mathbf{K})
+\end{gather*}
+
+\noindent where $\boldsymbol{\mu} = (m(\xvec_1), \dots, m(\xvec_n))^\intercal$ and
+\begin{gather}
+    \mathbf{K}= 
+    \left(
+    \begin{matrix}
+        k(\xvec_1,\xvec_1) & \dots & k(\xvec_1,\xvec_n) \\
+        \vdots & \ddots & \vdots \\
+        k(\xvec_n,\xvec_1) & \dots & k(\xvec_n,\xvec_n)
+    \end{matrix}\right).
+\end{gather}
+
+We note that from a purely modeling perspective, the best accuracy will be achieved by modeling each property separately with a different GP mean function and covariance matrix given the trends in the available data. However, this requires modeling expertise and given that much of the data range for each property with regards to molecular weight has already been explored, we opt to use one general model framework which is likely to capture all properties under study in this work and any future properties of interest. In the context of using GC predictions to train a GP model, we determined that the discrepancy of the JR-GC model and experimental data is a function of molecular weight but that the relationship between the two was not always immediately obvious. However in all cases we expect that JR-GC model and the experimental property data to be linearly proportional. As such, while we use both molecular weight and JR-GC predictions as training data features, we implement a linear mean function which relies solely on the original JR-GC predictions. We fix the hyperparameters associated with the mean function such that $\boldsymbol{\mu} = \Ygcvec$.  Other model forms which were considered can be found in SI section XX. 
+
+The covariance matrix, often called the kernel, indicates how GP features relate to each other and the smoothness of the feature. In this work, the rational quadratic (RQ) kernel is used since it accounts for varying amounts of smoothness in each dataset through hyperparameter $\alpha$. We also add a white kernel to account for uncertainty in the experimental data. The full kernel function for any two data points is defined by \eqref{kernel_final}. Mat\`ern $\frac{1}{2}$, Mat\`ern $\frac{3}{2}$, Mat\`ern $\frac{5}{2}$, and the SE kernels are examined in section \ref{sec:kern_sweep} and are defined in SI section (reference SI section).
 
 \begin{equation}
-    \mathbf{y_{\text{exp}}} \sim GP = \mathcal{N}\left( \mathbf{y_{GC}}, K(\mathbf{X}) \right)
-    \label{Method_final}
-\end{equation}
-
-The covariance matrix, often called the kernel, indicates how GP features relate to each other and the smoothness of the feature. In this work, the rational quadratic (RQ) kernel is used since it accounts for varying amounts of smoothness in each dataset through its hyperparameter $\alpha$. We also add a white kernel to account for uncertainty in the experimental data. The full kernel function for any two data points is defined by \eqref{kernel_final}. Mat\`ern $\frac{1}{2}$, Mat\`ern $\frac{3}{2}$, Mat\`ern $\frac{5}{2}$, and the SE kernels are examined in section \ref{sec:kern_sweep} and are defined in SI section (reference SI section).
-
-\begin{equation}
-    k(\mathbf{x},\mathbf{x}^{\prime}) = \sigma_{rq}^2 \left(1 + \frac{d(\mathbf{x}, \mathbf{x}^{\prime})^2}{2\alpha \ell^2}\right)^{-\alpha} + \sigma_w^2\delta(\mathbf{x}, \mathbf{x}^{\prime})
+    k(\xvec_i,\xvec_j) = \sigma_f^2 \left(1 +\frac{1}{2 \alpha} \,\mathbf{r}^\intercal \,{\ell}^{-1} \,\mathbf{r} \right)^{-\alpha} + \sigma_w^2\delta_{i,j}
     \label{kernel_final}
 \end{equation}
 
-\noindent where:
-\begin{itemize}
-  \item \( \sigma_{rq}^2 \) is the signal variance of the RQ kerenl,
-  \item \( \ell \) is the length scale,
-  \item \( \alpha \) is a shape parameter,
-  \item \( \sigma_w^2 \) is the variance of the noise,
-  \item \( d(\mathbf{x}, \mathbf{x}^{\prime})^2 \) is the squared euclidean distance between the input points \( \mathbf{x}_i \) and \( \mathbf{x}_j \),
-  \item \( \delta(\mathbf{x}, \mathbf{x}^{\prime}) \) is the Kronecker delta which applies noise to the data when \( \mathbf{x} = \mathbf{x}^{\prime} \).
-\end{itemize}
-
-We note that hyperparameters $\alpha$, $\ell$, $\sigma_{rq}$, and $\sigma_{w}$ must be inferred from the data. Given this kernel and model structure, predictions for any data $\mathbf{x}^{new}$ can be computed with the following mean $\boldsymbol{\mu}(\mathbf{x})$ and variance $\Sigma(\mathbf{x})$ \cite{Gramacy2020Surrogates:Sciences}.
-
+\noindent where  $\mathbf{r} = \xvec_i - \xvec_j$, $\sigma_f^2$ is the amplitude (variance) of the process, and $\ell$ is a length scale which controls the smoothness of the function, $\sigma_w$ is the variance of the experimental noise, applied through the Kronecker delta function $\delta_{i,j}$:
 \begin{gather*}
-\boldsymbol{\mu}(\mathbf{x}^{new}) = \Sigma{(\mathbf{x}^{new},\mathbf{X}\vert \mathbf{h})} \Sigma_{\mathbf{X}}^{-1} \mathbf{\mathbf{y}}
-\end{gather*}
-\begin{gather*}
-\Sigma(\mathbf{x}^{new}) = \Sigma(\mathbf{x}^{new} \vert \mathbf{h}) - \Sigma(\mathbf{x}^{new},\mathbf{X} \vert \mathbf{h}) \Sigma_{\mathbf{X}}^{-1} \Sigma(\mathbf{X},\mathbf{x}^{new}\vert \mathbf{h})
+    \delta_{i,j} = 
+    \begin{cases}
+        0, & i\neq j,\\
+        1, & i= j.
+    \end{cases}
 \end{gather*}
 
-In our notation, $\Sigma$ is a covariance matrix and a scalar variance is $\sigma^2$. Given these predictions, we can undo our scaling transformation on our GP predictions to obtain the values in the correct units.
+We note that hyperparameters $\alpha$, $\ell$, $\sigma_{f}$, and $\sigma_{w}$ must be inferred from the data. 
+
+To make predictions about some new data set $\xvec^*$ we note that our training and new data follow a joint multivariate normal distribution. That is,
+\begin{gather*}
+    \begin{bmatrix}
+        \mathbf{y} \\
+        \mathbf{y}_*
+    \end{bmatrix}
+    \sim 
+    \mathcal{N}\left(
+    \begin{bmatrix}
+        \boldsymbol{\mu}\\
+        \boldsymbol{\mu}_*
+    \end{bmatrix},
+    \begin{bmatrix}
+        \mathbf{K}_{nn} & \mathbf{K}_{n*} \\
+        \mathbf{K}_{*n} & \mathbf{K}_{**}
+    \end{bmatrix} \right).
+\end{gather*}
+
+\noindent Predictions $\mathbf{y}_*$ can then be described by the conditional distribution of the new data set given the training data set.
+
+\begin{gather}
+    \mathbf{y}_* \,|\, \xvec, \mathbf{y} \sim \mathcal{N}(\boldsymbol{\mu}_* + \mathbf{K}_{*n}\,(\mathbf{K}_{nn})^{-1}\,(\mathbf{y}-\boldsymbol{\mu}), \mathbf{K}_{**} - \mathbf{K}_{∗n} \,(\mathbf{K}_{nn})^{-1}\,\mathbf{K}_{n*}).   
+\end{gather}
 
 %General implementation details
-GP models were implemented using GPflow \cite{Matthews2017GPflow:TensorFlow}. In this work, a white kernel is used to account for experimental noise and the hyperparameter is trained starting from an initial value calculated from the average experimental uncertainty when available. The hyperparameter tuning was implemented using scipy.optimize \cite{Virtanen2020SciPyPython} with the Limited-memory Broyden–Fletcher–Goldfarb–Shanno Bound (L-BFGS-B) algorithm to perform maximum likelihood estimation and was repeated ten times to avoid local hyperparameter solutions. On the first training pass, hyperparameters were all initialized at 1.0. On subsequent repeats, $\ell$, $\sigma^2_w$, and $\alpha$ were uniformly selected from bounds $[0.1, 100]$, $[0.05, 10]$, and $[0.1, 100]$  respectively. Bounds for these parameters after optimization were also set.
+GP models were implemented using GPflow \cite{Matthews2017GPflow:TensorFlow}. In this work, a white kernel is used to account for experimental noise and $\sigma_w$ is always trained starting from an initial value of 1.0. The hyperparameter tuning was implemented using scipy.optimize \cite{Virtanen2020SciPyPython} with the Limited-memory Broyden–Fletcher–Goldfarb–Shanno Bound (L-BFGS-B) algorithm to perform maximum likelihood estimation and was repeated ten times to avoid local hyperparameter solutions. On the first training pass, hyperparameters were all initialized at 1.0. On subsequent repeats, $\ell$, $\sigma^2_{rq}$, and $\alpha$ were uniformly selected from bounds $(0, 100]$, $(0, 1.0]$, and $(0, 100]$  respectively. Optimization bounds for $\ell$ and $\sigma^2_{rq}$ were set as $[10^{-5}, 10^2]$ and optimization bounds for $\alpha$ were set to $[10^{-5}, 5\times 10^3]$.
 
-We use the condition number to determine the numerical stability of our models. The condition number is an indication of how small perturbations in the inputs can affect the outputs \cite{Foster2009}. As a rule of thumb, the number of significant digits lost in addition to those from machine precision is proportional to the logarithmic scaled value of a condition number \cite{NumMathComput}. Ideally, a condition number should be as close to one as possible and a condition number that is much greater than one (in this case we used 500 as a cutoff) is ill-conditioned. That is, a small change in the inputs has significant impact on the output.
+We use the condition number to determine the numerical stability of our models. The condition number is an indication of how small perturbations in the inputs can affect the outputs \cite{Foster2009}. As a rule of thumb, the number of significant digits lost in addition to those from machine precision is proportional to the logarithmic scaled value of a condition number \cite{NumMathComput}. Ideally, a condition number should be as close to one as possible and a condition number that is much greater than one (in this case we used 500 as a cutoff) is ill-conditioned. That is, a small change in the inputs has significant impact on the output.}
 
 \alltodo{Do the primary authors think the reader knows what Baysian inference is? Maybe a paragraph long section before GP basics that says what it is on a high level followed by Bayes law would be helpful for vocab like likelihood, prior, evidence, etc.}
 \mcnote{The readers will not know what Bayesian inference is, but I think a whole paragraph to explain these terms might not be necessary. You've done a good job of explaining them in your sections below.}
@@ -385,7 +410,7 @@ We determined in section XX that the discrepancy of the JR-GC model for each pro
     \label{kernel_final}
 \end{equation} 
 
-GP models were implemented using GPflow \cite{Matthews2017GPflow:TensorFlow}. In this work, a white kernel is used to account for experimental noise and the hyperparameter is trained starting from an initial value calculated from the average experimental uncertainty when available. The hyperparameter tuning was implemented using scipy.optimize \cite{Virtanen2020SciPyPython} with the Limited-memory Broyden–Fletcher–Goldfarb–Shanno Bound (L-BFGS-B) algorithm to perform maximum likelihood estimation and was repeated ten times to avoid local hyperparameter solutions. On the first training pass, hyperparameters were all initialized at 1.0. On subsequent repeats, $\ell$, $\sigma^2_w$, and $\alpha$ were uniformly selected from bounds $[0.1, 100]$, $[0.05, 10]$, and $[0.1, 100]$  respectively. Bounds for these parameters after optimization were also set.
+GP models were implemented using GPflow \cite{Matthews2017GPflow:TensorFlow}. The hyperparameter tuning was implemented using scipy.optimize \cite{Virtanen2020SciPyPython} with the Limited-memory Broyden–Fletcher–Goldfarb–Shanno Bound (L-BFGS-B) algorithm to perform maximum likelihood estimation and was repeated ten times to avoid local hyperparameter solutions. On the first training pass, hyperparameters were all initialized at 1.0. On subsequent repeats, $\ell$ and $\alpha$ were uniformly selected from bounds $(0, 100]$ and $(0, 100]$ respectively. $\sigma^2_f$ was selected from a log-normal distribution with bounds $[0,1.0]$ and $\sigma_w$ was always initialized at $1.0$. A more nuanced method would be to initialize $\sigma_w$ as the scaled experimental uncertainty when available. Optimization bounds for $\alpha$ were set to $[10^{-5}, 10^2]$ and all other hyperparameters were optimized within bounds $[10^{-5}, 5\times 10^3]$.
 
 We use the condition number to determine the numerical stability of our models. The condition number is an indication of how small perturbations in the inputs can affect the outputs \cite{Foster2009}. As a rule of thumb, the number of significant digits lost in addition to those from machine precision is proportional to the logarithmic scaled value of a condition number \cite{NumMathComput}. Ideally, a condition number should be as close to one as possible and a condition number that is much greater than one (in this case we used 500 as a cutoff) is ill-conditioned. That is, a small change in the inputs has significant impact on the output.
 
