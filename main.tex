@@ -9,6 +9,7 @@
 \usepackage{amssymb}
 \usepackage{amsmath}
 \usepackage{comment}
+\usepackage[dvipsnames]{xcolor} % moved to earlier to avoid options class
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Place any additional packages needed here.  Only include packages
 %% which are essential, to avoid problems later.
@@ -41,6 +42,8 @@
 \usepackage{caption}
 \usepackage{arydshln}
 \usepackage{xr} % for cross reference
+\usepackage{placeins}
+\usepackage{subcaption}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%% Barnabas' Added packages %%%%%%%%%%%%%
@@ -58,13 +61,18 @@
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%% KJ commands
-\usepackage{xcolor}
-\newcommand{\kjnote}[1]{{\color{blue} (#1)}}
-\newcommand{\mcnote}[1]{{\color{purple} (#1)}}
-\newcommand{\kjtodo}[1]{{\color{red} (#1)}}
-\newcommand{\alltodo}[1]{{\color{cyan} (#1)}}
+\newcommand{\kjnote}[1]{{\color{Blue} (\texttt{kjnote}: #1)}}
+\newcommand{\kjtodo}[1]{{\color{Red} (\texttt{kjtodo}: #1)}}
+\newcommand{\alltodo}[1]{{\color{Cyan} (\texttt{alltodo}: #1)}}
 \newcommand{\reals}{\ensuremath{\mathbb{R}}}
 \newcommand{\xvec}{\ensuremath{\mathbf{x}}}
+\newcommand{\xmatrix}{\ensuremath{\mathbf{X}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%% AD commands
+\newcommand{\adnote}[1]{{\color{OliveGreen} (\texttt{adnote}: #1)}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% MC Commands
+\newcommand{\mcnote}[1]{{\color{Plum} (\texttt{mcnote}: #1)}}
 \newcommand{\MW}{\ensuremath{\text{M.W}}}
 \newcommand{\Ygc}[1][]{\ensuremath{y_{\text{GC}_{#1}}}}
 \newcommand{\Ygcvec}[1][]{\ensuremath{\mathbf{y}_{\text{GC}_{#1}}}}
@@ -177,6 +185,15 @@ Abstract
 %% Start the main part of the manuscript here.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\emph{The following are color coded commands for notes. This will be removed before we submit!}
+\begin{enumerate}
+    \item \kjtodo{TODO note for KJ}
+    \item \kjnote{Note from KJ to herself or the team}
+    \item \alltodo{TODO note for the team}
+    \item \mcnote{Note from MC to herself or the team}
+    \item \adnote{Note from AWD}
+\end{enumerate}
+
 \section{Introduction}
 
 
@@ -227,8 +244,10 @@ When splitting data into training and testing sets, an 80/20 split was used and 
 
 %Introduction to a kernel function and mean and variance predictions
 \mcnote{GP Introduction. A short alternative to KJ's description below. Can be updated to match KJ notation and "GPs in the context of this work" if wanted}
+\adnote{I believe the following text was from MC. I took it out of a mcnote to make the color black.}
 
-\mcnote{To describe a Gaussian Process (GP), consider a dataset $D = \{(\xvec_i, \yexp[i]\}) \vert \xvec_i \in \mathbb{R}^d, \text{ and } \yexp[i] \in \mathbb{R}, \forall \, i \in \{1,. . ., n\}$ with inputs $\mathbf{X}$ and outputs $\yexpvec[]$. Here $\xvec$ represents the GC model predictions ($\Ygcvec$) and molecular weight ($\textbf{M.W}$) for all molecules $n$, and $\yexpvec$ represents the experimental predictions for any property $y$. If we assume that experimental data noise is independent and identically distributed with zero mean and constant variance, $\sigma_{\yexp[i]}^2$,it follows that $\yexp[i] = f(\xvec_i) + \epsilon$ where the noise is defined by $\epsilon \sim \mathcal{N}(0,\sigma_{\yexp[i]}^2)$. The GP then seeks to estimate $\yexp[i] = f(\xvec_i) + \epsilon$ as a normal distribution with mean function, $m(\xvec_i)$ for $m(\xvec_i): \mathbb{R}^d \rightarrow \mathbb{R}$, and covariance matrix, $k(\xvec_i, \xvec_i^{\prime})$ for $k: \mathbb{R}^d \times \mathbb{R}^d \rightarrow \mathbb{R}$ \cite{Frazier2018AOptimization}. We then define our GP model for all $\mathbf{X}$:
+
+To describe a Gaussian Process (GP), consider a dataset $D = \{(\xvec_i, \yexp[i]\}) \vert \xvec_i \in \mathbb{R}^d, \text{ and } \yexp[i] \in \mathbb{R}, \forall \, i \in \{1,. . ., n\}$ with inputs $\mathbf{X}$ and outputs $\yexpvec[]$. Here $\xvec$ represents the GC model predictions ($\Ygcvec$) and molecular weight ($\textbf{M.W}$) for all molecules $n$, and $\yexpvec$ represents the experimental predictions for any property $y$. If we assume that experimental data noise is independent and identically distributed with zero mean and constant variance, $\sigma_{\yexp[i]}^2$,it follows that $\yexp[i] = f(\xvec_i) + \epsilon$ where the noise is defined by $\epsilon \sim \mathcal{N}(0,\sigma_{\yexp[i]}^2)$. The GP then seeks to estimate $\yexp[i] = f(\xvec_i) + \epsilon$ as a normal distribution with mean function, $m(\xvec_i)$ for $m(\xvec_i): \mathbb{R}^d \rightarrow \mathbb{R}$, and covariance matrix, $k(\xvec_i, \xvec_i^{\prime})$ for $k: \mathbb{R}^d \times \mathbb{R}^d \rightarrow \mathbb{R}$ \cite{Frazier2018AOptimization}. We then define our GP model for all $\mathbf{X}$:
 \begin{gather*}
      \yexpvec \sim \mathcal{GP} = \mathcal{N}(\boldsymbol{\mu}, \mathbf{K})
 \end{gather*}
@@ -284,21 +303,21 @@ To make predictions about some new data set $\xvec^*$ we note that our training 
 
 \noindent Predictions $\mathbf{y}_*$ can then be described by the conditional distribution of the new data set given the training data set.
 
-\begin{gather}
-    \mathbf{y}_* \,|\, \xvec, \mathbf{y} \sim \mathcal{N}(\boldsymbol{\mu}_* + \mathbf{K}_{*n}\,(\mathbf{K}_{nn})^{-1}\,(\mathbf{y}-\boldsymbol{\mu}), \mathbf{K}_{**} - \mathbf{K}_{∗n} \,(\mathbf{K}_{nn})^{-1}\,\mathbf{K}_{n*}).   
-\end{gather}
+% \begin{gather}
+%     \mathbf{y}_* \,|\, \xvec, \mathbf{y} \sim \mathcal{N}(\boldsymbol{\mu}_* + \mathbf{K}_{*n}\,(\mathbf{K}_{nn})^{-1}\,(\mathbf{y}-\boldsymbol{\mu}), \mathbf{K}_{**} - \mathbf{K}_{∗n} \,(\mathbf{K}_{nn})^{-1}\,\mathbf{K}_{n*}).   
+% \end{gather}
 
 %General implementation details
 GP models were implemented using GPflow \cite{Matthews2017GPflow:TensorFlow}. In this work, a white kernel is used to account for experimental noise and $\sigma_w$ is always trained starting from an initial value of 1.0. The hyperparameter tuning was implemented using scipy.optimize \cite{Virtanen2020SciPyPython} with the Limited-memory Broyden–Fletcher–Goldfarb–Shanno Bound (L-BFGS-B) algorithm to perform maximum likelihood estimation and was repeated ten times to avoid local hyperparameter solutions. On the first training pass, hyperparameters were all initialized at 1.0. On subsequent repeats, $\ell$, $\sigma^2_{rq}$, and $\alpha$ were uniformly selected from bounds $(0, 100]$, $(0, 1.0]$, and $(0, 100]$  respectively. Optimization bounds for $\ell$ and $\sigma^2_{rq}$ were set as $[10^{-5}, 10^2]$ and optimization bounds for $\alpha$ were set to $[10^{-5}, 5\times 10^3]$.
 
-We use the condition number to determine the numerical stability of our models. The condition number is an indication of how small perturbations in the inputs can affect the outputs \cite{Foster2009}. As a rule of thumb, the number of significant digits lost in addition to those from machine precision is proportional to the logarithmic scaled value of a condition number \cite{NumMathComput}. Ideally, a condition number should be as close to one as possible and a condition number that is much greater than one (in this case we used 500 as a cutoff) is ill-conditioned. That is, a small change in the inputs has significant impact on the output.}
+We use the condition number to determine the numerical stability of our models. The condition number is an indication of how small perturbations in the inputs can affect the outputs \cite{Foster2009}. As a rule of thumb, the number of significant digits lost in addition to those from machine precision is proportional to the logarithmic scaled value of a condition number \cite{NumMathComput}. Ideally, a condition number should be as close to one as possible and a condition number that is much greater than one (in this case we used 500 as a cutoff) is ill-conditioned. That is, a small change in the inputs has significant impact on the output.
 
 \alltodo{Do the primary authors think the reader knows what Baysian inference is? Maybe a paragraph long section before GP basics that says what it is on a high level followed by Bayes law would be helpful for vocab like likelihood, prior, evidence, etc.}
 \mcnote{The readers will not know what Bayesian inference is, but I think a whole paragraph to explain these terms might not be necessary. You've done a good job of explaining them in your sections below.}
 \\
-\kjnote{Begin KJ proposal for explaining GPs
+\kjnote{Begin KJ proposal for explaining GPs}
 \subsubsection{Gaussian Process Basics}
-A stochastic process is a (infinite) collection of random variables indexed by a set $\{\xvec\}$. A Gaussian process (GP) is a stochastic process where any finite number of random variables have a joint Gaussian distribution. We use $\xvec_i \in \reals^d$ to denote the index and $f: \reals^d \rightarrow \reals$ as a the random variable that is indexed by $\xvec$ (i.e., the stochastic process). A GP is specified by a mean function
+A stochastic process is a (infinite) collection of random variables indexed by a set $\{\xvec\}$. A Gaussian process (GP) is a stochastic process where any finite number of random variables have a joint Gaussian distribution. Let $\xvec_i \in \reals^d$ denote an index and $f: \reals^d \rightarrow \reals$ denote a random variable that is indexed by $\xvec$ (i.e., the stochastic process). A GP is specified by a mean function
 \begin{gather}
     m(\xvec) := \mathbb{E}\,[f(\xvec)] \label{eq: mean}
 \end{gather}
@@ -306,16 +325,9 @@ and a covariance function
 \begin{gather}
     k(\xvec, \xvec') := \text{Cov}\,[f(\xvec), f(\mathbf{x'})]. \label{eq: cov}
 \end{gather}
-We introduce the notation 
-\begin{gather*}
-    f(\xvec)\sim \mathcal{GP}(m(\xvec), \, k(\xvec,\xvec'))
-\end{gather*}
-to denote that $f(\cdot)$ follows a GP distribution with mean function $m(\cdot)$ and covariance function $k(\cdot,\cdot)$. Equivalently, by the definition of a GP, for any finite subset $\xvec_1, \dots, \xvec_n$ of the random variables, $\mathbf{f}=(f(\xvec_1),  \dots, f(\xvec_n))^\intercal$ follows a multivariate normal distribution with a mean vector and covariance matrix governed elementwise by \eqref{eq: mean} and \eqref{eq: cov}, respectively. That is,
-\begin{gather*}
-     \mathbf{f} \sim \mathcal{N}(\boldsymbol{\mu}, \mathbf{K}),
-\end{gather*}
-where $\boldsymbol{\mu} = (m(\xvec_n), \dots, m(\xvec_n))^\intercal$ and 
-\begin{gather}
+The notation $f(\xvec)\sim \mathcal{GP}(m(\xvec), \, k(\xvec,\xvec'))$
+denotes that $f(\cdot)$ follows a GP distribution with mean function $m(\cdot)$ and covariance function $k(\cdot,\cdot)$. Equivalently, by the definition of a GP, for any finite subset $\xvec_1, \dots, \xvec_n$ of the random variables, $\mathbf{f}=(f(\xvec_1),  \dots, f(\xvec_n))^\intercal$ follows a multivariate normal distribution with a mean vector and covariance matrix governed elementwise by \eqref{eq: mean} and \eqref{eq: cov}, respectively. That is, $\mathbf{f} \sim \mathcal{N}(\boldsymbol{\mu}, \mathbf{K}),$ where $\boldsymbol{\mu} = (m(\xvec_n), \dots, m(\xvec_n))^\intercal$ and
+\begin{gather} 
     \mathbf{K} = 
     \left(
     \begin{matrix}
@@ -325,19 +337,17 @@ where $\boldsymbol{\mu} = (m(\xvec_n), \dots, m(\xvec_n))^\intercal$ and
     \end{matrix}\right).
 \end{gather}
 
-
 In Bayesian nonparametrics, a GP is used as a prior for a random variable indexed by an infinite set. Upon observing a finite subset of these random variables, the posterior is another GP. This is commonly applied in regression settings to recover latent functions.
 
 \subsubsection{Model Selection and Kernels}
-\alltodo{other authors please confirm all kernel functions used in the models were covered here} 
-\mcnote{They are}\\
-When modeling with GPs, the mean and covariance functions allows the modeler to encode their (lack or) prior information on the latent function. 
 
-In mathematics, a \texit{kernel} refers to a function that defines a similarity measure between pairs of points. In the context of GPs, a kernel is a positive-definite function that defines the covariance structure. For example, the squared exponential (SE) (i.e., Gaussian) kernel is given by
+When deploying GPs for regression, (lack of) prior information of the latent function is encoded through the mean and covariance functions. \kjtodo{write a sentence here about the mean function} This section focuses on how to choose stationary kernel functions for modeling the covariance of the GP that are common in application literature \kjtodo{references needed}. For a more generalized perspective on classes of kernel functions, the interested reader is referred to \citeauthor{Genton} \cite{Genton}.
+
+In mathematics, a \textit{kernel} refers to a function that defines a similarity measure between pairs of points. In the context of GPs, a kernel is a positive-definite function that defines the covariance structure. For example, the squared exponential (SE) (i.e., Gaussian) kernel is given by
 \begin{gather}
     k_{\text{SE}}(\xvec_i,\xvec_j) = \sigma_f^2 \exp \left(-\frac{1}{2}\, \mathbf{r}^\intercal \,\boldsymbol{\Lambda}^{-1} \,\mathbf{r} \right), \label{eq: sekernel}
 \end{gather}
-where $\mathbf{r} = \xvec_i - \xvec_j$, $\sigma_f^2$ is the amplitude (variance) of the process, and $\boldsymbol{\Lambda}$ is a matrix of length scales that control the smoothness of the function. We specify how a modeler can structure the length scale matrix to encode prior knowledge of the process at the end of this section. The SE kernel assumes the underlying function is infinitely differentiable. Thus, the SE kernel is widely used due to ability to model smooth functions \alltodo{advice needed: does this last sentence require a citation?}.
+where $\mathbf{r} = \xvec_i - \xvec_j$ is the distance between two points, $\sigma_f^2$ is the variance of the process, and $\boldsymbol{\Lambda}$ is a matrix of length scales that control the smoothness of the function. The SE kernel assumes the underlying function is infinitely differentiable. Thus, the SE kernel is widely used due to ability to model smooth functions \alltodo{advice needed: does this last sentence require a citation?}. Furthermore, a modeler can structure the length scale matrix $\boldsymbol{\Lambda}$ to encode additional smoothness assumptions of the underlying function. This is covered in detail at the end of this section. 
 
 A more general form of \eqref{eq: sekernel} is the rational quadratic (RQ) kernel given by
 \begin{gather}
@@ -349,34 +359,32 @@ Finally, we review the Mat\'ern kernel governed by
 \begin{gather}
     k_{\text{Mat\'ern}}(\xvec_i,\xvec_j) = \sigma_f^2 \,\frac{2^{1-\nu}}{\Gamma(\nu)} \, \left(\sqrt{2\nu} \, \mathbf{r}^\intercal \,\boldsymbol{\Lambda}^{-1} \,\mathbf{r} \right)^{\nu}\, K_\nu  \left(\sqrt{2\nu} \, \mathbf{r}^\intercal \,\boldsymbol{\Lambda}^{-1} \,\mathbf{r} \right). \label{eq: maternkern}
 \end{gather}
-Here, $\nu$ is a smoothness parameter, $\Gamma(\cdot)$ is the Gamma function, and $K_\nu(\cdot)$ is the modified Bessel function of the second kind. Like the RQ kernel \eqref{eq: rationalquadkernel}, Matérn kernels are a generalization of the SE kernel. It can be shown that in the limit $\nu \rightarrow \infty$, the Mat\'ern kernel becomes the SE kernel. Moreover, the SE kernel assumes infinitely differentiable (smooth) functions, while the Matérn kernel allows for varying degrees of smoothness through $\nu$. These kernels can be useful when modeling real-world phenomena with unknown or varying smoothness, providing more flexibility. Common choices for $\nu$ in machine learning and GP regresison applications literature include 3/2 and 5/2 \alltodo{GP modeling authors: please include the citations here that motivated the decision to include these kernels}. 
+Here, $\nu$ is a smoothness parameter, $\Gamma(\cdot)$ is the Gamma function, and $K_\nu(\cdot)$ is the modified Bessel function of the second kind. Like the RQ kernel \eqref{eq: rationalquadkernel}, Matérn kernels are a generalization of the SE kernel. It can be shown that in the limit $\nu \rightarrow \infty$, the Mat\'ern kernel becomes the SE kernel. Moreover, the SE kernel assumes infinitely differentiable (smooth) functions, while the Matérn kernel allows for varying degrees of smoothness through $\nu$. These kernels can be useful when modeling real-world phenomena with unknown or varying smoothness, thereby providing more flexibility. Common choices for $\nu$ in machine learning and GP regresison applications literature include 3/2 and 5/2 \alltodo{GP modeling authors: please include the citations here that motivated the decision to include these kernels}. 
 
-In principled inference, the structure of of the length scale matrix $\boldsymbol{\Lambda}$ is used to model (lack of) prior information about the function. In an isotropic GP, a single length scale is used for all input dimensions. Mathematically, this means the length scale matrix is written as $\boldsymbol{\Lambda} = \lambda^2 \, \mathbf{I}$. This modeling choice enforces that all input dimensions are equally important and have the same effect on the output. Alternatively, if one wanted to use separate length scales for each input dimension, one could elect to use an anisotropic kernel function with automatic relevance detection. This allows the kernel to capture the varying relevance of different dimensions, meaning some dimensions can be more influential than others in predicting the output. Mathematically, this means the length scale matrix is written as $\boldsymbol{\Lambda} = \text{diag}(\lambda_1^2,\dots,\lambda_d^2)$.
-
-In this section, we covered stationary kernel functions that are common in application literature for GPs \alltodo{citation needed?}. For a more generalized perspective on classes of kernel functions, we refer the interested reader to \citeauthor{Genton} \cite{Genton}.
+In principled inference, the structure of of the length scale matrix $\boldsymbol{\Lambda}$ is used to model (lack of) prior information about the function. In an isotropic GP, a single length scale is used for all input dimensions. Mathematically, this means the length scale matrix is written as $\boldsymbol{\Lambda} = \lambda^2 \, \mathbf{I}$. This modeling choice enforces that all input dimensions are equally important and have the same effect on the output. Alternatively, if one wanted to use separate length scales for each input dimension, one could elect to use kernels \eqref{eq: sekernel} - \eqref{eq: maternkern} with automatic relevance detection. This allows the kernel to capture the varying relevance of different dimensions, meaning some dimensions can be more influential than others in predicting the output. Mathematically, this means the length scale matrix is written as $\boldsymbol{\Lambda} = \text{diag}(\lambda_1^2,\dots,\lambda_d^2)$.
 
 \subsubsection{Gaussian Processes for Regression}
-Consider the regression setting where we are supplied with a dataset $\mathcal{D} = \{(\xvec_i, y_i)\}_{i=1}^n$ composed of $n$ pairs of regressors $\xvec_i \in \reals^d$ and observations $y_i \in \reals$. The objective is to recover the latent data generating process $f(\cdot)$. In most practical settings, the underlying process is perturbed by noise $\varepsilon_i$. That is,
+Consider the regression setting in which a modeler is supplied with a dataset $\mathcal{D} = \{(\xvec_i, y_i)\}_{i=1}^n$ composed of $n$ pairs of regressors $\xvec_i \in \reals^d$ and observations $y_i \in \reals$. The objective is to recover the latent data generating process $f(\cdot)$. In most practical settings, the underlying process is perturbed by noise $\varepsilon$. That is,
 \begin{gather*}
     y_i = f(\xvec_i) + \varepsilon_i, \quad i \in \{1,\dots, n\},
 \end{gather*}
-where $\varepsilon_i \stackrel{\text{i.i.d.}}{\sim} \mathcal{N}(0,\sigma^2)$. In GP regression (GPR), it is assumed that $f(\cdot)\sim \mathcal{GP}(m(\cdot),k(\cdot,\cdot))$. This assumption is called the prior. By linearity of expectation,
+where $\varepsilon_i \stackrel{\text{i.i.d.}}{\sim} \mathcal{N}(0,\sigma_n^2)$. In GP regression (GPR) \alltodo{remove this acronym if not used later on in the text}, it is assumed that $f(\cdot)\sim \mathcal{GP}(m(\cdot),k(\cdot,\cdot))$. This assumption is called the prior. By linearity of expectation,
 \begin{gather*}
     \mathbb{E}\,[y_i\,|\,\xvec_i] = m(\xvec_i)
 \end{gather*}
 and
 \begin{gather*}
-    \text{Cov}\,[y_i\, | \,\xvec_i, y_j \, | \,\xvec_j] = k(\xvec_i, \xvec_j) + \sigma^2 \,\delta_{i,j},
+    \text{Cov}\,[y_i\, | \,\xvec_i, y_j \, | \,\xvec_j] = k(\xvec_i, \xvec_j) + \sigma_n^2 \,h_{i,j},
 \end{gather*}
-where $\delta_{i,j}$ is the Kronecker delta function
+where $h_{i,j}$ is the Kronecker delta function
 \begin{gather*}
-    \delta_{i,j} = 
+    h_{i,j} = 
     \begin{cases}
         0, & i\neq j,\\
         1, & i= j.
     \end{cases}
 \end{gather*}
-The goal in the regression setting is to predict $f(\cdot)$ over a test set $\xvec^*$. By the GP prior on $f(\cdot)$, the finite set of training and test outputs follow a joint multivariate normal distribution. That is,
+The goal in the regression setting is to predict $f(\cdot)$ over a test set $\xmatrix_*$. By the GP prior on $f(\cdot)$, the finite set of training and test outputs follow a joint multivariate normal distribution. That is,
 \begin{gather*}
     \begin{bmatrix}
         \mathbf{y} \\
@@ -389,16 +397,64 @@ The goal in the regression setting is to predict $f(\cdot)$ over a test set $\xv
         \boldsymbol{\mu}_*
     \end{bmatrix},
     \begin{bmatrix}
-        \mathbf{K}_{nn} +\sigma^2\,\mathbf{I} & \mathbf{K}_{n*} \\
-        \mathbf{K}_{*n} & \mathbf{K}_{**}
+        \mathbf{K} +\sigma_n^2\,\mathbf{I} & \mathbf{K}_* \\
+        \mathbf{K}^\intercal_* & \mathbf{K}_{**}
     \end{bmatrix} \right).
 \end{gather*}
-Here, $\mathbf{K}_{nn}$ is the $n\times n$ covariance matrix defined on the training data,  $\mathbf{K}_{n*}$ is the $n \times |\text{test}|$ covariance matrix, etc. 
-
-\kjtodo{Left off here} To make predictions at new test points $\xvec_*$, one computes the conditional distribution of the test outputs given the training data $\mathbf{f}_* \,|\, \xvec, \mathbf{y}$. This is done by computing the finite-dimensional conditional distribution
+Here, $\mathbf{K}_*$ is the $n \times |\text{test}|$ covariance matrix and $\mathbf{K}_{**}$ is the $|\text{test}| \times |\text{test}|$ covariance matrix. 
+To make predictions at the test points $\xmatrix_{*}$, one can leverage the conditional distribution of the test outputs given the training data $\mathcal{D}$. This is done with the finite-dimensional conditional distribution
 \begin{gather}
-    \mathbf{f}_* \,|\, \xvec, \mathbf{y} \sim \mathcal{N}(\boldsymbol{\mu}_* + \mathbf{K}_{*n}\,(\mathbf{K}_{nn} +\sigma^2\,\mathbf{I})^{-1}\,(\mathbf{y}-\boldsymbol{\mu}), \mathbf{K}_{**} - \mathbf{K}_{∗n} \,(\mathbf{K}_{nn}+\sigma^2\,\mathbf{I})^{-1}\,\mathbf{K}_{n*}).   
+    \mathbf{f}_* \,|\, \xmatrix_*, \mathcal{D} \sim \mathcal{N}(\mathbf{K}_{*}^\intercal \,(\mathbf{K} +\sigma_n^2 \mathbf{I})^{-1}\,(\mathbf{y}-\boldsymbol{\mu}),  \mathbf{K}_{**} - \mathbf{K}_{*}^\intercal \,(\mathbf{K}+\sigma_n^2\,\mathbf{I})^{-1}\,\mathbf{K}_{*}).   \label{eq: gppredict}
 \end{gather}
+Note that this is the predictive distribution for $\mathbf{f}_*$. The predictive distribution for $\mathbf{y}_*$ can be obtained by adding $\sigma_n^2\, \mathbf{I}$ to the covariance in \eqref{eq: gppredict}.
+
+\subsubsection{Hyperparameter Estimation and Criteria for Model Selection}
+As shown in the \alltodo{Model Selection and Kernels section, rename if you change this name}, the behavior of mean and kernel functions are somewhat dictated by their parameters $\boldsymbol{\theta} = (\sigma_n^2, \sigma_f, \lambda_1,\dots,\lambda_d)^\intercal$. If the elements of $\boldsymbol{\theta}$ are not chosen by the practitioner, they must be inferred from the sample data $\mathcal{D}$. Furthermore, one might be interested in comparing the performance of several GP models and selecting the best performing model. The evidence (i.e., marginal likelihood) accomplishes both objectives.
+
+The evidence is given by
+\begin{gather*}
+    p(\mathbf{y}\, | \, \xmatrix) = \int p(\mathbf{y}\, | \, \mathbf{f}) \,  p(\mathbf{f}\, | \, \xmatrix) \, \text{d}\mathbf{f},
+\end{gather*}
+where we marginalize over the the function values $\mathbf{f}$. Given that both $p(\mathbf{y}\, | \, \mathbf{f})$ and $ p(\mathbf{f}\, | \, \mathbf{X})$ are Gaussian, the marginal likelihood can be computed in closed form. Moreover, the marginal likelihood has distribution
+\begin{gather*}
+    \mathbf{y}\, | \, \mathbf{X} \sim \mathcal{N}(\boldsymbol{\mu}, \mathbf{K} + \sigma_n^2 \,\mathbf{I}),
+\end{gather*}
+and the expression for the evidence is the p.d.f. of this distribution
+\begin{gather*}
+    p(\mathbf{y}\, | \, \mathbf{X}) = (2\pi)^{-n/2}\,\vert \mathbf{K} + \sigma_n^2 \,\mathbf{I}\vert^{-1/2}\,\exp \left( -\frac{1}{2}\,(\mathbf{y}-\boldsymbol{\mu})^\intercal \, (\mathbf{K} + \sigma_n^2 \,\mathbf{I})^{-1}\,(\mathbf{y}-\boldsymbol{\mu})\right),
+\end{gather*}
+where $|\cdot|$ is the determinant. In practice, the negative log evidence is minimized to find the optimal $\hat{\boldsymbol{\theta}}$, that is
+\begin{gather}
+    \hat{\boldsymbol{\theta}} = \arg \min_{\boldsymbol{\theta}} \, \frac{n}{2}\log{2\pi} + \frac{1}{2}\log{|\mathbf{K} + \sigma_n^2 \,\mathbf{I}|} +  \frac{1}{2}\,(\mathbf{y}-\boldsymbol{\mu})^\intercal \, (\mathbf{K} + \sigma_n^2 \,\mathbf{I})^{-1}\,(\mathbf{y}-\boldsymbol{\mu}). \label{eq: lml}
+\end{gather}
+The terms in \eqref{eq: lml} aid in model selection as follows. The first component is the normalization constant, the second component is the model complexity penalty, and the third component is the model first to the data. A smaller model fit term indicates better model fit. The determinant of the covariance matrix reflects the area or volume of the function space covered by the model \kjtodo{make sure its both area and volume}. Thus, the larger (smaller) the determinant, the greater (lesser) the complexity of the model. Thus, \eqref{eq: lml} balances the tradeoff between minimizing complexity and maximizing model fit.
+\kjnote{end of proposed text on GP modeling}
+
+
+\subsection{Hybrid Modeling}
+\alltodo{Feel free to move this section wherever it fits best}
+\kjnote{begin text from KJ}\\
+In their seminal work, statisticians \citeauthor{koh} \cite{koh} developed a framework for Bayesian calibration of computer models, which has become commonplace in the physical sciences. \kjtodo{write review about this}\\
+
+Given $n$ observations $\mathbf{y}=(y_1,\dots,y_n)^\intercal$ generated by manipulating a controlled variable $\xvec_i = (x_{i,1},\dots,x_{i,d})^\intercal$, the goal of model calibration is to find the underlying mapping $\zeta: \mathbb{R}^d \rightarrow \mathbb{R}$ that describes the physical scenario. This relationship is written as
+\begin{gather}
+    y_i = \zeta(\mathbf{x}_i) + \varepsilon_i, \quad i \in \{1,\dots,n\}. \label{eq: trueprocess}
+\end{gather}
+
+In practice, $\zeta(\cdot)$ is unknown, and the modeler must rely on a simulation or lower-fidelity model denoted $\eta(\mathbf{x}, \boldsymbol{\theta})$. The model has parameters $\boldsymbol{\theta}=(\theta_1,\dots,\theta_p)^\intercal$ that need to be estimated from data. To account for discrepancy in the model $\eta(\cdot,\cdot)$, a model discrepancy function $\delta: \mathbb{R}^d \rightarrow \mathbb{R}$ is included. This leads to:
+\begin{gather}
+     y_i = \zeta(\mathbf{x}_i) + \varepsilon_i = \eta(\mathbf{x}_i,\boldsymbol{\theta}) + \delta(\mathbf{x}_i) + \varepsilon_i, \quad i \in \{1,\dots,n\}.
+\end{gather}
+
+Typically, $\delta(\cdot)$ is modeled using a Gaussian Process (GP), although any nonparametric method can be used in practice. If $\eta(\cdot,\cdot)$ is computationally expensive, it can also be represented as a GP. In this work, it is assumed that $\eta(\cdot,\cdot)$ can be modeled directly and $\delta(\cdot)\sim \mathcal{GP}(m(\cdot),k(\cdot,\cdot))$. Thus, the hybrid model reduces to the GP
+\begin{gather}
+    \zeta(\mathbf{x}) \sim \mathcal{GP}(\eta(\mathbf{x},\boldsymbol{\theta}) + m(\mathbf{x}), k(\mathbf{x}, \mathbf{x}'))
+\end{gather}
+
+In this application, there are no parameters $\boldsymbol{\theta}$ to estimate in the low-fidelity model. Moreover, estimation of $\zeta(\cdot)$ is accomplished by estimating the parameters in the GP mean and covariance functions.
+\alltodo{please confirm Jobac model has no parameters that are being fit}.
+
+\kjnote{end text from KJ}
 
 \subsection{GPs in the context of this work}
 In this work, we define $\mathcal{D} = \{(\Ygc[i], \text{M.W}_i), \yexp[i])\}_{i=1}^n$ for all molecules $n$ and any property of interest $y \in [H_{vap}, P_c, T_c, T_b ,T_M, V_c]$. We define $\Ygc[i] \text{ } \forall \text{ } i\in n$ as JR-GC model predictions, $\text{M.W}_i \text{ } \forall \text{ } i\in n$ as the molecular weights, and $\yexp[i] \text{ } \forall \text{ } i\in n$ as the experimental values. We begin by noting that from a modeling perspective, the best accuracy will be achieved by analyzing trends in the available data and setting the GP mean and covariance functions to capture those trends. However, this requires modeling expertise and given that much of the data range for each property with regards to molecular weight has already been explored, we opt to use one general model framework which is likely to capture all properties under study in this work and any future properties of interest. The effect of model form on our results is examined in section \ref{sec:kern_sweep}.
@@ -410,52 +466,9 @@ We determined in section XX that the discrepancy of the JR-GC model for each pro
     \label{kernel_final}
 \end{equation} 
 
-GP models were implemented using GPflow \cite{Matthews2017GPflow:TensorFlow}. The hyperparameter tuning was implemented using scipy.optimize \cite{Virtanen2020SciPyPython} with the Limited-memory Broyden–Fletcher–Goldfarb–Shanno Bound (L-BFGS-B) algorithm to perform maximum likelihood estimation and was repeated ten times to avoid local hyperparameter solutions. On the first training pass, hyperparameters were all initialized at 1.0. On subsequent repeats, $\ell$ and $\alpha$ were uniformly selected from bounds $(0, 100]$ and $(0, 100]$ respectively. $\sigma^2_f$ was selected from a log-normal distribution with bounds $[0,1.0]$ and $\sigma_w$ was always initialized at $1.0$. A more nuanced method would be to initialize $\sigma_w$ as the scaled experimental uncertainty when available. Optimization bounds for $\alpha$ were set to $[10^{-5}, 10^2]$ and all other hyperparameters were optimized within bounds $[10^{-5}, 5\times 10^3]$.
+GP models were implemented using GPflow \cite{Matthews2017GPflow:TensorFlow} (version \adnote{fill in}). The hyperparameter tuning was implemented using scipy.optimize \cite{Virtanen2020SciPyPython} (version: \adnote{fill in}) with the Limited-memory Broyden–Fletcher–Goldfarb–Shanno Bound (L-BFGS-B) algorithm to perform maximum likelihood estimation and was repeated ten times to avoid local hyperparameter solutions. On the first training pass, hyperparameters were all initialized at 1.0. On subsequent repeats, $\ell$ and $\alpha$ were uniformly selected from bounds $(0, 100]$ and $(0, 100]$ respectively. $\sigma^2_f$ was selected from a log-normal distribution with bounds $[0,1.0]$ and $\sigma_w$ was always initialized at $1.0$. A more nuanced method would be to initialize $\sigma_w$ as the scaled experimental uncertainty when available. Optimization bounds for $\alpha$ were set to $[10^{-5}, 10^2]$ and all other hyperparameters were optimized within bounds $[10^{-5}, 5\times 10^3]$.
 
 We use the condition number to determine the numerical stability of our models. The condition number is an indication of how small perturbations in the inputs can affect the outputs \cite{Foster2009}. As a rule of thumb, the number of significant digits lost in addition to those from machine precision is proportional to the logarithmic scaled value of a condition number \cite{NumMathComput}. Ideally, a condition number should be as close to one as possible and a condition number that is much greater than one (in this case we used 500 as a cutoff) is ill-conditioned. That is, a small change in the inputs has significant impact on the output.
-
-\subsubsection{Hyperparameter Estimation and Criteria for Model Selection}
-As shown in the kernel section \kjtodo{reference later}, the behavior of mean and kernel functions are somewhat dictated by their parameters $\boldsymbol{\theta}$ \kjtodo{retype with theta subscript}. If these are not chosen by the practitioner, they must be inferred from data. Furthermore, one might be interested in comparing the performance of several GP models and selecting the best performing model (i.e., model selection). The evidence (i.e., marginal likelihood) allows us to accomplish both.
-
-The evidence is given by
-\begin{gather}
-    p(\mathbf{y}\, | \, \xvec) = \int p(\mathbf{y}\, | \, \mathbf{f}) \,  p(\mathbf{f}\, | \, \xvec) \, \text{d}\mathbf{f},
-\end{gather}
-where we marginalize over the the function values $\mathbf{f}$. Given that both $p(\mathbf{y}\, | \, \mathbf{f})$ and $ p(\mathbf{f}\, | \, \mathbf{X})$ are Gaussian, the marginal likelihood can be computed in closed form. Moreover, the marginal likelihood has distribution,
-\begin{gather}
-    \mathbf{y}\, | \, \mathbf{X} \sim \mathcal{N}(\boldsymbol{\mu}, \mathbf{K}_{nn} + \sigma^2 \,\mathbf{I}),
-\end{gather}
-or
-\begin{gather}
-    p(\mathbf{y}\, | \, \mathbf{X}) = (2\pi)^{-n/2}\,\text{det}(\mathbf{K}_{nn} + \sigma^2 \,\mathbf{I})^{-1}\,\exp \left( -\frac{1}{2}(\mathbf{y}-\boldsymbol{\mu})^\intercal \, (\mathbf{K}_{nn} + \sigma^2 \,\mathbf{I})^{-1}\,(\mathbf{y}-\boldsymbol{\mu})\right)
-\end{gather}
-}
-
-\subsection{Hybrid Modeling}
-\alltodo{Feel free to move this section wherever it fits best}\\
-
-\kjnote{\\
-In their seminal work, statisticians \kjtodo{cite KOH} developed a framework for Bayesian calibration of computer models, which has become commonplace in the physical sciences. \kjtodo{write review about this}\\
-
-Given $n$ observations $\mathbf{y}=(y_1,\dots,y_n)^\intercal$ generated by manipulating a controlled variable $\xvec_i = (x_{i,1},\dots,x_{i,d})^\intercal$, the goal of model calibration is to find the underlying mapping $\zeta: \mathbb{R}^d \rightarrow \mathbb{R}$ that describes the physical scenario. This relationship is written as
-\begin{gather}
-    y_i = \zeta(\mathbf{x}_i) + \varepsilon_i, \quad i = 1,\dots,n. \label{eq: trueprocess}
-\end{gather}
-
-In practice, $\zeta(\cdot)$ is unknown, and we rely on a simulation or lower-fidelity model denoted $\eta(\mathbf{x}, \boldsymbol{\theta})$. The model has parameters $\boldsymbol{\theta}=(\theta_1,\dots,\theta_p)^\intercal$ that need to be estimated from data. To account for discrepancy in the model $\eta(\cdot,\cdot)$, a model discrepancy function $\delta: \mathbb{R}^d \rightarrow \mathbb{R}$ is included. This leads to:
-\begin{gather}
-     y_i = \zeta(\mathbf{x}_i) + \varepsilon_i = \eta(\mathbf{x}_i,\boldsymbol{\theta}) + \delta(\mathbf{x}_i) + \varepsilon_i, \quad i = 1,\dots,n.
-\end{gather}
-
-Typically, $\delta(\cdot)$ is modeled using a Gaussian Process (GP), although any nonparametric method can be used in practice. If $\eta(\cdot,\cdot)$ is computationally expensive, it can also be represented as a GP. In this work, we assume that $\eta(\cdot,\cdot)$ can be modeled directly and $\delta(\cdot)\sim \mathcal{GP}(m(\cdot),k(\cdot,\cdot))$. Thus, the hybrid model reduces to the GP
-\begin{gather}
-    \zeta(\mathbf{x}) \sim \mathcal{GP}(\eta(\mathbf{x},\boldsymbol{\theta}) + m(\mathbf{x}), k(\mathbf{x}, \mathbf{x}'))
-\end{gather}
-
-In this application, we do not have parameters $\boldsymbol{\theta}$ to estimate in the low-fidelity model. Moreover, estimation of $\zeta(\cdot)$ is accomplished by estimating the parameters in the GP mean and covariance functions.
-\alltodo{please confirm Jobac model has no parameters that are being fit}.
-}
-
 
 \subsection{Error Metrics}
 \alltodo{Do we need both MAPE and MAPD? Should we change "deviation" to "error"?.}
@@ -790,16 +803,55 @@ We use mean absolute error (MAE), mean absolute prediction error (MAPE), mean ab
 %Final Parity plots will go here
 
 \subsection{Uncertainty Analysis}
-To assess the numerical stability of the final models, the condition number was examined.
-%Kyla to add more
+For every thermophysical property considered, \alltodo{best performing GP??} was
+\begin{figure}
+    \centering
+    \includegraphics[width=0.75\linewidth]{images/error_bar_chart.png}
+    \caption{Error vs. thermophysical property of selected GP models. Salmon (green) represents mean absolute error (root mean squared error). Solid colors (stripes) represent the training (testing) data. \alltodo{I know these colors are strange, they were chosen to be cvd friendly. Thoughts?}}
+    \label{fig:enter-label}
+\end{figure}
 
-\subsection{Extensability of Other GC Models and Properties}
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{images/lml_bar_chart_Hvap.png}
+    \caption{\alltodo{Primary authors, please help me figure out a better naming system for the x-axis of these plots. If possible, can we exclude some models so the plots are smaller? I'm not sure what the boolean flag is at the end of the results in the kernel sweep folder. We can make one subplot for all thermophysical properties once we narrow down which architectures we want to present}. Log evidence (i.e., marginal likelihood) vs. model architecture for heat of vaporization used in kernel sweep. The maximum log evidence is plotted in red.}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{images/lml_bar_chart_Pc.png}
+    \caption{Log evidence (i.e., marginal likelihood) vs. model architecture for critical pressure used in kernel sweep. The maximum log evidence is plotted in red.}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{images/lml_bar_chart_Tb.png}
+    \caption{Log evidence (i.e., marginal likelihood) vs. model architecture for boiling temperature used in kernel sweep. The maximum log evidence is plotted in red.}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{images/lml_bar_chart_Tc.png}
+    \caption{Log evidence (i.e., marginal likelihood) vs. model architecture for critical temperature used in kernel sweep. The maximum log evidence is plotted in red.}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{images/lml_bar_chart_Tm.png}
+    \caption{Log evidence (i.e., marginal likelihood) vs. model architecture for melting temperature used in kernel sweep. The maximum log evidence is plotted in red.}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{images/lml_bar_chart_Vc.png}
+    \caption{Log evidence (i.e., marginal likelihood) vs. model architecture for critical volume used in kernel sweep. The maximum log evidence is plotted in red.}
+\end{figure}
+To assess the numerical stability of the final models, the condition number was examined. \kjnote{I dont recommend extending this discussion in the main text. Instead, I recommend that we write a sentence saying condition numbers of $\mathbf{K}$ can be found in the SI. We can add a paragraph at the end of the Model Selection and Hyperparameter Estimation section explaining why the condition number matters for optimization.}
+\FloatBarrier
+
+\subsection{\alltodo{Extensability} of Other GC Models and Properties}
 %Barnabas to provide specific examples
 Although this work focuses on six properties and a Joback and Reid group contribution method, the technique for creating models is directly applicable to other properties and other GC methods. A GP model can be built using the same steps as in this work as long as the GC method can provide a the property prediction. GC prediction and property data must be rigorously analyzed to determine appropriate features for the model. Their relationships should be analyzed to collect and apply a priori information including well-known physical correlations. With appropriate scaling, a model can then be trained and validated to produce improved accuracy results with uncertainty information.
 
 \section{Conclusions}
 
 
+\section{Nomenclature}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% The "Acknowledgement" section can be given in all manuscript
