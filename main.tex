@@ -196,31 +196,175 @@ Abstract
 
 \section{Introduction}
 
+%Reliable property prediction of materials is critical in many applications (Barnabas)
+The most pressing challenges facing humanity, as summarized in the seventeen sustainable development goals (SDGs), require innovation in materials and process development. 
+SDGs such as "zero hunger", "good health and well-being", "affordable and clean energy", and "climate action" \cite{unitednations17GOALSSustainable2015} require the discovery of new materials, new processes, and improvement in existing systems and processes.  
+%       %automated molecular discovery - need fast and accurate with uncertainty
+Considering the enormity of the chemical and material design space, the discovery of new materials must be automated since the discovery of new materials often can not be feasibly pursued through arbitrary "make and test" experiments alone. 
+Machinery for automatic test candidate generation and the prediction of the properties and performance of these test candidates is crucial for the materials and process discovery solutions that humanity needs at this present time.
+Materials property prediction is thus critical to the discovery of new materials and the development of new and existing processes. 
+%       %Computer-aided molecular design (CAMD) Use Prof. Adjiman’s work - CAMD relies on fast and accurate models to bridge molecular and process scales
+Computer-aided molecular design (CAMD) integrates and automates considerations from the molecular to process scales in the development of new materials and processes. 
+However, one of the existing challenges to the use of CAMD lies in the availability and integration of fast and reliable property prediction methods in CAMD workflows \cite{adjimanProcessSystemsEngineering2021}.
+%       %Use refrigerant design as a motivating example.
+The refrigerant design challenge is one motivating material discovery challenge that affects the four SDGs mentioned above and several more. 
+Presently used refrigerant fluids are predominantly hydrofluorocarbons (HFCs), which have high global warming potential and severe climate change effects. In 2016, the Kigali agreement was signed by 197 countries to phase out HFCs. 
+This phase-out is underway so there is a need for the discovery of alternative refrigerant fluids
+\cite{departmentofecologystateofwashingtonHydrofluorocarbons2023, usaepaReducingHydrofluorocarbonHFC2014, davenportNationsFightingPowerful2016, mcgrathClimateChangeMonumental2016, veldersLargeContributionProjected2009}. 
+The refrigeration and air-conditioning industry has a direct bearing on food sustainability (zero hunger), good health and well-being, climate action, and affordable and clean energy, amongst several other SDGs. 
+Fast and reliable property prediction of new molecules/materials is needed for addressing problems such as the refrigerant design challenge and many other challenges in several areas.
 
--Thermophysical property prediction is key to all material, and process development tasks with applications in many fields
+%A review of methods for obtaining properties of new molecules (Barnabas)
+%       %Experiments
+Experimental measurements are generally considered the highest-fidelity route for determining the properties of materials. 
+However, obtaining experimental measurements for all possible materials for a given application can be extremely expensive and not practically feasible. 
+Databases of materials and some of their experimentally measured properties have been assembled for decades. However these databases only contain a minuscule fraction of all possible molecules that may possibly exist. Furthermore, even for the materials that exist in these databases, there is often limited data on their properties; it is either there are no experimental measurements on some of the required properties for a given material and/or the experimental measurement data are not available at the desired state points. Thus, alternatives to experimental measurements and database compilations are needed. There is the need for property prediction methods for new molecules.
+%       %Molecular simulation
+Molecular simulations (MS) represent a potentially high-fidelity alternative to experiments for predicting the properties of molecules, especially for new or uncommon molecules or for properties of common molecules but at extreme conditions for which experimental data is limited. It is also generally less expensive and less time-consuming compared to experiments, which means MS can be used as a tool for assessing more molecules than would be done experimentally. However, for high throughput screening of millions or more molecules for molecular discovery, experimental testing becomes impossible and MS becomes prohibitively computationally expensive and time-consuming. Furthermore, high-fidelity MS requires accurate force fields (FFs) that capture the physics of the molecules being modeled. Such accurate FFs may not be available for new molecules, posing a challenge to the use of MS for high-throughput screening of new molecules.
 
--GC models
+%       %Engineering models (EoS, activity coefficients, correlationsetc.)
+Alternatives to MS exist for predicting the properties of new materials or existing materials at conditions for which experimental data is unavailable. 
+These methods typically involve the use of thermodynamic or engineering models for property predictions. 
+These thermodynamic models are of two main classes: Equation of State (EoS) models and activity coefficient models. 
+Typical thermodynamic models usually require fitting an Equation of State (EoS)  or activity coefficient (AC) model using limited experimental data. Often, this constitutes vapor-liquid equilibria (VLE) data. 
+The fitted EoS or activity coefficient models can then be used for predicting other properties and at state points for which experimental data may be unavailable. 
+Such thermodynamic models have also been successfully used in predicting mixture properties especially for cases where binary interaction parameters could be obtained by fitting to experimental data for the specific mixtures. 
+A common type of EoS model is the cubic EoS, such as the Soave–Redlich–Kwong (SRK) and Peng–Robinson (PR) EoS. 
+Another important class of EoS models is the Statistical Associating Fluid Theory (SAFT) based EoS, which has several variations, including the perturbed chain SAFT and SAFT-VR.
+Some common AC models include the Non-random Two-liquid (NRTL) and the Universal Quasichemical (UNIQUAC) AC models. 
+All of the above-named thermodynamic models have been successfully used for property predictions in a variety of applications; however, they usually require parameter fitting using component-specific experimental data, which are not available for new yet-to-be-synthesized molecules. 
+Therefore, the above methods are limited by the availability of experimental data and, thus, of little use for materials discovery tasks involving new or uncommon molecules. 
+Furthermore, these EoS and AC based models are typically only directly useful for predicting thermodynamic properties and not transport or interfacial properties which may be important for material design. 
+These EoS and AC models must be coupled with engineering heuristics that have limited accuracy or methods such as entropy scaling - which again requires further fitting to scarce or unavailable experimental data - to allow for predictions of transport and interfacial properties. 
 
--The Joback and Reid GC model
+How can we rapidly predict the thermodynamic, transport, interfacial, safety, environmental, and other important properties of new molecules without recourse to scarce or unavailable experimental data for materials discovery? Two broad classes of approaches stand out: group contribution (GC)- based methods and machine learning (ML)- based methods. 
+%GC Models
+GC-based methods involve molecular modeling of materials as an assembly of a finite number of structural units or molecular fragments. 
+Once the GC model has been parameterized using experimental data, property predictions can be made for new molecules based only on the type and number of structural units present in the molecule. 
+The unique advantage of GC models is that they can be parameterized using limited available experimental data and then used to predict properties of entirely new molecules, provided these new molecules are only made up of structural units present in the data for parameterizing the GC models. 
+Furthermore, these GC-based models have been successfully applied in predicting not only thermodynamic properties but also transport, interfacial, and other types of properties. Examples of GC-based EoS models include the Predictive Soave-Redlich-Kwong (PSRK),  GC-SAFT, SAFT-$\gamma$-mie models amongst others. Examples of GC-based activity coefficient models include the UNIQUAC Functional-group Activity Coefficients (UNIFAC) and the NRTL-segment activity coefficients models. 
+These models have shown remarkable success in fully predictive modeling of pure components and mixtures. However, like thermodynamic models, they are generally restricted to predicting thermodynamic properties if not coupled with other tools like MS or entropy scaling.
+There are other GC-based property prediction models that are neither EoS nor AC models. Examples of these models include the Joback and Reid (JR) GC method (which is notably popular), Lydersen method, the Marrero-Gani method, and the Wilson-Jasperson Method. These types of GC methods typically consist of a collection of several models or equations—one equation for one property—for direct and derivative-free computation of properties. 
+Such GC methods have been successfully used to predict thermodynamic, transport, interfacial, and other types of properties and are fast and relatively easy to implement. 
+However, the most accessible types of these GC methods, which are first-order GC models like the Joback and Reid GC method, are known to have significant systematic bias. 
+The more nuanced second-order GC methods, like the Marrero-Gani method, are more challenging to implement and sometimes only give a marginal improvement in predictive accuracy or even surprisingly worse predictions in some cases compared to the simpler JR GC method. 
+Furthermore, these GC methods generally do not have uncertainty estimates associated with their predictions, which is important for material screening.
+%ML Models
+ An alternative class of methods to the GC-based methods for property predictions of new molecules is machine learning (ML) based methods. 
+ There has been a surge in ML for property predictions using different kinds of ML models, including neural networks, support vector machines, Gaussian processes, random forests, etc. Typically, ML models require a large amount of data, which is not always available. 
+ Furthermore, ML models rarely have high physical interpretability, unlike thermodynamic models and some GC models. 
+ Furthermore, uncertainty propagation and estimation from complex ML models like deep neural networks can be cumbersome. 
+ A certain type of ML method which have shown promise in low-quantity data applications and allows for easy and often reasonable prediction of uncertainties is Gaussian process regression (GPR) surrogate modeling. 
+ Using a Gaussian process (GP) for property predictions is an established practice and offers an easy and reliable predictive uncertainty estimate. However, one key consideration for using GPR or any ML model for property prediction is choosing the most appropriate input feature(s) for the ML model. The design of input features for ML models referred to as feature engineering and can prove critical to their success. It is typical for ML models found in the literature to have tens or hundreds of input features, many of which are not easy to physically interpret and link with the target properties. Several ML models rely on fingerprint representations based on the SMILES strings of molecules. This is problematic for several reasons. Such ML models must necessarily be large and require a lot of training data (which is usually not available), as the input feature size depends on the input feature size of the largest molecule in the training data set. Furthermore, such models are amongst the least physically interpretable ML models. 
+ Some other works in the literature have used molecular descriptors, which have been developed by practitioners in the quantitative structure-property relationship (QSPR) community for several decades. Currently, there are over two hundred (200) such descriptors accessible from the RDKit Python package. Selecting just the right combination of molecular descriptors, both in quantity and information content, for a given property prediction task can be challenging and requires significant expertise in QSPR modeling, chemistry, physics, and an in-depth knowledge of several of the more than 200 molecular descriptors. Furthermore, the right choice of QSPR-based molecular descriptors must necessarily vary from property to property. This further heightens the barrier and limits accessibility in adopting this approach for predicting the many diverse material properties that are often needed in material discovery tasks.
+Dinis et. al. showed that sigma profiles could be used as consistent molecular descriptors and input features to convolutional neural networks (CNNs). They showed excellent property predictions for several diverse properties using the same input features with a constant input feature size of fifty-one (51). This input feature size is much lower than those of SMILES-based fingerprint inputs but may be higher than those in ML models that use QSPR-based molecular descriptors as input features. Additionally, 51 features is generally a large amount in the context of GP modeling. Furthermore, the authors found that sigma profiles correlated highly with certain target properties like aqueous solubility, yielding high model performance metrics and less so to certain properties like refractive index and density.
 
--Limitations of GC models
+In summary, some of the most widely used fully predictive approaches for property prediction of new molecules are GC-based or ML-based methods. Current GC-based methods are either not accurate enough and/or significantly complex to implement or, like thermodynamic GC models, not readily applicable to transport, interfacial, and other types of properties that may be of interest for materials discovery. On the other hand, most of the current ML methods in the literature either require a large amount of data that may not be available or use an inconsistent set of input features for different properties, which requires feature engineering expertise. They may also be highly complex models like CNNs or may not be as suitable for certain properties and usually do not provide easily accessible uncertainty estimates for predicted property values.
 
-- GP models
+In this work, we propose a unique solution to the challenge of predicting the properties of new molecules that may be applied to any property of interest. Our approach offers promise as a fast, accurate, accessible, generalizable method that uses a consistent set of input features and model architecture, with a very small input feature size and importantly, with uncertainty estimates for the predicted properties.
+We integrate the unique strengths of GC-based methods with GPR to achieve this feat. For any given property \textbf{P}, we use property predictions from a simple first-order GC method, the JR GC model, which intrinsically has significant systematic biases for several properties, coupled with a highly accessible molecular property, the molecular weight (MW), as the two (2) input features to a GP, which is trained to predict the 'correct' value of the target property \textbf{P} in addition to GP predicted uncertainties.
+This highly accessible approach is easy to implement, generalizable, computationally inexpensive, gives accurate and reliable property predictions, and provides uncertainty estimates for predicted properties.
+The rest of this article details the data collection, preparation, and analysis stages of this work. We begin the results section by demonstrating and interpreting the systematic bias in the JR GC model using our collected and processed data. We then show that using a GP dramatically and consistently corrects the JR GC model's systematic bias and improves predictive accuracy while also obtaining reasonable uncertainty estimates for the GP-predicted properties. Finally, we show that this approach, which we henceforth refer to as the GCGP method, is robust to GP model architecture.
 
--Use of GP models as 'corrector' models
+\section{Methods and Data}
+%\alltodo{standard in math is to remove equation numbers from all equations not referenced somewhere else in the text. Primary authors please either delete this comment if not standard for target journal or remind everyone to remove numbers from equations not referenced in the text at the end}
 
--The central idea: use GC predictions in GP models for improved property prediction
-
--How the rest of the paper is organized
-
-
-\section{Methods}
-\alltodo{standard in math is to remove equation numbers from all equations not referenced somewhere else in the text. Primary authors please either delete this comment if not standard for target journal or remind everyone to remove numbers from equations not referenced in the text at the end}
 \subsection{Data Collection and Preparation}
-\subsection{Joback and Reid GC Method}
+
+Six properties, \textbf{P}, were modeled in this work to demonstrate various aspects of the GCGP method. The properties are the normal boiling temperature ($T_b$), enthalpy of vaporization at normal boiling point ($H_{vap}$), critical pressure ($P_c$), critical molar volume ($V_c$), critical temperature ($T_c$), and the normal melting temperature ($T_m$).
+These properties are important for several materials discovery tasks. $T_b$, for example, is used in several engineering correlations and models for predicting properties such as the enthalpy of vaporization at temperatures other than the normal boiling temperature. In the JR GC method, $T_b$ is used in computing $T_c$. $T_b$ is also commonly used in the calculation of the accentric factor of molecules which is highly correlated to other properties such as the liquid heat capacity. 
+$T_c$, $P_c$, and $V_c$ are important for the consideration of stability, safety, and determination of appropriate operating regions for new fluids. $H_{vap}$ is important for materials design tasks such as the refrigerant design problem. $H_{vap}$ is also used in computations of the enthalpy of vaporization at temperatures other than the normal boiling temperature. The enthalpy of vaporization at the evaporating temperature in a vapor-compression refrigeration cycle is a highly important consideration for refrigerant design as it affects the volumetric capacity of the refrigerant fluid. $H_{vap}$ is generally important for any material design task for applications involving phase change between the liquid and vapor phases.
+Furthermore, these properties were selected as non-temperature-dependent properties to demonstrate the GCGP method. Future work could demonstrate the application of the GCGP method to temperature-dependent properties.
+
+In this work, for each molecule, three properties or data are required for each property. They are the experimental data or 'true data,' the JR GC model predictions, and the computed molecular weights (MW).
+
+\subsubsection{Experimental Data Collection}
+
+The experimental data for training GP models were obtained primarily from the 105th edition of the CRC Handbook of Chemistry and Physics. A few experimental data for $H_{vap}$ were collected from Yaws' Critical Property Data for Chemical Engineers and Chemists as available in the Knovel database.
+For each property, data points were collected for all molecules for which there was an intersection of available experimental data from the CRC Handbook of Chemistry and Physics and obtainable property predictions using the JR GC method.
+
+\begin{table}
+    \centering
+    \begin{tabular}{cccc}
+         Property&  Total number of data points&  Training set& Testing set
+         
+\\
+         $T_b$&  4442&  3554& 888
+\\
+         $H_{vap}$&  489&  391& 98
+\\
+         $P_c$&  686&  549& 137
+\\
+         $V_c$&  701&  561& 140
+\\
+         $T_c$&  715&  572& 143
+\\
+         $T_m$&  6210&  4968& 1242
+\\
+    \end{tabular}
+    \caption{Amount of Final Collected Data}
+    \label{tab:collected_data}
+\end{table}
+
+Table \ref{tab:collected_data} shows the final amounts of collected data for each property in this work. $T_m$ had the highest number of data points for molecules whose melting temperature could be predicted using the JR GC model. $H_{vap}$ had the least. Some data in the CRC Handbook of Chemistry and Physics for $T_m$ and $T_b$ were not used as there were flags provided to indicate that those temperatures may not be the true melting or boiling temperatures as they could undergo decomposition or sublimation at those temperatures. In this work, we only used data for $T_m$ and $T_b$ that did not have any sublimation or decomposition flags.
+
+\subsubsection{Joback and Reid GC Predictions}
+The JR GC method is a first-order GC method and has equations and parameters for the six properties considered in this work. The equations for each property are presented in equations \ref{eq:boiling_temp} - \ref{eq:melting_temp}. The model parameters are available in the original work.
+The JR GC method was selected for this work due to its popularity, its ease of use \& its accessibility, and the availability of open-source software, like JRGUI, for automatic generation of JR GC predictions of molecules given their SMILES strings.
+
+\begin{equation}
+    T_b \, [\text{K}] = 198.2 + \sum n_{i} * T_{b,i}
+    \label{eq:boiling_temp}
+\end{equation}
+
+
+\begin{equation}
+    H_{vap} \, [\text{kJ/mol}] = 15.30 + \sum n_{i} * H_{vap,i}
+    \label{eq:enthalpy_vap}
+\end{equation}
+
+
+\begin{equation}
+    P_c \, [\text{bar}] = \left[ 0.113 + 0.0032 N_a - \sum n_{i} * P_{c,i} \right]^{-2}
+    \label{eq:critical_pressure}
+\end{equation}
+
+\begin{equation}
+    V_c \, [\text{cm}^3/\text{mol}] = 17.5 + \sum n_{i} * V_{c,i}
+    \label{eq:critical_mol_vol}
+\end{equation}
+
+\begin{equation}
+    T_c \, [\text{K}] = T_b \left[ 0.584 + 0.965 \sum n_{i} * T_{c,i} - \left( \sum n_{i} * T_{c,i} \right)^2 \right]^{-1}
+    \label{eq:critical_temperature}
+\end{equation}
+
+
+\begin{equation}
+    T_m \, [\text{K}] = 122.5 + \sum n_{i} * T_{m,i}
+    \label{eq:melting_temp}
+\end{equation}
+
+In the above equations, $n_{i}$ is the number of structural units of type $i$ in the molecule. $\textbf{P}_i$ is the JR GC parameter corresponding to a structural unit of type $i$ for property $\textbf{P}$. $\textbf{P}_i$ determines how the presence of any given structural unit changes or contributes to the property $\textbf{P}$, where $\textbf{P} \in [T_b, H_{vap}, P_c,V_c, T_c, T_m]$.
+
+The JR GC method works by dividing the molecule into predefined structural units for which parameters are available in the JR GC method. The required property of the molecule is then predicted using the appropriate JR GC equation from equations \ref{eq:boiling_temp} - \ref{eq:melting_temp} with parameters from the JR GC parameter set for the specific property. Figure XX in the SI shows an example of how the JR GC method is used to compute properties.
+
+The JR GC method is known to show significant systematic bias in property prediction, especially at high molecular weights, for $T_b$, for example. Furthermore, the JR GC method may not have parameters for certain structural units or molecular fragments present in some molecules. This means that the JR GC method will not be applicable to such molecules. Predictions using the JR GC method do not have uncertainty estimates associated with them. However, it is expected that the JR GC predictions will have a strong physically interpretable correlation with the true property values, which thus provides the rationale for using the JR GC predictions as an input feature to a corrector model. In the context of this work, the corrector model is a GP.
+
+In this work, the JRGUI software, an open-source, Python-based code, was used for the automatic computation of JR GC predictions for all properties in this work. To use JRGUI in an automatic mode, a set of SMILES strings for the molecules for which predicted property values are desired is required. 
+The SMILES strings were obtained by parsing the CAS registry numbers of the molecules in the CRC Handbook of Chemistry and Physics using PubChemPy, another open-source Python-based package for interfacing with the PubChem database of compounds. The PubChem database is a database with a listing for over a hundred million compounds and contains SMILES strings for all or almost all compounds it has an entry for. In this work, we assume that all or almost all molecules in the CRC Handbook of Chemistry and Physics will have an entry in the PubChem database and thus have its SMILES string available from PubChem.
+
+The JRGUI software also provides the values of over two hundred molecular descriptors from RDKit in addition to other output data. The molecular weight (MW) is one of the outputs from the JRGUI tool and was used as the source of MW data for this work. It should be noted that MW can be readily computed in the same fashion as any simple GC property by simply summing the molecular weights of the structural units in a molecule so that there is no need to use RDKit or any specialized tool.
+
 \subsection{Data Pre-processing} \label{sec:preprocess}
+
+\subsubsection{Data Quality}
+We performed basic two-dimensional outlier detection analysis on the collected data to identify regions of the data that may exhibit unusual trends or behavior. We used the JR GC predictions and collected experimental data. We observed certain data points that showed significant deviations from the general trends in the JR GC predictions compared to experiments and flagged these points as 'outliers' with respect to the JR GC model. On further probing of these points, we identified three experimental $H_{vap}$ data for which the CRC Handbook of Chemistry and Physics had wrong data entries. We ascertained that the data entries for these molecules were wrong by comparing against data from the Yaws' Critical Property Data for Chemical Engineers and Chemists as available in the Knovel database and data from the National Institute of Standards and Technology (NIST) webbook. The NIST webbook and Yaws' Critical Property Data agreed while the CRC Handbook data were different for these three molecules. Furthermore, once the experimental $H_{vap}$ data for these three molecules were replaced with those from the Yaws' Critical Property Data, they ceased being flagged by our outlier detection algorithm. The other data points that were flagged as outliers for $H_{vap}$ were found to be due to limitations in the parameterization of the JR GC method. Further details, data, and figures about this are available in the supporting information (SI). 
+
+
+\subsubsection{Analysis of Input Feature and Label Data}
 %Analysis of feature vs label data and standardization (Montana and Kyla)
-We begin the modeling creation process by thoroughly analyzing the trends in the data. Figures \ref{fig:Data_Vis_Disc} and \ref{fig:Data_Vis_Prop} demonstrate that the GC predictions and molecular weight are correlated with the experimental data for all properties of interest. Figure \ref{fig:Data_Vis_Disc} shows that the discrepancy between GC predictions and experimental data are zero and thus, linearly correlated for $H_{vap}$, $P_c$, $V_c$. This is desirable behavior as we would ideally like our GC model to be relatively unbiased. The GC models for $T_m$, $T_b$ and $T_c$ are much worse predictors of the experimental data and thus we observe a nonlinear trend indicated by nonzero trends in the discrepancy. Figure \ref{fig:Data_Vis_Prop} demonstrates correlation between molecular weight and the experimental data and GC predictions for $V_c$, $T_b$, and $T_m$. However the two-tail trend that we observe for the molecular weight correlations suggests that another descriptor should be added to fully explain the data. We observe that $H_{vap}$ does not have a strong correlation with molecular weight, and that $P_c$ exhibits a strong nonlinear trend suggesting that molecular weight is an excellent molecular descriptor for $P_c$ and subpar for $H_{vap}$. However, we note that multiple studies list a relationship between $H_{vap}$ and molecular weight and therefore conclude that molecular weight is an adequate molecular descriptor for all properties of interest. (todo: Barnabas add the studies you mentioned which support this)
+We begin the modeling creation process by thoroughly analyzing the trends in the data. Figures \ref{fig:Data_Vis_Disc} and \ref{fig:Data_Vis_Prop} demonstrate that the JR GC predictions and molecular weight are correlated with the experimental data for all properties of interest. Figure \ref{fig:Data_Vis_Disc} shows that the discrepancy between JR GC predictions and experimental data are zero and thus, linearly correlated for $H_{vap}$, $P_c$, $V_c$. This is desirable behavior as we would ideally like our JR GC model to be relatively unbiased. The JR GC models for $T_m$, $T_b$ and $T_c$ are much worse predictors of the experimental data and thus we observe a nonlinear trend indicated by nonzero trends in the discrepancy. Figure \ref{fig:Data_Vis_Prop} demonstrates correlation between molecular weight and the experimental data and JR GC predictions for $V_c$, $T_b$, and $T_m$. However the two-tail trend that we observe for the molecular weight correlations suggests that another descriptor should be added to fully explain the data. We observe that $H_{vap}$ does not have a strong correlation with molecular weight, and that $P_c$ exhibits a strong nonlinear trend suggesting that molecular weight is an excellent molecular descriptor for $P_c$ and subpar for $H_{vap}$. However, we note that multiple studies list a relationship between $H_{vap}$ and molecular weight and therefore conclude that molecular weight is an adequate molecular descriptor for all properties of interest. \mcnote{(todo: Barnabas add the studies you mentioned which support this)}
 
 \begin{figure}[H]
     \centering
@@ -236,21 +380,15 @@ We begin the modeling creation process by thoroughly analyzing the trends in the
     \label{fig:Data_Vis_Prop}
 \end{figure}
 
-
-
 \subsection{GP Modeling}
-%Stratified sampling (Dinis)
-When splitting data into training and testing sets, an 80/20 split was used and all features and labels were standardized to have zero mean and unit variance using the scikit-learn StandardScaler \cite{scikit-learn} . Stratified sampling was used to split the data. (Dinis to add more details). Additionally, we standardize all feature and label data by removing the mean and scaling to unit variance.
-
 %Introduction to a kernel function and mean and variance predictions
 \mcnote{GP Introduction. A short alternative to KJ's description below. Can be updated to match KJ notation and "GPs in the context of this work" if wanted}
-\adnote{I believe the following text was from MC. I took it out of a mcnote to make the color black.}
-
-
-To describe a Gaussian Process (GP), consider a dataset $D = \{(\xvec_i, \yexp[i]\}) \vert \xvec_i \in \mathbb{R}^d, \text{ and } \yexp[i] \in \mathbb{R}, \forall \, i \in \{1,. . ., n\}$ with inputs $\mathbf{X}$ and outputs $\yexpvec[]$. Here $\xvec$ represents the GC model predictions ($\Ygcvec$) and molecular weight ($\textbf{M.W}$) for all molecules $n$, and $\yexpvec$ represents the experimental predictions for any property $y$. If we assume that experimental data noise is independent and identically distributed with zero mean and constant variance, $\sigma_{\yexp[i]}^2$,it follows that $\yexp[i] = f(\xvec_i) + \epsilon$ where the noise is defined by $\epsilon \sim \mathcal{N}(0,\sigma_{\yexp[i]}^2)$. The GP then seeks to estimate $\yexp[i] = f(\xvec_i) + \epsilon$ as a normal distribution with mean function, $m(\xvec_i)$ for $m(\xvec_i): \mathbb{R}^d \rightarrow \mathbb{R}$, and covariance matrix, $k(\xvec_i, \xvec_i^{\prime})$ for $k: \mathbb{R}^d \times \mathbb{R}^d \rightarrow \mathbb{R}$ \cite{Frazier2018AOptimization}. We then define our GP model for all $\mathbf{X}$:
+To describe a Gaussian Process (GP), consider a dataset $D = \{(\xvec_i, \yexp[i]\}) \vert \xvec_i \in \mathbb{R}^d, \text{ and } \yexp[i] \in \mathbb{R}, \forall \, i \in \{1,. . ., n\}$ with inputs $\mathbf{X}$ and outputs $\yexpvec[]$. Here $\xvec$ represents the GC model predictions ($\Ygcvec$) and molecular weight ($\textbf{M.W}$) for all molecules $n$, and $\yexpvec$ represents the experimental predictions for any property \textbf{P}. If we assume that experimental data noise is independent and identically distributed with zero mean and constant variance, $\sigma_{\yexp[i]}^2$,it follows that $\yexp[i] = f(\xvec_i) + \epsilon$ where the noise is defined by $\epsilon \sim \mathcal{N}(0,\sigma_{\yexp[i]}^2)$. The GP then seeks to estimate $\yexp[i] = f(\xvec_i) + \epsilon$ as a normal distribution with mean function, $m(\xvec_i)$ for $m(\xvec_i): \mathbb{R}^d \rightarrow \mathbb{R}$, and covariance matrix, $k(\xvec_i, \xvec_i^{\prime})$ for $k: \mathbb{R}^d \times \mathbb{R}^d \rightarrow \mathbb{R}$ \cite{Frazier2018AOptimization}. We then define our GP model for all $\mathbf{X}$:
 \begin{gather*}
      \yexpvec \sim \mathcal{GP} = \mathcal{N}(\boldsymbol{\mu}, \mathbf{K})
 \end{gather*}
+
+We note that this model can be classified as a hybrid model \cite{koh} since the mean function of the GP is actually a physics-based model with no stochastic component. 
 
 \noindent where $\boldsymbol{\mu} = (m(\xvec_1), \dots, m(\xvec_n))^\intercal$ and
 \begin{gather}
@@ -263,9 +401,9 @@ To describe a Gaussian Process (GP), consider a dataset $D = \{(\xvec_i, \yexp[i
     \end{matrix}\right).
 \end{gather}
 
-We note that from a purely modeling perspective, the best accuracy will be achieved by modeling each property separately with a different GP mean function and covariance matrix given the trends in the available data. However, this requires modeling expertise and given that much of the data range for each property with regards to molecular weight has already been explored, we opt to use one general model framework which is likely to capture all properties under study in this work and any future properties of interest. In the context of using GC predictions to train a GP model, we determined that the discrepancy of the JR-GC model and experimental data is a function of molecular weight but that the relationship between the two was not always immediately obvious. However in all cases we expect that JR-GC model and the experimental property data to be linearly proportional. As such, while we use both molecular weight and JR-GC predictions as training data features, we implement a linear mean function which relies solely on the original JR-GC predictions. We fix the hyperparameters associated with the mean function such that $\boldsymbol{\mu} = \Ygcvec$.  Other model forms which were considered can be found in SI section XX. 
+We note that from a purely modeling perspective, the best accuracy will be achieved by modeling each property separately with a different GP mean function and covariance matrix given the trends in the available data. However, this requires modeling expertise and given that much of the data range for each property with regards to molecular weight has already been explored, we opt to use one general model framework which is likely to capture all properties under study in this work and any future properties of interest. In the context of using JR GC predictions to train a GP model, we determined that the discrepancy of the JR GC model and experimental data is a function of molecular weight but that the relationship between the two was not always immediately obvious. However in all cases we expect that JR GC model and the experimental property data to be linearly proportional. As such, while we use both molecular weight and JR GC predictions as training data features, we implement a linear mean function which relies solely on the original JR GC predictions. We fix the hyperparameters associated with the mean function such that $\boldsymbol{\mu} = \Ygcvec$.  Other model forms which were considered can be found in SI section XX. 
 
-The covariance matrix, often called the kernel, indicates how GP features relate to each other and the smoothness of the feature. In this work, the rational quadratic (RQ) kernel is used since it accounts for varying amounts of smoothness in each dataset through hyperparameter $\alpha$. We also add a white kernel to account for uncertainty in the experimental data. The full kernel function for any two data points is defined by \eqref{kernel_final}. Mat\`ern $\frac{1}{2}$, Mat\`ern $\frac{3}{2}$, Mat\`ern $\frac{5}{2}$, and the SE kernels are examined in section \ref{sec:kern_sweep} and are defined in SI section (reference SI section).
+The covariance matrix, often called the kernel, indicates how GP features relate to each other and the smoothness of the feature. In this work, the rational quadratic (RQ) kernel is used since it accounts for varying amounts of smoothness in each dataset through hyperparameter $\alpha$. We also add a white kernel to account for uncertainty in the experimental data. The full kernel function for any two data points is defined by \eqref{kernel_final}. Mat\`ern $\frac{1}{2}$, Mat\`ern $\frac{3}{2}$, Mat\`ern $\frac{5}{2}$, and the SE kernels are examined in section XX and are defined in SI section (reference SI section).
 
 \begin{equation}
     k(\xvec_i,\xvec_j) = \sigma_f^2 \left(1 +\frac{1}{2 \alpha} \,\mathbf{r}^\intercal \,{\ell}^{-1} \,\mathbf{r} \right)^{-\alpha} + \sigma_w^2\delta_{i,j}
@@ -281,9 +419,12 @@ The covariance matrix, often called the kernel, indicates how GP features relate
     \end{cases}
 \end{gather*}
 
-We note that hyperparameters $\alpha$, $\ell$, $\sigma_{f}$, and $\sigma_{w}$ must be inferred from the data. 
+We note that the best fitting hyperparameters $\hat{\mathbf{h}} \in [\alpha, \ell, \sigma_{f}, \sigma_{w}]$ are inferred via maximum likelihood estimation during GP training via equation \eqref{eq: lml}. This method balances maximizing model fit and minimizing model complexity. However, we note that this process should be repeated multiple times as the solution to \eqref{eq: lml} is non-convex and often has many locally optimal solutions. 
+\begin{gather}
+    \hat{\mathbf{h}} := \arg \min_{\mathbf{h}} \, \frac{n}{2}\log{2\pi} + \frac{1}{2}\log{|\mathbf{K}|} +  \frac{1}{2}\,(\mathbf{y}-\boldsymbol{\mu})^\intercal \, (\mathbf{K})^{-1}\,(\mathbf{y}-\boldsymbol{\mu}). \label{eq: lml}
+\end{gather}
 
-To make predictions about some new data set $\xvec^*$ we note that our training and new data follow a joint multivariate normal distribution. That is,
+To make predictions about some new data set $\xvec^*$ using the trained GP model we note that our training and new data follow a joint multivariate normal distribution. That is,
 \begin{gather*}
     \begin{bmatrix}
         \mathbf{y} \\
@@ -310,183 +451,196 @@ To make predictions about some new data set $\xvec^*$ we note that our training 
 %General implementation details
 GP models were implemented using GPflow \cite{Matthews2017GPflow:TensorFlow}. In this work, a white kernel is used to account for experimental noise and $\sigma_w$ is always trained starting from an initial value of 1.0. The hyperparameter tuning was implemented using scipy.optimize \cite{Virtanen2020SciPyPython} with the Limited-memory Broyden–Fletcher–Goldfarb–Shanno Bound (L-BFGS-B) algorithm to perform maximum likelihood estimation and was repeated ten times to avoid local hyperparameter solutions. On the first training pass, hyperparameters were all initialized at 1.0. On subsequent repeats, $\ell$, $\sigma^2_{rq}$, and $\alpha$ were uniformly selected from bounds $(0, 100]$, $(0, 1.0]$, and $(0, 100]$  respectively. Optimization bounds for $\ell$ and $\sigma^2_{rq}$ were set as $[10^{-5}, 10^2]$ and optimization bounds for $\alpha$ were set to $[10^{-5}, 5\times 10^3]$.
 
-We use the condition number to determine the numerical stability of our models. The condition number is an indication of how small perturbations in the inputs can affect the outputs \cite{Foster2009}. As a rule of thumb, the number of significant digits lost in addition to those from machine precision is proportional to the logarithmic scaled value of a condition number \cite{NumMathComput}. Ideally, a condition number should be as close to one as possible and a condition number that is much greater than one (in this case we used 500 as a cutoff) is ill-conditioned. That is, a small change in the inputs has significant impact on the output.
+\mcnote{Commenting out condition number stuff}
+% We use the condition number to determine the numerical stability of our models. The condition number is an indication of how small perturbations in the inputs can affect the outputs \cite{Foster2009}. As a rule of thumb, the number of significant digits lost in addition to those from machine precision is proportional to the logarithmic scaled value of a condition number \cite{NumMathComput}. Ideally, a condition number should be as close to one as possible and a condition number that is much greater than one (in this case we used 500 as a cutoff) is ill-conditioned. That is, a small change in the inputs has significant impact on the output.
 
 \alltodo{Do the primary authors think the reader knows what Baysian inference is? Maybe a paragraph long section before GP basics that says what it is on a high level followed by Bayes law would be helpful for vocab like likelihood, prior, evidence, etc.}
 \mcnote{The readers will not know what Bayesian inference is, but I think a whole paragraph to explain these terms might not be necessary. You've done a good job of explaining them in your sections below.}
 \\
 \kjnote{Begin KJ proposal for explaining GPs}
-\subsubsection{Gaussian Process Basics}
-A stochastic process is a (infinite) collection of random variables indexed by a set $\{\xvec\}$. A Gaussian process (GP) is a stochastic process where any finite number of random variables have a joint Gaussian distribution. Let $\xvec_i \in \reals^d$ denote an index and $f: \reals^d \rightarrow \reals$ denote a random variable that is indexed by $\xvec$ (i.e., the stochastic process). A GP is specified by a mean function
-\begin{gather}
-    m(\xvec) := \mathbb{E}\,[f(\xvec)] \label{eq: mean}
-\end{gather}
-and a covariance function
-\begin{gather}
-    k(\xvec, \xvec') := \text{Cov}\,[f(\xvec), f(\mathbf{x'})]. \label{eq: cov}
-\end{gather}
-The notation $f(\xvec)\sim \mathcal{GP}(m(\xvec), \, k(\xvec,\xvec'))$
-denotes that $f(\cdot)$ follows a GP distribution with mean function $m(\cdot)$ and covariance function $k(\cdot,\cdot)$. Equivalently, by the definition of a GP, for any finite subset $\xvec_1, \dots, \xvec_n$ of the random variables, $\mathbf{f}=(f(\xvec_1),  \dots, f(\xvec_n))^\intercal$ follows a multivariate normal distribution with a mean vector and covariance matrix governed elementwise by \eqref{eq: mean} and \eqref{eq: cov}, respectively. That is, $\mathbf{f} \sim \mathcal{N}(\boldsymbol{\mu}, \mathbf{K}),$ where $\boldsymbol{\mu} = (m(\xvec_n), \dots, m(\xvec_n))^\intercal$ and
-\begin{gather} 
-    \mathbf{K} = 
-    \left(
-    \begin{matrix}
-        k(\xvec_1,\xvec_1) & \dots & k(\xvec_1,\xvec_n) \\
-        \vdots & \ddots & \vdots \\
-        k(\xvec_n,\xvec_1) & \dots & k(\xvec_n,\xvec_n)
-    \end{matrix}\right).
-\end{gather}
+\mcnote{I have commented out KJs explanation and consolidated the GP methods to <3 pages at Barnabas's request. See above.}
+\kjnote{Thanks for commenting this out as opposed to deleting. Happy to help make this shorter. When this is sent to the PI's, can you guys include what I wrote as an addendum or leave it in blue? AD can help us merge the sections. Thank you!}
+% \subsubsection{Gaussian Process Basics}
+% A stochastic process is a (infinite) collection of random variables indexed by a set $\{\xvec\}$. A Gaussian process (GP) is a stochastic process where any finite number of random variables have a joint Gaussian distribution. Let $\xvec_i \in \reals^d$ denote an index and $f: \reals^d \rightarrow \reals$ denote a random variable that is indexed by $\xvec$ (i.e., the stochastic process). A GP is specified by a mean function
+% \begin{gather}
+%     m(\xvec) := \mathbb{E}\,[f(\xvec)] \label{eq: mean}
+% \end{gather}
+% and a covariance function
+% \begin{gather}
+%     k(\xvec, \xvec') := \text{Cov}\,[f(\xvec), f(\mathbf{x'})]. \label{eq: cov}
+% \end{gather}
+% The notation $f(\xvec)\sim \mathcal{GP}(m(\xvec), \, k(\xvec,\xvec'))$
+% denotes that $f(\cdot)$ follows a GP distribution with mean function $m(\cdot)$ and covariance function $k(\cdot,\cdot)$. Equivalently, by the definition of a GP, for any finite subset $\xvec_1, \dots, \xvec_n$ of the random variables, $\mathbf{f}=(f(\xvec_1),  \dots, f(\xvec_n))^\intercal$ follows a multivariate normal distribution with a mean vector and covariance matrix governed elementwise by \eqref{eq: mean} and \eqref{eq: cov}, respectively. That is, $\mathbf{f} \sim \mathcal{N}(\boldsymbol{\mu}, \mathbf{K}),$ where $\boldsymbol{\mu} = (m(\xvec_n), \dots, m(\xvec_n))^\intercal$ and
+% \begin{gather} 
+%     \mathbf{K} = 
+%     \left(
+%     \begin{matrix}
+%         k(\xvec_1,\xvec_1) & \dots & k(\xvec_1,\xvec_n) \\
+%         \vdots & \ddots & \vdots \\
+%         k(\xvec_n,\xvec_1) & \dots & k(\xvec_n,\xvec_n)
+%     \end{matrix}\right).
+% \end{gather}
 
-In Bayesian nonparametrics, a GP is used as a prior for a random variable indexed by an infinite set. Upon observing a finite subset of these random variables, the posterior is another GP. This is commonly applied in regression settings to recover latent functions.
+% In Bayesian nonparametrics, a GP is used as a prior for a random variable indexed by an infinite set. Upon observing a finite subset of these random variables, the posterior is another GP. This is commonly applied in regression settings to recover latent functions.
 
-\subsubsection{Model Selection and Kernels}
+% \subsubsection{Model Selection and Kernels}
 
-When deploying GPs for regression, (lack of) prior information of the latent function is encoded through the mean and covariance functions. \kjtodo{write a sentence here about the mean function} This section focuses on how to choose stationary kernel functions for modeling the covariance of the GP that are common in application literature \kjtodo{references needed}. For a more generalized perspective on classes of kernel functions, the interested reader is referred to \citeauthor{Genton} \cite{Genton}.
+% When deploying GPs for regression, (lack of) prior information of the latent function is encoded through the mean and covariance functions. \kjtodo{write a sentence here about the mean function} This section focuses on how to choose stationary kernel functions for modeling the covariance of the GP that are common in application literature \kjtodo{references needed}. For a more generalized perspective on classes of kernel functions, the interested reader is referred to \citeauthor{Genton} \cite{Genton}.
 
-In mathematics, a \textit{kernel} refers to a function that defines a similarity measure between pairs of points. In the context of GPs, a kernel is a positive-definite function that defines the covariance structure. For example, the squared exponential (SE) (i.e., Gaussian) kernel is given by
-\begin{gather}
-    k_{\text{SE}}(\xvec_i,\xvec_j) = \sigma_f^2 \exp \left(-\frac{1}{2}\, \mathbf{r}^\intercal \,\boldsymbol{\Lambda}^{-1} \,\mathbf{r} \right), \label{eq: sekernel}
-\end{gather}
-where $\mathbf{r} = \xvec_i - \xvec_j$ is the distance between two points, $\sigma_f^2$ is the variance of the process, and $\boldsymbol{\Lambda}$ is a matrix of length scales that control the smoothness of the function. The SE kernel assumes the underlying function is infinitely differentiable. Thus, the SE kernel is widely used due to ability to model smooth functions \alltodo{advice needed: does this last sentence require a citation?}. Furthermore, a modeler can structure the length scale matrix $\boldsymbol{\Lambda}$ to encode additional smoothness assumptions of the underlying function. This is covered in detail at the end of this section. 
+% In mathematics, a \textit{kernel} refers to a function that defines a similarity measure between pairs of points. In the context of GPs, a kernel is a positive-definite function that defines the covariance structure. For example, the squared exponential (SE) (i.e., Gaussian) kernel is given by
+% \begin{gather}
+%     k_{\text{SE}}(\xvec_i,\xvec_j) = \sigma_f^2 \exp \left(-\frac{1}{2}\, \mathbf{r}^\intercal \,\boldsymbol{\Lambda}^{-1} \,\mathbf{r} \right), \label{eq: sekernel}
+% \end{gather}
+% where $\mathbf{r} = \xvec_i - \xvec_j$ is the distance between two points, $\sigma_f^2$ is the variance of the process, and $\boldsymbol{\Lambda}$ is a matrix of length scales that control the smoothness of the function. The SE kernel assumes the underlying function is infinitely differentiable. Thus, the SE kernel is widely used due to ability to model smooth functions \alltodo{advice needed: does this last sentence require a citation?}. Furthermore, a modeler can structure the length scale matrix $\boldsymbol{\Lambda}$ to encode additional smoothness assumptions of the underlying function. This is covered in detail at the end of this section. 
 
-A more general form of \eqref{eq: sekernel} is the rational quadratic (RQ) kernel given by
-\begin{gather}
-    k_{\text{RQ}}(\xvec_i,\xvec_j) = \sigma_f^2 \left(1 +\frac{1}{2 \alpha} \,\mathbf{r}^\intercal \,\boldsymbol{\Lambda}^{-1} \,\mathbf{r} \right)^{-\alpha}. \label{eq: rationalquadkernel}
-\end{gather}
-The RQ kernel can model a wider range of functions by adjusting the parameter $\alpha$. In the limit $\alpha \rightarrow \infty$, it is approximately the SE kernel \eqref{eq: sekernel}. Thus, the RQ kernel is more flexible than the SE kernel. If the modeler wishes the function to exhibit variations at multiple length scales, the RQ kernel is more suitable than the SE kernel.
+% A more general form of \eqref{eq: sekernel} is the rational quadratic (RQ) kernel given by
+% \begin{gather}
+%     k_{\text{RQ}}(\xvec_i,\xvec_j) = \sigma_f^2 \left(1 +\frac{1}{2 \alpha} \,\mathbf{r}^\intercal \,\boldsymbol{\Lambda}^{-1} \,\mathbf{r} \right)^{-\alpha}. \label{eq: rationalquadkernel}
+% \end{gather}
+% The RQ kernel can model a wider range of functions by adjusting the parameter $\alpha$. In the limit $\alpha \rightarrow \infty$, it is approximately the SE kernel \eqref{eq: sekernel}. Thus, the RQ kernel is more flexible than the SE kernel. If the modeler wishes the function to exhibit variations at multiple length scales, the RQ kernel is more suitable than the SE kernel.
 
-Finally, we review the Mat\'ern kernel governed by
-\begin{gather}
-    k_{\text{Mat\'ern}}(\xvec_i,\xvec_j) = \sigma_f^2 \,\frac{2^{1-\nu}}{\Gamma(\nu)} \, \left(\sqrt{2\nu} \, \mathbf{r}^\intercal \,\boldsymbol{\Lambda}^{-1} \,\mathbf{r} \right)^{\nu}\, K_\nu  \left(\sqrt{2\nu} \, \mathbf{r}^\intercal \,\boldsymbol{\Lambda}^{-1} \,\mathbf{r} \right). \label{eq: maternkern}
-\end{gather}
-Here, $\nu$ is a smoothness parameter, $\Gamma(\cdot)$ is the Gamma function, and $K_\nu(\cdot)$ is the modified Bessel function of the second kind. Like the RQ kernel \eqref{eq: rationalquadkernel}, Matérn kernels are a generalization of the SE kernel. It can be shown that in the limit $\nu \rightarrow \infty$, the Mat\'ern kernel becomes the SE kernel. Moreover, the SE kernel assumes infinitely differentiable (smooth) functions, while the Matérn kernel allows for varying degrees of smoothness through $\nu$. These kernels can be useful when modeling real-world phenomena with unknown or varying smoothness, thereby providing more flexibility. Common choices for $\nu$ in machine learning and GP regresison applications literature include 3/2 and 5/2 \alltodo{GP modeling authors: please include the citations here that motivated the decision to include these kernels}. 
+% Finally, we review the Mat\'ern kernel governed by
+% \begin{gather}
+%     k_{\text{Mat\'ern}}(\xvec_i,\xvec_j) = \sigma_f^2 \,\frac{2^{1-\nu}}{\Gamma(\nu)} \, \left(\sqrt{2\nu} \, \mathbf{r}^\intercal \,\boldsymbol{\Lambda}^{-1} \,\mathbf{r} \right)^{\nu}\, K_\nu  \left(\sqrt{2\nu} \, \mathbf{r}^\intercal \,\boldsymbol{\Lambda}^{-1} \,\mathbf{r} \right). \label{eq: maternkern}
+% \end{gather}
+% Here, $\nu$ is a smoothness parameter, $\Gamma(\cdot)$ is the Gamma function, and $K_\nu(\cdot)$ is the modified Bessel function of the second kind. Like the RQ kernel \eqref{eq: rationalquadkernel}, Matérn kernels are a generalization of the SE kernel. It can be shown that in the limit $\nu \rightarrow \infty$, the Mat\'ern kernel becomes the SE kernel. Moreover, the SE kernel assumes infinitely differentiable (smooth) functions, while the Matérn kernel allows for varying degrees of smoothness through $\nu$. These kernels can be useful when modeling real-world phenomena with unknown or varying smoothness, thereby providing more flexibility. Common choices for $\nu$ in machine learning and GP regresison applications literature include 3/2 and 5/2 \alltodo{GP modeling authors: please include the citations here that motivated the decision to include these kernels}. 
 
-In principled inference, the structure of of the length scale matrix $\boldsymbol{\Lambda}$ is used to model (lack of) prior information about the function. In an isotropic GP, a single length scale is used for all input dimensions. Mathematically, this means the length scale matrix is written as $\boldsymbol{\Lambda} = \lambda^2 \, \mathbf{I}$. This modeling choice enforces that all input dimensions are equally important and have the same effect on the output. Alternatively, if one wanted to use separate length scales for each input dimension, one could elect to use kernels \eqref{eq: sekernel} - \eqref{eq: maternkern} with automatic relevance detection. This allows the kernel to capture the varying relevance of different dimensions, meaning some dimensions can be more influential than others in predicting the output. Mathematically, this means the length scale matrix is written as $\boldsymbol{\Lambda} = \text{diag}(\lambda_1^2,\dots,\lambda_d^2)$.
+% In principled inference, the structure of of the length scale matrix $\boldsymbol{\Lambda}$ is used to model (lack of) prior information about the function. In an isotropic GP, a single length scale is used for all input dimensions. Mathematically, this means the length scale matrix is written as $\boldsymbol{\Lambda} = \lambda^2 \, \mathbf{I}$. This modeling choice enforces that all input dimensions are equally important and have the same effect on the output. Alternatively, if one wanted to use separate length scales for each input dimension, one could elect kernels \eqref{eq: sekernel} - \eqref{eq: maternkern} with automatic relevance detection. This allows the kernel to capture the varying relevance of different dimensions, meaning some dimensions can be more influential than others in predicting the output. Mathematically, this means the length scale matrix is written as $\boldsymbol{\Lambda} = \text{diag}(\lambda_1^2,\dots,\lambda_d^2)$.
 
-\subsubsection{Gaussian Processes for Regression}
-Consider the regression setting in which a modeler is supplied with a dataset $\mathcal{D} = \{(\xvec_i, y_i)\}_{i=1}^n$ composed of $n$ pairs of regressors $\xvec_i \in \reals^d$ and observations $y_i \in \reals$. The objective is to recover the latent data generating process $f(\cdot)$. In most practical settings, the underlying process is perturbed by noise $\varepsilon$. That is,
-\begin{gather*}
-    y_i = f(\xvec_i) + \varepsilon_i, \quad i \in \{1,\dots, n\},
-\end{gather*}
-where $\varepsilon_i \stackrel{\text{i.i.d.}}{\sim} \mathcal{N}(0,\sigma_n^2)$. In GP regression (GPR) \alltodo{remove this acronym if not used later on in the text}, it is assumed that $f(\cdot)\sim \mathcal{GP}(m(\cdot),k(\cdot,\cdot))$. This assumption is called the prior. By linearity of expectation,
-\begin{gather*}
-    \mathbb{E}\,[y_i\,|\,\xvec_i] = m(\xvec_i)
-\end{gather*}
-and
-\begin{gather*}
-    \text{Cov}\,[y_i\, | \,\xvec_i, y_j \, | \,\xvec_j] = k(\xvec_i, \xvec_j) + \sigma_n^2 \,h_{i,j},
-\end{gather*}
-where $h_{i,j}$ is the Kronecker delta function
-\begin{gather*}
-    h_{i,j} = 
-    \begin{cases}
-        0, & i\neq j,\\
-        1, & i= j.
-    \end{cases}
-\end{gather*}
-The goal in the regression setting is to predict $f(\cdot)$ over a test set $\xmatrix_*$. By the GP prior on $f(\cdot)$, the finite set of training and test outputs follow a joint multivariate normal distribution. That is,
-\begin{gather*}
-    \begin{bmatrix}
-        \mathbf{y} \\
-        \mathbf{f}_*
-    \end{bmatrix}
-    \sim 
-    \mathcal{N}\left(
-    \begin{bmatrix}
-        \boldsymbol{\mu}\\
-        \boldsymbol{\mu}_*
-    \end{bmatrix},
-    \begin{bmatrix}
-        \mathbf{K} +\sigma_n^2\,\mathbf{I} & \mathbf{K}_* \\
-        \mathbf{K}^\intercal_* & \mathbf{K}_{**}
-    \end{bmatrix} \right).
-\end{gather*}
-Here, $\mathbf{K}_*$ is the $n \times |\text{test}|$ covariance matrix and $\mathbf{K}_{**}$ is the $|\text{test}| \times |\text{test}|$ covariance matrix. 
-To make predictions at the test points $\xmatrix_{*}$, one can leverage the conditional distribution of the test outputs given the training data $\mathcal{D}$. This is done with the finite-dimensional conditional distribution
-\begin{gather}
-    \mathbf{f}_* \,|\, \xmatrix_*, \mathcal{D} \sim \mathcal{N}(\mathbf{K}_{*}^\intercal \,(\mathbf{K} +\sigma_n^2 \mathbf{I})^{-1}\,(\mathbf{y}-\boldsymbol{\mu}),  \mathbf{K}_{**} - \mathbf{K}_{*}^\intercal \,(\mathbf{K}+\sigma_n^2\,\mathbf{I})^{-1}\,\mathbf{K}_{*}).   \label{eq: gppredict}
-\end{gather}
-Note that this is the predictive distribution for $\mathbf{f}_*$. The predictive distribution for $\mathbf{y}_*$ can be obtained by adding $\sigma_n^2\, \mathbf{I}$ to the covariance in \eqref{eq: gppredict}.
+% \subsubsection{Gaussian Processes for Regression}
+% Consider the regression setting in which a modeler is supplied with a dataset $\mathcal{D} = \{(\xvec_i, y_i)\}_{i=1}^n$ composed of $n$ pairs of regressors $\xvec_i \in \reals^d$ and observations $y_i \in \reals$. The objective is to recover the latent data generating process $f(\cdot)$. In most practical settings, the underlying process is perturbed by noise $\varepsilon$. That is,
+% \begin{gather*}
+%     y_i = f(\xvec_i) + \varepsilon_i, \quad i \in \{1,\dots, n\},
+% \end{gather*}
+% where $\varepsilon_i \stackrel{\text{i.i.d.}}{\sim} \mathcal{N}(0,\sigma_n^2)$. In GP regression (GPR) \alltodo{remove this acronym if not used later on in the text}, it is assumed that $f(\cdot)\sim \mathcal{GP}(m(\cdot),k(\cdot,\cdot))$. This assumption is called the prior. By linearity of expectation,
+% \begin{gather*}
+%     \mathbb{E}\,[y_i\,|\,\xvec_i] = m(\xvec_i)
+% \end{gather*}
+% and
+% \begin{gather*}
+%     \text{Cov}\,[y_i\, | \,\xvec_i, y_j \, | \,\xvec_j] = k(\xvec_i, \xvec_j) + \sigma_n^2 \,h_{i,j},
+% \end{gather*}
+% where $h_{i,j}$ is the Kronecker delta function
+% \begin{gather*}
+%     h_{i,j} = 
+%     \begin{cases}
+%         0, & i\neq j,\\
+%         1, & i= j.
+%     \end{cases}
+% \end{gather*}
+% The goal in the regression setting is to predict $f(\cdot)$ over a test set $\xmatrix_*$. By the GP prior on $f(\cdot)$, the finite set of training and test outputs follow a joint multivariate normal distribution. That is,
+% \begin{gather*}
+%     \begin{bmatrix}
+%         \mathbf{y} \\
+%         \mathbf{f}_*
+%     \end{bmatrix}
+%     \sim 
+%     \mathcal{N}\left(
+%     \begin{bmatrix}
+%         \boldsymbol{\mu}\\
+%         \boldsymbol{\mu}_*
+%     \end{bmatrix},
+%     \begin{bmatrix}
+%         \mathbf{K} +\sigma_n^2\,\mathbf{I} & \mathbf{K}_* \\
+%         \mathbf{K}^\intercal_* & \mathbf{K}_{**}
+%     \end{bmatrix} \right).
+% \end{gather*}
+% Here, $\mathbf{K}_*$ is the $n \times |\text{test}|$ covariance matrix and $\mathbf{K}_{**}$ is the $|\text{test}| \times |\text{test}|$ covariance matrix. 
+% To make predictions at the test points $\xmatrix_{*}$, one can leverage the conditional distribution of the test outputs given the training data $\mathcal{D}$. This is done with the finite-dimensional conditional distribution
+% \begin{gather}
+%     \mathbf{f}_* \,|\, \xmatrix_*, \mathcal{D} \sim \mathcal{N}(\mathbf{K}_{*}^\intercal \,(\mathbf{K} +\sigma_n^2 \mathbf{I})^{-1}\,(\mathbf{y}-\boldsymbol{\mu}),  \mathbf{K}_{**} - \mathbf{K}_{*}^\intercal \,(\mathbf{K}+\sigma_n^2\,\mathbf{I})^{-1}\,\mathbf{K}_{*}).   \label{eq: gppredict}
+% \end{gather}
+% Note that this is the predictive distribution for $\mathbf{f}_*$. The predictive distribution for $\mathbf{y}_*$ can be obtained by adding $\sigma_n^2\, \mathbf{I}$ to the covariance in \eqref{eq: gppredict}.
 
-\subsubsection{Hyperparameter Estimation and Criteria for Model Selection}
-As shown in the \alltodo{Model Selection and Kernels section, rename if you change this name}, the behavior of mean and kernel functions are somewhat dictated by their parameters $\boldsymbol{\theta} = (\sigma_n^2, \sigma_f, \lambda_1,\dots,\lambda_d)^\intercal$. If the elements of $\boldsymbol{\theta}$ are not chosen by the practitioner, they must be inferred from the sample data $\mathcal{D}$. Furthermore, one might be interested in comparing the performance of several GP models and selecting the best performing model. The evidence (i.e., marginal likelihood) accomplishes both objectives.
+% \subsubsection{Hyperparameter Estimation and Criteria for Model Selection}
+% As shown in the \alltodo{Model Selection and Kernels section, rename if you change this name}, the behavior of mean and kernel functions are somewhat dictated by their parameters $\boldsymbol{\theta} = (\sigma_n, \sigma_f, \lambda_1,\dots,\lambda_d)^\intercal$. If the elements of $\boldsymbol{\theta}$ are not chosen by the practitioner, they must be inferred from the sample data $\mathcal{D}$. Furthermore, one might be interested in comparing the performance of several GP models and selecting the best performing model. The evidence (i.e., marginal likelihood) accomplishes both objectives.
 
-The evidence is given by
-\begin{gather*}
-    p(\mathbf{y}\, | \, \xmatrix) = \int p(\mathbf{y}\, | \, \mathbf{f}) \,  p(\mathbf{f}\, | \, \xmatrix) \, \text{d}\mathbf{f},
-\end{gather*}
-where we marginalize over the the function values $\mathbf{f}$. Given that both $p(\mathbf{y}\, | \, \mathbf{f})$ and $ p(\mathbf{f}\, | \, \mathbf{X})$ are Gaussian, the marginal likelihood can be computed in closed form. Moreover, the marginal likelihood has distribution
-\begin{gather*}
-    \mathbf{y}\, | \, \mathbf{X} \sim \mathcal{N}(\boldsymbol{\mu}, \mathbf{K} + \sigma_n^2 \,\mathbf{I}),
-\end{gather*}
-and the expression for the evidence is the p.d.f. of this distribution
-\begin{gather*}
-    p(\mathbf{y}\, | \, \mathbf{X}) = (2\pi)^{-n/2}\,\vert \mathbf{K} + \sigma_n^2 \,\mathbf{I}\vert^{-1/2}\,\exp \left( -\frac{1}{2}\,(\mathbf{y}-\boldsymbol{\mu})^\intercal \, (\mathbf{K} + \sigma_n^2 \,\mathbf{I})^{-1}\,(\mathbf{y}-\boldsymbol{\mu})\right),
-\end{gather*}
-where $|\cdot|$ is the determinant. In practice, the negative log evidence is minimized to find the optimal $\hat{\boldsymbol{\theta}}$, that is
-\begin{gather}
-    \hat{\boldsymbol{\theta}} = \arg \min_{\boldsymbol{\theta}} \, \frac{n}{2}\log{2\pi} + \frac{1}{2}\log{|\mathbf{K} + \sigma_n^2 \,\mathbf{I}|} +  \frac{1}{2}\,(\mathbf{y}-\boldsymbol{\mu})^\intercal \, (\mathbf{K} + \sigma_n^2 \,\mathbf{I})^{-1}\,(\mathbf{y}-\boldsymbol{\mu}). \label{eq: lml}
-\end{gather}
-The terms in \eqref{eq: lml} aid in model selection as follows. The first component is the normalization constant, the second component is the model complexity penalty, and the third component is the model first to the data. A smaller model fit term indicates better model fit. The determinant of the covariance matrix reflects the area or volume of the function space covered by the model \kjtodo{make sure its both area and volume}. Thus, the larger (smaller) the determinant, the greater (lesser) the complexity of the model. Thus, \eqref{eq: lml} balances the tradeoff between minimizing complexity and maximizing model fit.
-\kjnote{end of proposed text on GP modeling}
+% The evidence is given by
+% \begin{gather*}
+%     p(\mathbf{y}\, | \, \xmatrix) = \int p(\mathbf{y}\, | \, \mathbf{f}) \,  p(\mathbf{f}\, | \, \xmatrix) \, \text{d}\mathbf{f},
+% \end{gather*}
+% where we marginalize over the the function values $\mathbf{f}$. Given that both $p(\mathbf{y}\, | \, \mathbf{f})$ and $ p(\mathbf{f}\, | \, \mathbf{X})$ are Gaussian, the marginal likelihood can be computed in closed form. Moreover, the marginal likelihood has distribution
+% \begin{gather*}
+%     \mathbf{y}\, | \, \mathbf{X} \sim \mathcal{N}(\boldsymbol{\mu}, \mathbf{K} + \sigma_n^2 \,\mathbf{I}),
+% \end{gather*}
+% and the expression for the evidence is the p.d.f. of this distribution
+% \begin{gather*}
+%     p(\mathbf{y}\, | \, \mathbf{X}) = (2\pi)^{-n/2}\,\vert \mathbf{K} + \sigma_n^2 \,\mathbf{I}\vert^{-1/2}\,\exp \left( -\frac{1}{2}\,(\mathbf{y}-\boldsymbol{\mu})^\intercal \, (\mathbf{K} + \sigma_n^2 \,\mathbf{I})^{-1}\,(\mathbf{y}-\boldsymbol{\mu})\right),
+% \end{gather*}
+% where $|\cdot|$ is the determinant. In practice, the negative log evidence is minimized to find the optimal $\hat{\boldsymbol{\theta}}$, that is
+% \begin{gather}
+%     \hat{\boldsymbol{\theta}} := \arg \min_{\boldsymbol{\theta}} \, \frac{n}{2}\log{2\pi} + \frac{1}{2}\log{|\mathbf{K} + \sigma_n^2 \,\mathbf{I}|} +  \frac{1}{2}\,(\mathbf{y}-\boldsymbol{\mu})^\intercal \, (\mathbf{K} + \sigma_n^2 \,\mathbf{I})^{-1}\,(\mathbf{y}-\boldsymbol{\mu}). \label{eq: lml}
+% \end{gather}
+% The terms in \eqref{eq: lml} aid in model selection as follows. The first component is the normalization constant, the second component is the model complexity penalty, and the third component is the model first to the data. A smaller model fit term indicates better model fit. The determinant of the covariance matrix reflects the area or volume of the function space covered by the model \kjtodo{make sure its both area and volume}. Thus, the larger (smaller) the determinant, the greater (lesser) the complexity of the model. Thus, \eqref{eq: lml} balances the tradeoff between minimizing complexity and maximizing model fit.
+% \kjnote{end of proposed text on GP modeling}
 
 
-\subsection{Hybrid Modeling}
-\alltodo{Feel free to move this section wherever it fits best}
-\kjnote{begin text from KJ}\\
-In their seminal work, statisticians \citeauthor{koh} \cite{koh} developed a framework for Bayesian calibration of computer models, which has become commonplace in the physical sciences. \kjtodo{write review about this}\\
+% \subsubsection{Hybrid Modeling}
+% \alltodo{Feel free to move this section wherever it fits best}
+% \kjnote{begin text from KJ}\\
+% In their seminal work, statisticians \citeauthor{koh} \cite{koh} developed a framework for Bayesian calibration of computer models, which has become commonplace in the physical sciences. \kjtodo{write review about this}\\
 
-Given $n$ observations $\mathbf{y}=(y_1,\dots,y_n)^\intercal$ generated by manipulating a controlled variable $\xvec_i = (x_{i,1},\dots,x_{i,d})^\intercal$, the goal of model calibration is to find the underlying mapping $\zeta: \mathbb{R}^d \rightarrow \mathbb{R}$ that describes the physical scenario. This relationship is written as
-\begin{gather}
-    y_i = \zeta(\mathbf{x}_i) + \varepsilon_i, \quad i \in \{1,\dots,n\}. \label{eq: trueprocess}
-\end{gather}
+% Given $n$ observations $\mathbf{y}=(y_1,\dots,y_n)^\intercal$ generated by manipulating a controlled variable $\xvec_i = (x_{i,1},\dots,x_{i,d})^\intercal$, the goal of model calibration is to find the underlying mapping $\zeta: \mathbb{R}^d \rightarrow \mathbb{R}$ that describes the physical scenario. This relationship is written as
+% \begin{gather}
+%     y_i = \zeta(\mathbf{x}_i) + \varepsilon_i, \quad i \in \{1,\dots,n\}. \label{eq: trueprocess}
+% \end{gather}
 
-In practice, $\zeta(\cdot)$ is unknown, and the modeler must rely on a simulation or lower-fidelity model denoted $\eta(\mathbf{x}, \boldsymbol{\theta})$. The model has parameters $\boldsymbol{\theta}=(\theta_1,\dots,\theta_p)^\intercal$ that need to be estimated from data. To account for discrepancy in the model $\eta(\cdot,\cdot)$, a model discrepancy function $\delta: \mathbb{R}^d \rightarrow \mathbb{R}$ is included. This leads to:
-\begin{gather}
-     y_i = \zeta(\mathbf{x}_i) + \varepsilon_i = \eta(\mathbf{x}_i,\boldsymbol{\theta}) + \delta(\mathbf{x}_i) + \varepsilon_i, \quad i \in \{1,\dots,n\}.
-\end{gather}
+% In practice, $\zeta(\cdot)$ is unknown, and the modeler must rely on a simulation or lower-fidelity model denoted $\eta(\mathbf{x}, \boldsymbol{\theta})$. The model has parameters $\boldsymbol{\theta}=(\theta_1,\dots,\theta_p)^\intercal$ that need to be estimated from data. To account for discrepancy in the model $\eta(\cdot,\cdot)$, a model discrepancy function $\delta: \mathbb{R}^d \rightarrow \mathbb{R}$ is included. This leads to:
+% \begin{gather}
+%      y_i = \zeta(\mathbf{x}_i) + \varepsilon_i = \eta(\mathbf{x}_i,\boldsymbol{\theta}) + \delta(\mathbf{x}_i) + \varepsilon_i, \quad i \in \{1,\dots,n\}.
+% \end{gather}
 
-Typically, $\delta(\cdot)$ is modeled using a Gaussian Process (GP), although any nonparametric method can be used in practice. If $\eta(\cdot,\cdot)$ is computationally expensive, it can also be represented as a GP. In this work, it is assumed that $\eta(\cdot,\cdot)$ can be modeled directly and $\delta(\cdot)\sim \mathcal{GP}(m(\cdot),k(\cdot,\cdot))$. Thus, the hybrid model reduces to the GP
-\begin{gather}
-    \zeta(\mathbf{x}) \sim \mathcal{GP}(\eta(\mathbf{x},\boldsymbol{\theta}) + m(\mathbf{x}), k(\mathbf{x}, \mathbf{x}'))
-\end{gather}
+% Typically, $\delta(\cdot)$ is modeled using a Gaussian Process (GP), although any nonparametric method can be used in practice. If $\eta(\cdot,\cdot)$ is computationally expensive, it can also be represented as a GP. In this work, it is assumed that $\eta(\cdot,\cdot)$ can be modeled directly and $\delta(\cdot)\sim \mathcal{GP}(m(\cdot),k(\cdot,\cdot))$. Thus, the hybrid model reduces to the GP
+% \begin{gather}
+%     \zeta(\mathbf{x}) \sim \mathcal{GP}(\eta(\mathbf{x},\boldsymbol{\theta}) + m(\mathbf{x}), k(\mathbf{x}, \mathbf{x}'))
+% \end{gather}
 
-In this application, there are no parameters $\boldsymbol{\theta}$ to estimate in the low-fidelity model. Moreover, estimation of $\zeta(\cdot)$ is accomplished by estimating the parameters in the GP mean and covariance functions.
-\alltodo{please confirm Jobac model has no parameters that are being fit}.
+% In this application, there are no parameters $\boldsymbol{\theta}$ to estimate in the low-fidelity model. Moreover, estimation of $\zeta(\cdot)$ is accomplished by estimating the parameters in the GP mean and covariance functions.
+% \alltodo{please confirm Jobac model has no parameters that are being fit}.
 
 \kjnote{end text from KJ}
 
-\subsection{GPs in the context of this work}
-In this work, we define $\mathcal{D} = \{(\Ygc[i], \text{M.W}_i), \yexp[i])\}_{i=1}^n$ for all molecules $n$ and any property of interest $y \in [H_{vap}, P_c, T_c, T_b ,T_M, V_c]$. We define $\Ygc[i] \text{ } \forall \text{ } i\in n$ as JR-GC model predictions, $\text{M.W}_i \text{ } \forall \text{ } i\in n$ as the molecular weights, and $\yexp[i] \text{ } \forall \text{ } i\in n$ as the experimental values. We begin by noting that from a modeling perspective, the best accuracy will be achieved by analyzing trends in the available data and setting the GP mean and covariance functions to capture those trends. However, this requires modeling expertise and given that much of the data range for each property with regards to molecular weight has already been explored, we opt to use one general model framework which is likely to capture all properties under study in this work and any future properties of interest. The effect of model form on our results is examined in section \ref{sec:kern_sweep}.
 
-We determined in section XX that the discrepancy of the JR-GC model for each property of interest and experimental property data is a function of molecular weight but that the relationship between the two was not always immediately obvious. However in all cases we expect that JR-GC model and the experimental property data to be linearly proportional. As such, while we use both molecular weight and JR-GC predictions as training data features, we implement a linear mean function which relies solely on the original JR GC predictions. We fix the hyperparameters associated with the mean function such that $m(\xvec) = \Ygcvec$ where $\Ygc[i] \text{ } \forall \text{ } i\in n$ are the JR-GC model predictions for $n$ molecules and any property of interest $y$. This mean function is especially appropriate when the JR-GC models faithfully represent the trend of experimental data. Other model forms which were considered can be found in SI section XX. We choose the rational quadratic (RQ) kernel as the base kernel function for the GP models of every property to account for varying levels of smoothness. We add a white kernel with variance $\sigma_w$ to the RQ kernel to account for uncertainty in the experimental data such that the final covariance function used in this work is defined by \eqref{kernel_final}. 
 
-\begin{equation}
-    k(\xvec_i,\xvec_j) = \sigma_f^2 \left(1 +\frac{1}{2 \alpha} \,\mathbf{r}^\intercal \,\boldsymbol{\Lambda}^{-1} \,\mathbf{r} \right)^{-\alpha} + \sigma_w^2\delta_{i,j} 
-    \label{kernel_final}
-\end{equation} 
 
-GP models were implemented using GPflow \cite{Matthews2017GPflow:TensorFlow} (version \adnote{fill in}). The hyperparameter tuning was implemented using scipy.optimize \cite{Virtanen2020SciPyPython} (version: \adnote{fill in}) with the Limited-memory Broyden–Fletcher–Goldfarb–Shanno Bound (L-BFGS-B) algorithm to perform maximum likelihood estimation and was repeated ten times to avoid local hyperparameter solutions. On the first training pass, hyperparameters were all initialized at 1.0. On subsequent repeats, $\ell$ and $\alpha$ were uniformly selected from bounds $(0, 100]$ and $(0, 100]$ respectively. $\sigma^2_f$ was selected from a log-normal distribution with bounds $[0,1.0]$ and $\sigma_w$ was always initialized at $1.0$. A more nuanced method would be to initialize $\sigma_w$ as the scaled experimental uncertainty when available. Optimization bounds for $\alpha$ were set to $[10^{-5}, 10^2]$ and all other hyperparameters were optimized within bounds $[10^{-5}, 5\times 10^3]$.
+% \subsubsection{GPs in the context of this work}
 
-We use the condition number to determine the numerical stability of our models. The condition number is an indication of how small perturbations in the inputs can affect the outputs \cite{Foster2009}. As a rule of thumb, the number of significant digits lost in addition to those from machine precision is proportional to the logarithmic scaled value of a condition number \cite{NumMathComput}. Ideally, a condition number should be as close to one as possible and a condition number that is much greater than one (in this case we used 500 as a cutoff) is ill-conditioned. That is, a small change in the inputs has significant impact on the output.
+% In this work, we define $\mathcal{D} = \{(\Ygc[i], \text{M.W}_i), \yexp[i])\}_{i=1}^n$ for all molecules $n$ and any property of interest $y \in [H_{vap}, P_c, T_c, T_b ,T_M, V_c]$. We define $\Ygc[i] \text{ } \forall \text{ } i\in n$ as JR GC model predictions, $\text{M.W}_i \text{ } \forall \text{ } i\in n$ as the molecular weights, and $\yexp[i] \text{ } \forall \text{ } i\in n$ as the experimental values. We begin by noting that from a modeling perspective, the best accuracy will be achieved by analyzing trends in the available data and setting the GP mean and covariance functions to capture those trends. However, this requires modeling expertise and given that much of the data range for each property with regards to molecular weight has already been explored, we opt to use one general model framework which is likely to capture all properties under study in this work and any future properties of interest. The effect of model form on our results is examined in section \ref{sec:kern_sweep}.
+
+% We determined in section XX that the discrepancy of the JR GC model for each property of interest and experimental property data is a function of molecular weight but that the relationship between the two was not always immediately obvious. However in all cases we expect that JR GC model and the experimental property data to be linearly proportional. As such, while we use both molecular weight and JR GC predictions as training data features, we implement a linear mean function which relies solely on the original JR GC predictions. We fix the hyperparameters associated with the mean function such that $m(\xvec) = \Ygcvec$ where $\Ygc[i] \text{ } \forall \text{ } i\in n$ are the JR GC model predictions for $n$ molecules and any property of interest $y$. This mean function is especially appropriate when the JR GC models faithfully represent the trend of experimental data. Other model forms which were considered can be found in SI section XX. We choose the rational quadratic (RQ) kernel as the base kernel function for the GP models of every property to account for varying levels of smoothness. We add a white kernel with variance $\sigma_w$ to the RQ kernel to account for uncertainty in the experimental data such that the final covariance function used in this work is defined by \eqref{kernel_final}. 
+
+% \begin{equation}
+%     k(\xvec_i,\xvec_j) = \sigma_f^2 \left(1 +\frac{1}{2 \alpha} \,\mathbf{r}^\intercal \,\boldsymbol{\Lambda}^{-1} \,\mathbf{r} \right)^{-\alpha} + \sigma_w^2\delta_{i,j} 
+%     \label{kernel_final}
+% \end{equation} 
+
+% GP models were implemented using GPflow \cite{Matthews2017GPflow:TensorFlow} (version \adnote{fill in}). The hyperparameter tuning was implemented using scipy.optimize \cite{Virtanen2020SciPyPython} (version: \adnote{fill in}) with the Limited-memory Broyden–Fletcher–Goldfarb–Shanno Bound (L-BFGS-B) algorithm to perform maximum likelihood estimation and was repeated ten times to avoid local hyperparameter solutions. On the first training pass, hyperparameters were all initialized at 1.0. On subsequent repeats, $\ell$ and $\alpha$ were uniformly selected from bounds $(0, 100]$ and $(0, 100]$ respectively. $\sigma^2_f$ was selected from a log-normal distribution with bounds $[0,1.0]$ and $\sigma_w$ was always initialized at $1.0$. A more nuanced method would be to initialize $\sigma_w$ as the scaled experimental uncertainty when available. Optimization bounds for $\alpha$ were set to $[10^{-5}, 10^2]$ and all other hyperparameters were optimized within bounds $[10^{-5}, 5\times 10^3]$.
+
+% We use the condition number to determine the numerical stability of our models. The condition number is an indication of how small perturbations in the inputs can affect the outputs \cite{Foster2009}. As a rule of thumb, the number of significant digits lost in addition to those from machine precision is proportional to the logarithmic scaled value of a condition number \cite{NumMathComput}. Ideally, a condition number should be as close to one as possible and a condition number that is much greater than one (in this case we used 500 as a cutoff) is ill-conditioned. That is, a small change in the inputs has significant impact on the output.
+
+
+%Stratified sampling (Dinis)
+\subsubsection{Stratified sampling}
+When splitting data into training and testing sets, an 80/20 split was used and all features and labels were standardized to have zero mean and unit variance using the scikit-learn StandardScaler \cite{scikit-learn} . Stratified sampling was used to split the data. (Dinis to add more details). Additionally, we standardize all feature and label data by removing the mean and scaling to unit variance.
+
+\mcnote{Isn't this just section 4?}
+%\subsubsection{Testing the Effects of Kernel Choice and Model Structure}
 
 \subsection{Error Metrics}
-\alltodo{Do we need both MAPE and MAPD? Should we change "deviation" to "error"?.}
-\mcnote{We don't. We currently use both now, but it's up to Barnabas to decide the final metrics so I wrote down both for now.}
-We use mean absolute error (MAE), mean absolute prediction error (MAPE), mean absolute percent deviation (MAPD), coefficient of determination ($R^2$), and root mean squared error (RMSE) to quantify and critically analyze the error of our GP models. This section gives an overview of the definition of these error metrics. Note that in \eqref{eq:COD}, $\overline{y_{\text{exp}}}$ is the average value of $\mathbf{y}_{\text{exp}}$. 
+We use mean absolute error (MAE), mean absolute percent error (MAPE), coefficient of determination ($R^2$), and root mean squared error (RMSE) to quantify and critically analyze the error of our GP models. This section gives an overview of the definition of these error metrics. Note that in \eqref{eq:COD}, $\overline{y_{\text{exp}}}$ is the average value of $\mathbf{y}_{\text{exp}}$. 
 
 \begin{equation}
     \text{MAE} = \frac{1}{N} \sum_{i=1}^{N} \left| y_{\text{exp}_i} - \mu(\mathbf{x}_i) \right|
     \label{eq:MAE}
 \end{equation}
 
-\begin{equation}
-    \alltodo{\text{MAPE}} = \frac{1}{N} \sum_{i=1}^{N} \left| \frac{y_{\text{exp}_i} - \mu(\mathbf{x}_i)}{y_{\text{exp}_i}} \right|
-    \label{eq:MAPE}
-\end{equation}
+% \begin{equation}
+%     \alltodo{\text{MAPE}} = \frac{1}{N} \sum_{i=1}^{N} \left| \frac{y_{\text{exp}_i} - \mu(\mathbf{x}_i)}{y_{\text{exp}_i}} \right|
+%     \label{eq:MAPE}
+% \end{equation}
 
 \begin{equation}
-    \text{MAP\alltodo{D}} = \frac{1}{N} \sum_{i=1}^{N} \left| \frac{y_{\text{exp}_i} - \mu(\mathbf{x}_i)}{y_{\text{exp}_i}} \right| \times 100\%
+    \text{MAPE} = \frac{1}{N} \sum_{i=1}^{N} \left| \frac{y_{\text{exp}_i} - \mu(\mathbf{x}_i)}{y_{\text{exp}_i}} \right| \times 100\%
     \label{eq:MAPD}
 \end{equation}
 
@@ -502,8 +656,110 @@ We use mean absolute error (MAE), mean absolute prediction error (MAPE), mean ab
 
 \section{Results and Discussion}
 
+\subsection{JR GC method has systematic bias and limited accuracy}
 
-\subsection{Kernel Sweep} 
+Figure \ref{fig:2D_JRGC_bias} shows the systematic bias of the JR GC predictions when compared against experimental data. Deviations from the experimental data are most pronounced for $T_m$ and $T_b$, especially at higher molecular weights. Similar but less pronounced systematic deviation of JR GC predictions from experimental data is observed for $T_c$ and $V_c$.   
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.1\linewidth]{images/2D_GC_bias.png}
+    \caption{Parity plot of experimental data against JR GC predictions.}
+    \label{fig:2D_JRGC_bias}
+\end{figure}
+
+This systematic bias is due to one of the flaws of the JR GC method, which assumes that structural units contribute to the value of these properties in a monotonous manner. Thus, we observe, for example, that the JR GC method predicts that several molecules would have $T_m$ values greater than 1500 $K$, which is not the case in nature. Molecules do not monotonously and boundlessly melt at higher temperatures as the structural units are added.
+The systematic bias of the JR GC predictions for $H_{vap}$ and $P_c$ is more nuanced. Unlike the other properties for which the JR GC method shows systematic bias that is generally correlated with molecular weight, the systematic bias of the JR GC method for $H_{vap}$ and $P_c$ is for specific classes of molecules.
+We found from our outlier detection analysis, presented in detail in the SI, that the JR GC method shows significant systematic bias in it's $H_{vap}$ predictions for highly fluorinated and highly nitrated molecules. In Figure \ref{fig:2D_JRGC_bias}, there are two points with conspicuously low JR GC $H_{vap}$ predictions. 
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/Hvap_molecules_with_large_bias.png}
+    \caption{Molecules with large bias in JR GC $H_{vap}$ predictions}
+    \label{fig:JRGC_Hvap_bias_molecules}
+\end{figure}
+
+These two points correspond to molecules with moderate to high MW. The two molecules with this large underestimation in  $H_{vap}$ using the JR GC method are shown in Figure \ref{fig:JRGC_Hvap_bias_molecules} a and b. They are both highly fluorinated molecules. The group contribution of the fluorine group to $H_{vap}$ according to the JR GC method is -0.67 $kJ/mol$. This explains why, for highly fluorinated molecules, the JR GC method predicts very low values of $H_{vap}$ contrary to experimental or true values. The JR GC method could predict negative $H_{vap}$ values for sufficiently fluorinated molecules, which would be unphysical. Figure \ref{fig:JRGC_Hvap_bias_molecules} c shows another class of molecules for which the JR GC method has a large systematic bias in its $H_{vap}$ predictions. They are highly nitrated compounds like tetranitromethane shown in Figure \ref{fig:JRGC_Hvap_bias_molecules} c. The JR GC $H_{vap}$ predictions for tetranitromethane is 82.89 $kJ/mol$ and can be observed in Figure \ref{fig:2D_JRGC_bias} as the highest JR GC $H_{vap}$ prediction in our data. The JR GC method predicts that every $-NO_2$ structural unit in a molecule should contribute 16.738 $kJ/mol$ to the $H_{vap}$ of the molecule. This contribution is high and much higher than those of other structural units in the JR GC method parameter set for $H_{vap}$. This leads to an overestimation in $H_{vap}$ for highly nitrated molecules.
+A similar scenario is observed for JR GC $P_c$ predictions for highly brominated molecules.  
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.1\linewidth]{images/3D_gc_mw_exp.png}
+    \caption{3D surface plot of MW, JR GC predictions, and discrepancy of JR GC predictions from experimental data.}
+    \label{fig:3D_JRGC_MW_disc}
+\end{figure}
+
+Figure \ref{fig:3D_JRGC_MW_disc} shows the surfaces that we learn using a GP for each property. It also further helps to visualize the systematic bias of the JR GC method and how this bias is correlated with MW. We observe a strong correlation between the JR GC predictions discrepancy and MW for $T_m$, $T_b$, $T_c$, and $V_c$. The surfaces in Figure \ref{fig:3D_JRGC_MW_disc} generally possess a navigable structure rather than random collections of points in 3D space. This provides additional justification for why GPs are suitable for learning these surfaces.
+
+
+\subsection{GCGP method accurately predicts properties and corrects systematic bias}
+
+In this work, we used a GP to correct the systematic bias of the JR GC method. The results are presented in Figure \ref{fig:GCGP_final_results}.
+Applying the GCGP method almost doubled (0.44 to 0.86) the coefficient of determination ($R^2$) between predictions and experimental values of the testing set for $T_b$. The MAE reduced from 28.8 $K$ for the JR GC predictions to 19.5 $K$ for the GCGP predictions. 
+Similarly, we also observed correction of systematic bias and significant improvement in predictive accuracy for $T_c$ as shown in Figure \ref{fig:GCGP_final_results}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.1\linewidth]{images/GCGP_final_results.png}
+    \caption{GCGP corrections of systematic bias in JR GC model}
+    \label{fig:GCGP_final_results}
+\end{figure}
+
+ 
+The largest correction in systematic bias was observed for the property for which the JR GC method had the highest systematic bias - $T_m$. The testing set $R^2$ was 0.71, which is not as high as that for the other properties modeled in this work. However, it is noteworthy that the $R^2$ for the JR GC predictions is -0.51, which is very poor. This very low $R^2$ value limits the predictive accuracy that can be obtained using the GCGP method. $T_m$ represents an extreme case scenario for the GCGP method. We see that even when the GC method, which is used as one of the two input features as well as the mean function of the GP, is extremely systematically biased, the GCGP method is still able to provide decent results. The MAE of the GCGP predictions for $T_m$ is about 42 $K$, which is almost half the MAE for the JR GC predictions with an MAE of about 79 $K$. The $T_m$ data collected from the CRC Handbook of Chemistry and Physics had several entries for which the $T_m$ values were exactly the same even for molecules with widely differing structural units, functional groups, and molecular weight. Of the about 6200 experimental $T_m$  values collected, over 4000 molecules shared the same value of $T_m$ with at least one other molecule. In some cases, more than ten molecules shared the same value of $T_m$. This unusual nature of the $T_m$ data makes it difficult for the corrector GP to learn and correct the systematic bias in the JR GC predictions for $T_m$. This also explains why the GP training $R^2$ is significantly lower than those for other properties as well as why the training and testing sets $R^2$ are similar for $T_m$. In any case, the $T_m$ results show that the GCGP method provides a route to hugely improve the predictive accuracy of simple GC-based models, even (and especially) for scenarios when the GC models have extremely poor predictive performance. One other extreme scenario explored in this work is for the case when the GC models have high predictive accuracies with only a small observable systematic bias. $V_c$ is our example for this other extreme. The testing set $R^2$ for the JR GC prediction of $V_c$ is 0.98. The GCGP method could only give a similar $R^2$ for the testing set, and it may thus seem that there was no correction of bias gained by applying the GCGP method. However, a visual observation of the $V_c$ results in Figure \ref{fig:GCGP_final_results} shows that GCGP method indeed corrects the systematic bias in $V_c$, which is observable for molecules with high experimental $V_c$ values. This is more glaring from the training set results but can also be observed from the testing set results. The systematic deviations in $V_c$ in the testing set JR GC predictions became small random deviations after correction using a GP.
+$H_{vap}$ and $P_c$ represent special cases, as already discussed in the preceding section. The $H_{vap}$ results, as shown in Figure \ref{fig:GCGP_final_results}, may appear to suggest that the GCGP method did not provide any improvements in predictive accuracy and correction of systematic bias for the testing set. However, the systematic bias in the JR GC predictions for $H_{vap}$ for a given molecule is dependent on the presence and number of certain chemical moieties in the molecule. The systematic bias for $H_{vap}$ applied to highly fluorinated or highly nitrated molecules. There were only two highly fluorinated molecules that had the lowest JR GC $H_{vap}$ predictions and one highly nitrated molecule that had the highest JR GC $H_{vap}$ predictions in our data set. Our use of stratified sampling based on the input features ensured that the data for these three molecules were placed in the training set. To demonstrate that the GCGP method indeed learned and is able to correct for the unique chemical constituent based systematic bias for $H_{vap}$, we obtained additional experimental data for five highly fluorinated molecules from Yaws' Critical Property Data for Chemical Engineers and Chemists as available in the Knovel database.
+
+
+\subsection{GC-GP Provides Uncertainty Estimates}
+\alltodo{I propose for this section, we present the model selection results first. This will help us conclude which GP is the best GP for each property, then we report the error bar chart for that modeling choice.}
+
+\subsubsection{Error Analysis}
+For every thermophysical property, the MAE \eqref{eq:MAE} and RMSE \eqref{eq:RMSE} were assessed for the model architecture described in (refrence GP modeling section)
+\begin{figure}
+    \centering
+    \includegraphics[width=0.75\linewidth]{images/error_bar_chart.png}
+    \caption{Error vs. thermophysical property of selected GP models. Salmon (green) represents mean absolute error (root mean squared error). Solid colors (stripes) represent the training (testing) data. \alltodo{I know these colors are strange, they were chosen to be cvd friendly. Thoughts?}}
+    \label{fig:enter-label}
+\end{figure}
+\subsubsection{Model Selection}
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{images/lml_bar_chart_Hvap.png}
+    \caption{\alltodo{Primary authors, please help me figure out a better naming system for the x-axis of these plots. If possible, can we exclude some models so the plots are smaller? I'm not sure what the boolean flag is at the end of the results in the kernel sweep folder. We can make one subplot for all thermophysical properties once we narrow down which architectures we want to present}. Log evidence (i.e., marginal likelihood) vs. model architecture for heat of vaporization used in kernel sweep. The maximum log evidence is plotted in red.}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{images/lml_bar_chart_Pc.png}
+    \caption{Log evidence (i.e., marginal likelihood) vs. model architecture for critical pressure used in kernel sweep. The maximum log evidence is plotted in red.}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{images/lml_bar_chart_Tb.png}
+    \caption{Log evidence (i.e., marginal likelihood) vs. model architecture for boiling temperature used in kernel sweep. The maximum log evidence is plotted in red.}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{images/lml_bar_chart_Tc.png}
+    \caption{Log evidence (i.e., marginal likelihood) vs. model architecture for critical temperature used in kernel sweep. The maximum log evidence is plotted in red.}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{images/lml_bar_chart_Tm.png}
+    \caption{Log evidence (i.e., marginal likelihood) vs. model architecture for melting temperature used in kernel sweep. The maximum log evidence is plotted in red.}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{images/lml_bar_chart_Vc.png}
+    \caption{Log evidence (i.e., marginal likelihood) vs. model architecture for critical volume used in kernel sweep. The maximum log evidence is plotted in red.}
+\end{figure}
+To assess the numerical stability of the final models, the condition number was examined. \kjnote{I dont recommend extending this discussion in the main text. Instead, I recommend that we write a sentence saying condition numbers of $\mathbf{K}$ can be found in the SI. We can add a paragraph at the end of the Model Selection and Hyperparameter Estimation section explaining why the condition number matters for optimization.}
+\FloatBarrier
+
+
+
+
+\subsection{GCGP approach is robust across kernel and model structure choices} 
 \label{sec:kern_sweep}
 %Note this will be replaced with a table for each property and prediction and the "best" kernel with all others in the SI
 
@@ -551,298 +807,10 @@ We use mean absolute error (MAE), mean absolute prediction error (MAPE), mean ab
     \label{tab:hvap_ksweep}
 \end{table}
 
-
-\vspace{0.5cm}
-
-
-\begin{table}[H]
-    \centering
-    \begin{tabular}{>{\centering\arraybackslash}p{1.0cm}>{\centering\arraybackslash}p{1.0cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{1.0cm}>{\centering\arraybackslash}p{1.0cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{1cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{1cm}>{\centering\arraybackslash}p{0.75cm}}
-    \vspace{1.15cm}  kern ID& 
-    \vspace{1.15cm} Cond   N& 
-    \vspace{0.66cm} R2  train     1&  
-    \vspace{0.66cm} R2  test   1& 
-    \vspace{0.146cm} (\%) MAPD test \hspace{0.5cm}  1&  
- \vspace{0.146cm} (K) MAE test  \hspace{0.5cm}   1&  \vspace{0.66cm} R2 train   4& \vspace{0.66cm} R2 test   4& \vspace{0.146cm} (\%) MAPD test  \hspace{0.5cm}  4&
- \vspace{0.146cm} (K) MAE test  \hspace{0.5cm}   4&
- \vspace{0.66cm} R2   train      5&
- \vspace{0.66cm} R2   test     5&
- \vspace{0.146cm} (\%) MAPD test  \hspace{0.5cm}   5&
- \vspace{0.146cm} (K) MAE test  \hspace{0.5cm}   5
- 
-%\\ 
-
-\\
-          rbf(2)   &  320.59&  0.94&  0.93&  3.87&  20.96&  0.94&  0.93&  3.83&  20.72& 0.95& 0.93& 3.91&20.95
-\\
-         rq(2)   &  354.16&  0.95&  0.93&  3.89&  20.92&  0.95&  0.93&  3.88&  20.92& 0.95& 0.93& 3.9&20.95
-\\
-         mt1(2) &  225.2&  0.98&  0.93&  3.96&  21.29&  0.98&  0.93&  3.93&  21.19& 0.98& 0.93& 3.94&21.19
-\\
-         mt3(2)&  281.35&  0.96&  0.93&  3.9&  20.97&  0.96&  0.93&  3.89&  20.93& 0.96& 0.93& 3.91&21.04
-\\
-         mt5(2) &  296.29&  0.95&  0.93&  3.89&  20.86&  0.95&  0.93&  3.87&  20.77& 0.96& 0.93& 3.9&20.96
-\\
-         rbf    &  320.59&  0.94&  0.93&  3.87&  21.03&  0.94&  0.93&  3.83&  20.73& 0.95& 0.93& 3.92&20.96
-\\
-         rq   &  354.16&  0.95&  0.93&  3.9&  20.94&  0.95&  0.93&  3.89&  20.95& 0.95& 0.93& 3.9&20.97
-\\
-         mt1  &  225.2&  0.98&  0.93&  3.96&  21.23&  0.98&  0.93&  3.93&  21.19& 0.98& 0.93& 3.94&21.2
-\\
-         mt3  &  281.35&  0.96&  0.93&  3.91&  21.01&  0.96&  0.93&  3.9&  20.96& 0.96& 0.93& 3.92&21.06
-\\
- mt5  & 296.29& 0.95& 0.93& 3.89& 20.88& 0.95& 0.93& 3.87& 20.8& 0.95& 0.93& 3.91&20.97
-\\
-    \end{tabular}
-    \caption{Kernel Sweep Summary for $T_{c}$ using models 1, 4, and 5}
-    \label{tab:tc_ksweep}
-\end{table}
-
-
-
 \vspace{0.5cm}
 
 
 
-\begin{table}[H]
-    \centering
-    \begin{tabular}{>{\centering\arraybackslash}p{1.0cm}>{\centering\arraybackslash}p{1.0cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{1.0cm}>{\centering\arraybackslash}p{1.0cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{1cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{1cm}>{\centering\arraybackslash}p{0.75cm}}
-    \vspace{1.15cm}  kern ID& 
-    \vspace{1.15cm} Cond   N& 
-    \vspace{0.66cm} R2  train     1&  
-    \vspace{0.66cm} R2  test   1& 
-    \vspace{0.146cm} (\%) MAPD test \hspace{0.5cm}  1&  
- \vspace{0.146cm} (Bars) MAE test  \hspace{0.5cm}   1&  \vspace{0.66cm} R2 train   4& \vspace{0.66cm} R2 test   4& \vspace{0.146cm} (\%) MAPD test  \hspace{0.5cm}  4&
- \vspace{0.146cm} (Bars) MAE test  \hspace{0.5cm}   4&
- \vspace{0.66cm} R2   train      5&
- \vspace{0.66cm} R2   test     5&
- \vspace{0.146cm} (\%) MAPD test  \hspace{0.5cm}   5&
- \vspace{0.146cm} (Bars) MAE test  \hspace{0.5cm}   5
- 
-%\\ 
-
-\\
-          rbf(2)   &  288.35&  0.94&  0.94&  5.35&  1.91&  0.94&  0.94&  5.41&  1.93& 0.94& 0.94& 5.47&1.94
-\\
-         rq(2)   &  324.91&  0.94&  0.93&  5.39&  1.92&  0.94&  0.94&  5.41&  1.93& 0.94& 0.94& 5.47&1.94
-\\
-         mt1(2) &  201.31&  0.96&  0.93&  5.57&  1.94&  0.96&  0.94&  5.48&  1.92& 0.96& 0.94& 5.56&1.93
-\\
-         mt3(2)&  251.63&  0.94&  0.93&  5.47&  1.95&  0.94&  0.94&  5.42&  1.92& 0.94& 0.93& 5.44&1.93
-\\
-         mt5(2) &  265.37&  0.94&  0.93&  5.45&  1.95&  0.94&  0.94&  5.4&  1.92& 0.94& 0.94& 5.42&1.92
-\\
-         rbf    &  288.35&  0.94&  0.94&  5.44&  1.93&  0.94&  0.94&  5.36&  1.92& 0.94& 0.94& 5.38&1.92
-\\
-         rq   &  324.91&  0.94&  0.94&  5.4&  1.92&  0.94&  0.94&  5.36&  1.92& 0.94& 0.94& 5.38&1.92
-\\
-         mt1  &  201.31&  0.96&  0.93&  5.57&  1.94&  0.95&  0.93&  5.44&  1.92& 0.95& 0.93& 5.5&1.92
-\\
-         mt3  &  251.63&  0.94&  0.94&  5.44&  1.93&  0.94&  0.94&  5.41&  1.93& 0.94& 0.94& 5.44&1.93
-\\
- mt5  & 265.37& 0.94& 0.94& 5.39& 1.92& 0.94& 0.94& 5.36& 1.92& 0.94& 0.94& 5.4&1.92
-\\
-    \end{tabular}
-    \caption{Kernel Sweep Summary for $P_{c}$ using models 1, 4, and 5}
-    \label{tab:pc_ksweep}
-\end{table}
-
-\vspace{0.5cm}
-
-
-\begin{table}[H]
-    \centering
-    \begin{tabular}{>{\centering\arraybackslash}p{1.0cm}>{\centering\arraybackslash}p{1.0cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{1.0cm}>{\centering\arraybackslash}p{1.0cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{1cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{1cm}>{\centering\arraybackslash}p{0.75cm}}
-       \vspace{1.15cm}  kern ID& 
-       \vspace{1.15cm} Cond   N& 
-       \vspace{0.66cm} R2  train     1&  
- \vspace{0.66cm} R2  test   1& 
- \vspace{0.146cm} (\%) MAPD test \hspace{0.5cm}  1&  
- ($cm^{3} \cdot mol^{-1}$) MAE test  \hspace{0.5cm}   1&  \vspace{0.66cm} R2 train   4& \vspace{0.66cm} R2 test   4& \vspace{0.146cm} (\%) MAPD test  \hspace{0.5cm}  4&  
- ($cm^{3} \cdot mol^{-1}$) MAE test  \hspace{0.5cm}   4& \vspace{0.66cm} R2   train      5& 
- \vspace{0.66cm} R2   test     5& 
- \vspace{0.146cm} (\%) MAPD test  \hspace{0.5cm}   5&
- ($cm^{3} \cdot mol^{-1}$) MAE test  \hspace{0.5cm}   5
- 
-%\\ 
-
-\\
-          rbf(2)   &  341.77&  0.99&  0.98&  3.66&  17.84&  0.99&  0.98&  3.59&  16.74& 0.99& 0.98& 3.62&16.83
-\\
-         rq(2)   &  368.58&  0.99&  0.98&  3.64&  17.13&  0.99&  0.98&  3.58&  16.82& 0.99& 0.98& 3.6&16.94
-\\
-         mt1(2) &  243.1&  1&  0.98&  3.4&  16.59&  1&  0.98&  3.26&  16.15& 1& 0.98& 3.24&15.92
-\\
-         mt3(2)&  302.36&  1&  0.96&  3.64&  19.73&  0.99&  0.98&  3.61&  17.17& 0.99& 0.98& 3.59&17.04
-\\
-         mt5(2) &  317.61&  0.99&  0.98&  3.73&  18.16&  0.99&  0.98&  3.61&  17.14& 0.99& 0.98& 3.6&16.99
-\\
-         rbf    &  341.77&  0.99&  0.96&  3.95&  20.24&  0.99&  0.98&  3.58&  16.68& 0.99& 0.98& 3.61&16.79
-\\
-         rq   &  368.58&  0.99&  0.98&  3.66&  17.64&  0.99&  0.98&  3.59&  16.73& 0.99& 0.98& 3.61&16.82
-\\
-         mt1  &  243.1&  1&  0.98&  3.38&  16.84&  1&  0.98&  3.3&  16.18& 1& 0.98& 3.28&15.97
-\\
-         mt3  &  302.36&  0.99&  0.98&  3.63&  17.23&  0.99&  0.98&  3.6&  17.11& 0.99& 0.98& 3.57&16.95
-\\
- mt5  & 317.61& 0.99& 0.98& 3.73& 18.24& 0.99& 0.98& 3.61& 17.12& 0.99& 0.98& 3.6&16.9
-\\
-    \end{tabular}
-    \caption{Kernel Sweep Summary for $V_{c}$ using models 1, 4, and 5}
-    \label{tab:vc_ksweep}
-\end{table}
-
-
-\vspace{0.5cm}
-
-
-
-\begin{table}[H]
-    \centering
-    \begin{tabular}{>{\centering\arraybackslash}p{1.0cm}>{\centering\arraybackslash}p{1.25cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{1.0cm}>{\centering\arraybackslash}p{1.0cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{1cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{1cm}>{\centering\arraybackslash}p{0.75cm}}
-    \vspace{1.15cm}  kern ID& 
-    \vspace{1.15cm} Cond   N& 
-    \vspace{0.66cm} R2  train     1&  
-    \vspace{0.66cm} R2  test   1& 
-    \vspace{0.146cm} (\%) MAPD test \hspace{0.5cm}  1&  
- \vspace{0.146cm} (K) MAE test  \hspace{0.5cm}   1&  \vspace{0.66cm} R2 train   4& \vspace{0.66cm} R2 test   4& \vspace{0.146cm} (\%) MAPD test  \hspace{0.5cm}  4&
- \vspace{0.146cm} (K) MAE test  \hspace{0.5cm}   4&
- \vspace{0.66cm} R2   train      5&
- \vspace{0.66cm} R2   test     5&
- \vspace{0.146cm} (\%) MAPD test  \hspace{0.5cm}   5&
- \vspace{0.146cm} (K) MAE test  \hspace{0.5cm}   5
- 
-%\\ 
-
-\\
-          rbf(2)   &  1950.81&  0.89&  0.85&  4.55&  20.57&  0.89&  0.83&  4.57&  20.78& 0.89& 0.88& 4.51&20.11
-\\
-         rq(2)   &  2186.64&  0.9&  0.88&  4.5&  20.21&  0.9&  0.88&  4.48&  20.11& 0.9& 0.88& 4.48&20.03
-\\
-         mt1(2) &  1360.19&  0.95&  0.88&  4.41&  19.73&  0.96&  0.88&  4.39&  19.57& 0.95& 0.88& 4.39&19.58
-\\
-         mt3(2)&  1703.21&  0.9&  0.87&  4.5&  20.27&  0.9&  0.87&  4.49&  20.26& 0.9& 0.88& 4.47&19.98
-\\
-         mt5(2) &  1796.14&  0.9&  0.86&  4.52&  20.41&  0.9&  0.85&  4.53&  20.51& 0.9& 0.88& 4.48&20.02
-\\
-         rbf    &  1950.81&  0.89&  0.85&  4.55&  20.55&  0.89&  0.84&  4.55&  20.67& 0.89& 0.88& 4.51&20.11
-\\
-         rq   &  2186.64&  0.9&  0.88&  4.5&  20.2&  0.9&  0.88&  4.48&  20.11& 0.9& 0.88& 4.48&20.01
-\\
-         mt1  &  1360.19&  0.95&  0.88&  4.42&  19.76&  0.95&  0.88&  4.39&  19.62& 0.95& 0.88& 4.39&19.59
-\\
-         mt3  &  1703.21&  0.9&  0.87&  4.49&  20.22&  0.9&  0.87&  4.48&  20.18& 0.9& 0.88& 4.46&19.94
-\\
- mt5  & 1796.14& 0.9& 0.86& 4.52& 20.38& 0.9& 0.86& 4.52& 20.43& 0.9& 0.88& 4.48&20
-\\
-    \end{tabular}
-    \caption{Kernel Sweep Summary for $T_{b}$ using models 1, 4, and 5}
-    \label{tab:tb_ksweep}
-\end{table}
-
-
-
-\vspace{0.5cm}
-
-
-
-
-
-\begin{table}[H]
-    \centering
-    \begin{tabular}{>{\centering\arraybackslash}p{1.0cm}>{\centering\arraybackslash}p{1.25cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{1.0cm}>{\centering\arraybackslash}p{1.0cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{1cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{1cm}>{\centering\arraybackslash}p{0.75cm}}
-    \vspace{1.15cm}  kern ID& 
-    \vspace{1.15cm} Cond   N& 
-    \vspace{0.66cm} R2  train     1&  
-    \vspace{0.66cm} R2  test   1& 
-    \vspace{0.146cm} (\%) MAPD test \hspace{0.5cm}  1&  
- \vspace{0.146cm} (K) MAE test  \hspace{0.5cm}   1&  \vspace{0.66cm} R2 train   4& \vspace{0.66cm} R2 test   4& \vspace{0.146cm} (\%) MAPD test  \hspace{0.5cm}  4&
- \vspace{0.146cm} (K) MAE test  \hspace{0.5cm}   4&
- \vspace{0.66cm} R2   train      5&
- \vspace{0.66cm} R2   test     5&
- \vspace{0.146cm} (\%) MAPD test  \hspace{0.5cm}   5&
- \vspace{0.146cm} (K) MAE test  \hspace{0.5cm}   5
- 
-%\\ 
-
-\\
-          rbf(2)   &  2619.45&  0.71&  0.7&  13.3&  43.05&  0.7&  0.7&  13.31&  43.25& 0.71& 0.7& 13.32&43.24
-\\
-         rq(2)   &  2955.02&  0.71&  0.7&  13.33&  43.24&  0.71&  0.7&  13.3&  43.2& 0.71& 0.7& 13.35&43.32
-\\
-         mt1(2) &  1816.73&  0.73&  0.7&  13.3&  43.18&  0.74&  0.7&  13.3&  43.23& 0.73& 0.7& 13.31&43.23
-\\
-         mt3(2)&  2279.66&  0.71&  0.7&  13.29&  43.12&  0.71&  0.7&  13.28&  43.09& 0.71& 0.7& 13.32&43.2
-\\
-         mt5(2) &  2406.63&  0.71&  0.7&  13.29&  43.11&  0.71&  0.7&  13.29&  43.1& 0.71& 0.7& 13.32&43.22
-\\
-         rbf    &  2619.45&  0.71&  0.7&  13.29&  43.03&  0.7&  0.7&  13.31&  43.26& 0.71& 0.7& 13.3&43.06
-\\
-         rq   &  2955.02&  0.71&  0.7&  13.33&  43.24&  0.71&  0.7&  13.3&  43.21& 0.71& 0.7& 13.36&43.32
-\\
-         mt1  &  1816.73&  0.73&  0.7&  13.3&  43.17&  0.74&  0.7&  13.3&  43.23& 0.73& 0.7& 13.31&43.22
-\\
-         mt3  &  2279.66&  0.71&  0.7&  13.29&  43.12&  0.71&  0.7&  13.28&  43.1& 0.71& 0.7& 13.32&43.2
-\\
- mt5  & 2406.63& 0.71& 0.7& 13.29& 43.11& 0.71& 0.7& 13.29& 43.1& 0.71& 0.7& 13.32&43.22
-\\
-    \end{tabular}
-    \caption{Kernel Sweep Summary for $T_{m}$ using models 1, 4, and 5}
-    \label{tab:tm_ksweep}
-\end{table}
-
-
-
-\vspace{0.5cm}
-
-
-
-\subsection{Final Model Implementations}
-%Talk about omitting MW for some properties
-%Talk about final model selection based on results of preliminary trials, kernel sweep, and data analysis
-%Final Parity plots will go here
-
-\subsection{Uncertainty Analysis}
-For every thermophysical property considered, \alltodo{best performing GP??} was
-\begin{figure}
-    \centering
-    \includegraphics[width=0.75\linewidth]{images/error_bar_chart.png}
-    \caption{Error vs. thermophysical property of selected GP models. Salmon (green) represents mean absolute error (root mean squared error). Solid colors (stripes) represent the training (testing) data. \alltodo{I know these colors are strange, they were chosen to be cvd friendly. Thoughts?}}
-    \label{fig:enter-label}
-\end{figure}
-
-\begin{figure}
-    \centering
-    \includegraphics[width=\linewidth]{images/lml_bar_chart_Hvap.png}
-    \caption{\alltodo{Primary authors, please help me figure out a better naming system for the x-axis of these plots. If possible, can we exclude some models so the plots are smaller? I'm not sure what the boolean flag is at the end of the results in the kernel sweep folder. We can make one subplot for all thermophysical properties once we narrow down which architectures we want to present}. Log evidence (i.e., marginal likelihood) vs. model architecture for heat of vaporization used in kernel sweep. The maximum log evidence is plotted in red.}
-\end{figure}
-\begin{figure}
-    \centering
-    \includegraphics[width=\linewidth]{images/lml_bar_chart_Pc.png}
-    \caption{Log evidence (i.e., marginal likelihood) vs. model architecture for critical pressure used in kernel sweep. The maximum log evidence is plotted in red.}
-\end{figure}
-\begin{figure}
-    \centering
-    \includegraphics[width=\linewidth]{images/lml_bar_chart_Tb.png}
-    \caption{Log evidence (i.e., marginal likelihood) vs. model architecture for boiling temperature used in kernel sweep. The maximum log evidence is plotted in red.}
-\end{figure}
-\begin{figure}
-    \centering
-    \includegraphics[width=\linewidth]{images/lml_bar_chart_Tc.png}
-    \caption{Log evidence (i.e., marginal likelihood) vs. model architecture for critical temperature used in kernel sweep. The maximum log evidence is plotted in red.}
-\end{figure}
-\begin{figure}
-    \centering
-    \includegraphics[width=\linewidth]{images/lml_bar_chart_Tm.png}
-    \caption{Log evidence (i.e., marginal likelihood) vs. model architecture for melting temperature used in kernel sweep. The maximum log evidence is plotted in red.}
-\end{figure}
-\begin{figure}
-    \centering
-    \includegraphics[width=\linewidth]{images/lml_bar_chart_Vc.png}
-    \caption{Log evidence (i.e., marginal likelihood) vs. model architecture for critical volume used in kernel sweep. The maximum log evidence is plotted in red.}
-\end{figure}
-To assess the numerical stability of the final models, the condition number was examined. \kjnote{I dont recommend extending this discussion in the main text. Instead, I recommend that we write a sentence saying condition numbers of $\mathbf{K}$ can be found in the SI. We can add a paragraph at the end of the Model Selection and Hyperparameter Estimation section explaining why the condition number matters for optimization.}
-\FloatBarrier
 
 \subsection{\alltodo{Extensability} of Other GC Models and Properties}
 %Barnabas to provide specific examples

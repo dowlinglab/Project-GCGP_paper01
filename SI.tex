@@ -69,24 +69,37 @@
 
 
 \subsection{GP Model Screening}
-%Talk about 3 model forms
-We implemented three separate GP model structures to improve the results of JR GC predictions. All three models require both the GC property predictions $\mathbf{y_{GC}}$ and molecular weights ($\mathbf{M.W}$) as inputs but make different assumptions about the relationship between the input features and experimental property data $\mathbf{y_{\text{exp}}}$. We denote $\mathbf{X} = [\mathbf{y_{GC}}, \mathbf{M.W}]$
+%Talk about 5 model forms
+We implemented five separate GP model structures to improve the results of JR GC predictions. Four of the models require both the GC property predictions $\mathbf{y_{GC}}$ and molecular weights ($\mathbf{M.W}$) and one only requires ($\mathbf{M.W}$) as an input. Each model makes different assumptions about the relationship between the input features and experimental property data $\mathbf{y_{\text{exp}}}$. We denote $\mathbf{X} = [\mathbf{y_{GC}}, \mathbf{M.W}]$
 
-The first model shown in \eqref{Method_3} attempts to model the discrepancy between the GC predictions and experimental data using a GP. This method form is well-suited for properties where there is a clear correlation between the bias of the GC predictions and the experimental data. For a more robust implementation of this method, a mean function describing the bias with respect to input parameters should be added when clear. This model uses $m=0$, which reflects our belief that for GC models which are fairly accurate, bias should be negligible. 
-
-\begin{equation}
-    \mathbf{y_{\text{exp}}} - \mathbf{y_{GC}} = GP \sim \mathcal{N}\left(0, K(\mathbf{X}) \right)
-    \label{Method_3}
-\end{equation}
-
-The second GP model implementation in \eqref{Method_1} is the final model implementation which assumes $m = \mathbf{y_{GC}}$. This method is most suitable for property prediction data where $\mathbf{y_{GC}}$ is at least a somewhat faithful representation of $\mathbf{y_{\text{exp}}}$ and the relationship between $M.W$ and $\mathbf{y_{\text{exp}}}$ is unknown.
+Model 1 described by equation \eqref{Method_1} represents the most na\"ive approach to GP modeling in which we attempt to model $\mathbf{y_{\text{exp}}}$ using $m=0$. This method is best suited for models where trends in the data are unknown or difficult to elucidate and rely on the kernel function to do fully describe trends in the data.
 
 \begin{equation}
     \mathbf{y_{\text{exp}}} \sim  GP = \mathcal{N}\left(\mathbf{y_{GC}}, K(\mathbf{X}) \right)
     \label{Method_1}
 \end{equation}
 
-The third GP model form in \eqref{Method_5} is a generalization of \eqref{Method_1} which includes tunable hyperparameters $A$ and $b$ in the mean function such that $m(\mathbf{x} \vert \mathbf{A},\mathbf{b}) = \mathbf{A}\mathbf{x} + \mathbf{b}$. This model is well suited for property predictions where the correlation of $M.W$ and $\mathbf{y_{\text{exp}}}$ is linear or when $\mathbf{y_{GC}}$ is a poor estimator of $\mathbf{y_{\text{exp}}}$.
+Model 2 and Model 3, represented by equations \eqref{Method_2} and \eqref{Method_3} respectively, attempt to model the discrepancy between the GC predictions and experimental data using a GP and are classified as traditional hybrid models. This method form is well-suited for properties where there is a clear correlation between the bias of the GC predictions and the experimental data. For a more robust implementation of this method, a mean function describing the bias with respect to input parameters should be added when clear. This model uses $m=0$, which reflects our belief that for GC models which are fairly accurate, bias should be negligible. The difference between \eqref{Method_2} and \eqref{Method_3} is that \eqref{Method_2} models discrepancy as a function of only $\mathbf{M.W}$.
+
+\begin{equation}
+    \mathbf{y_{\text{exp}}} - \mathbf{y_{GC}} = GP \sim \mathcal{N}\left(0, K(\mathbf{M.W}) \right)
+    \label{Method_2}
+\end{equation}
+
+
+\begin{equation}
+    \mathbf{y_{\text{exp}}} - \mathbf{y_{GC}} = GP \sim \mathcal{N}\left(0, K(\mathbf{X}) \right)
+    \label{Method_3}
+\end{equation}
+
+The fourth GP model implementation (Model 4) in \eqref{Method_4} is the final model implementation which assumes $m = \mathbf{y_{GC}}$. This method is most suitable for property prediction data where $\mathbf{y_{GC}}$ is at least a somewhat faithful representation of $\mathbf{y_{\text{exp}}}$ and the relationship between $M.W$ and $\mathbf{y_{\text{exp}}}$ is unknown. We note that because $\mathbf{y_{GC}}$ is not a stochastic function, Method 4 and Method 3 are mathematically equivalent. Therefore, Method 4 is a hybrid model and equivalent to method 3. These models also produce the same results within a small numerical tolerance. 
+
+\begin{equation}
+    \mathbf{y_{\text{exp}}} \sim  GP = \mathcal{N}\left(\mathbf{y_{GC}}, K(\mathbf{X}) \right)
+    \label{Method_4}
+\end{equation}
+
+The fifth GP model form (Model 5) in \eqref{Method_5} is a generalization of \eqref{Method_4} which includes tunable hyperparameters $A$ and $b$ in the mean function such that $m(\mathbf{x} \vert \mathbf{A},\mathbf{b}) = \mathbf{A}\mathbf{x} + \mathbf{b}$. This model is well suited for property predictions where the correlation of $M.W$ and $\mathbf{y_{\text{exp}}}$ is linear or when $\mathbf{y_{GC}}$ is a poor estimator of $\mathbf{y_{\text{exp}}}$. We note that because 
 
 \begin{equation}
     \mathbf{y_{\text{exp}}} \sim GP = \mathcal{N}\left( \beta_{0} \mathbf{M.W} + \beta_{1} \mathbf{y_{GC}} +\beta_{2} , K(\mathbf{X}) \right)
