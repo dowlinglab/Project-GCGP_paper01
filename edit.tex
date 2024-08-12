@@ -42,9 +42,12 @@
 \usepackage{xr} % for cross reference
 
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%% Barnabas' Added packages %%%%%%%%%%%%%
 \usepackage{verbatim} %for easy writing of multi-line comments
 \usepackage{csvsimple}
+\usepackage{tabularx}
+\usepackage{array}
 %%%\usepackage{array}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -160,6 +163,81 @@
 \subsection{FFs Ranking}
 
 
+\begin{table}[H]
+\centering
+\begin{tabular}{p{2.9cm}p{1.8cm}p{1.6cm}p{1.5cm}p{1.6cm}p{1.6cm}p{1.6cm}p{1.6cm}} 
+Substance Name&  Molecular Formula&  CAS No.&  MW /$gmol^{-1}$&  JR GC $H_{vap}$ /$kJmol^{-1}$&  Exp. $H_{vap}$ /$kJmol^{-1}$&  GCGP $H_{vap}$ /$kJmol^{-1}$& GCGP Pred. Unc. /$kJmol^{-1}$ 
+
+%\hline 
+
+\\
+         perfluorodecalin&  $C_{10}F_{18}$&  306-94-5&  462.08&  9.68&  35.80&  35.77& 12.45
+\\
+         perfluorononane&  $C_{9}F_{20}$&  375-96-2&  488.07&  7.62&  34.22&  35.84& 15.09
+\\
+         perfluoro-2-methylpentane&  $C_{6}F_{14}$&  355-04-4&  338.05&  9.74&  27.89&  25.73& 16.37
+\\
+         pentadecafluoro-octanoic acid&  $C_{8}HF_{15}O_{2}$&  335-67-1&  414.07&  29.24&  40.40&  41.34& 18.08
+\\
+         heptadecafluoro-nonanoic acid&  $C_{9}HF_{17}O_{2}$&  375-95-1&  464.08&  28.54&  43.03&  45.15& 19.30
+\\
+\end{tabular}
+\caption{Caption}
+\label{tab:my_label}
+\end{table}
+
+
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{>{\centering\arraybackslash}p{1.0cm}>{\centering\arraybackslash}p{1.0cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{1.0cm}>{\centering\arraybackslash}p{1.0cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{1cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{0.75cm}>{\centering\arraybackslash}p{1cm}>{\centering\arraybackslash}p{0.75cm}}
+       \vspace{1.15cm}  kern ID& 
+       \vspace{1.15cm} Cond   N& 
+       \vspace{0.66cm} R2  train     1&  
+ \vspace{0.66cm} R2  test   1& 
+ \vspace{0.146cm} (\%) MAPD test \hspace{0.5cm}  1&  
+ ($kJ \cdot mol^{-1}$) MAE test  \hspace{0.5cm}   1&  \vspace{0.66cm} R2 train   4& 
+ \vspace{0.66cm} R2 test   4& 
+ \vspace{0.146cm} (\%) MAPD test  \hspace{0.5cm}  4&  
+ ($kJ \cdot mol^{-1}$) MAE test  \hspace{0.5cm}   4& \vspace{0.66cm} R2   train      5& 
+ \vspace{0.66cm} R2   test     5& 
+ \vspace{0.146cm} (\%) MAPD test  \hspace{0.5cm}   5&
+ ($kJ \cdot mol^{-1}$) MAE test  \hspace{0.5cm}   5
+ 
+%\\ 
+
+\\
+          rbf(2)   &  221.3&  0.86&  0.9&  5.14&  1.75&  0.86&  0.91&  5.1&  1.73& 0.86& 0.91& 5.13&1.74
+\\
+         rq(2)   &  244.34&  0.86&  0.9&  5.15&  1.76&  0.86&  0.9&  5.11&  1.74& 0.86& 0.91& 5.13&1.74
+\\
+         mt1(2) &  155&  0.9&  0.89&  5.53&  1.9&  0.9&  0.89&  5.57&  1.91& 0.89& 0.9& 5.49&1.88
+\\
+         mt3(2)&  193.68&  0.86&  0.9&  5.21&  1.79&  0.86&  0.9&  5.18&  1.77& 0.86& 0.9& 5.19&1.77
+\\
+         mt5(2) &  204.09&  0.86&  0.9&  5.18&  1.77&  0.86&  0.9&  5.14&  1.75& 0.86& 0.9& 5.16&1.76
+\\
+         rbf    &  221.3&  0.85&  0.88&  5.23&  1.84&  0.85&  0.88&  5.11&  1.8& 0.86& 0.88& 5.36&1.89
+\\
+         rq   &  244.34&  0.86&  0.88&  5.34&  1.87&  0.86&  0.88&  5.28&  1.86& 0.86& 0.88& 5.34&1.88
+\\
+         mt1  &  155&  0.91&  0.87&  5.42&  1.9&  0.91&  0.87&  5.39&  1.89& 0.9& 0.87& 5.36&1.88
+\\
+         mt3  &  193.68&  0.86&  0.88&  5.29&  1.85&  0.86&  0.88&  5.23&  1.84& 0.86& 0.88& 5.29&1.86
+\\
+ mt5  & 204.09& 0.86& 0.88& 5.28& 1.85& 0.85& 0.88& 5.18& 1.83& 0.86& 0.88& 5.31&1.87
+\\
+    \end{tabular}
+    \caption{Kernel Sweep Summary for $\Delta H_{vap}$ using models 1, 4, and 5}
+    \label{tab:hvap_ksweep}
+\end{table}
+
+
+
+
+
+
+\end{document}
 
 
 
