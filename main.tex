@@ -72,7 +72,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%% AD commands
 \newcommand{\adnote}[1]{{\color{OliveGreen} (\texttt{adnote}: #1)}}
 \newcommand{\banote}[1]{{\color{Salmon} (\texttt{banote}: #1)}}
-
+\newcommand{\emnote}[1]{{\color{SeaGreen} (\texttt{emnote}: #1)}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% MC Commands
 \newcommand{\mcnote}[1]{{\color{Plum} (\texttt{mcnote}: #1)}}
 \newcommand{\MW}{\ensuremath{\text{M.W}}}
@@ -195,11 +195,23 @@ Abstract
     \item \mcnote{Note from MC to herself or the team}
     \item \adnote{Note from AWD}
     \item \banote{Note from BA}
+    \item \emnote{Note from EJM}
 \end{enumerate}
 
 \section{Introduction}
 
-\adnote{AD, EM, and BA will work together to streamline the introduction. EM and AD have a lot of ideas of how to ensure this speaks to the target audience(s).}
+\adnote{AD, EM, and BA will work together to streamline the introduction. EM and AD have a lot of ideas of how to ensure this speaks to the target audience(s).
+
+Main points for introduction (based on AD and EM conversation):
+\begin{enumerate}
+    \item Molecular discovery and materials design for sustainability, focus on refrigeration as a motivating example
+    \item CAMD relies on accurate and inexpensive property predictions to link molecular and process scales
+    \item Group contribution methods are ``workhorse'' of CAMD, but show systematic bias
+    \item Hybrid models are a simple and effective way to correct this systematic bias with modest data sets
+\end{enumerate}
+
+}
+\emnote{Intro way too long - we can shorten when we agree upon results. I can help so don't worry about it}
 
 %Reliable property prediction of materials is critical in many applications (Barnabas)
 The most pressing challenges facing humanity, as summarized in the seventeen sustainable development goals (SDGs), require innovation in materials and process development. 
@@ -223,46 +235,52 @@ Fast and reliable property prediction of new molecules/materials is needed for a
 %       %Experiments
 Experimental measurements are generally considered the highest-fidelity route for determining the properties of materials. 
 However, obtaining experimental measurements for all possible materials for a given application can be extremely expensive and not practically feasible. 
-Databases of materials and some of their experimentally measured properties have been assembled for decades. However these databases only contain a minuscule fraction of all possible molecules that may possibly exist. Furthermore, even for the materials that exist in these databases, there is often limited data on their properties; it is either there are no experimental measurements on some of the required properties for a given material and/or the experimental measurement data are not available at the desired state points. Thus, alternatives to experimental measurements and database compilations are needed. There is the need for property prediction methods for new molecules.
+Databases \cite{Kim2023, yaws-critical-property, bookRumble2023, Dortmund2024} of materials and some of their experimentally measured properties have been assembled for decades. However these databases only contain a minuscule fraction of all possible molecules that may possibly exist. Furthermore, even for the materials that exist in these databases, there is often limited data on their properties; it is either there are no experimental measurements on some of the required properties for a given material and/or the experimental measurement data are not available at the desired state points. Thus, alternatives to experimental measurements and database compilations are needed. There is the need for property prediction methods for new molecules.
 %       %Molecular simulation
-Molecular simulations (MS) represent a potentially high-fidelity alternative to experiments for predicting the properties of molecules, especially for new or uncommon molecules or for properties of common molecules but at extreme conditions for which experimental data is limited. It is also generally less expensive and less time-consuming compared to experiments, which means MS can be used as a tool for assessing more molecules than would be done experimentally. However, for high throughput screening of millions or more molecules for molecular discovery, even MS becomes prohibitively computationally expensive and time-consuming. Furthermore, high-fidelity MS requires accurate force fields (FFs) that capture the physics of the molecules being modeled. Such accurate FFs may not be available for new molecules, posing a challenge to the use of MS for high-throughput screening of new molecules.
+Molecular simulations (MS) represent a potentially high-fidelity alternative to experiments for predicting the properties of molecules, especially for new or uncommon molecules or for properties of common molecules but at extreme conditions for which experimental data is limited. It is also generally less expensive and less time-consuming compared to experiments, which means MS can be used as a tool for assessing more molecules than would be done experimentally. However, for high throughput screening of millions or more molecules for molecular discovery, even MS becomes prohibitively computationally expensive and time-consuming. Furthermore, high-fidelity MS requires accurate force fields (FFs) that capture the physics of the molecules being modeled. Such accurate FFs may not be available for new molecules, posing a challenge to the use of MS for high-throughput screening of new molecules. 
 
 %       %Engineering models (EoS, activity coefficients, correlationsetc.)
 Alternatives to MS exist for predicting the properties of new materials or existing materials at conditions for which experimental data is unavailable. 
 These methods typically involve the use of thermodynamic or engineering models for property predictions. 
-These thermodynamic models are of two main classes: Equation of State (EoS) models and activity coefficient models. 
-Typical thermodynamic models usually require fitting an Equation of State (EoS)  or activity coefficient (AC) model using limited experimental data. Often, this constitutes vapor-liquid equilibria (VLE) data. 
+These thermodynamic models are typically of two main classes: Equation of State (EoS) models and activity coefficient models \cite{Kontogeorgis2009}. 
+Typical thermodynamic models usually require fitting an Equation of State (EoS)  or activity coefficient (AC) model using limited experimental data. Often, this constitutes vapor-liquid equilibria (VLE) data \cite{Kontogeorgis2009}. 
 The fitted EoS or activity coefficient models can then be used for predicting other properties and at state points for which experimental data may be unavailable. 
-Such thermodynamic models have also been successfully used in predicting mixture properties especially for cases where binary interaction parameters could be obtained by fitting to experimental data for the specific mixtures. 
-A common type of EoS model is the cubic EoS, such as the Soave–Redlich–Kwong (SRK) and Peng–Robinson (PR) EoS. 
-Another important class of EoS models is the Statistical Associating Fluid Theory (SAFT) based EoS, which has several variations, including the perturbed chain SAFT and SAFT-VR.
-Some common AC models include the Non-random Two-liquid (NRTL) and the Universal Quasichemical (UNIQUAC) AC models. 
+Such thermodynamic models have also been successfully used in predicting mixture properties \cite{leeThermodynamicPropertyPredictions1992, fedaliModelingThermodynamicProperties2014, nasrifarPredictionThermodynamicProperties2006}  especially for cases where binary interaction parameters could be obtained by fitting to experimental data for the specific mixtures. 
+A common type of EoS model is the cubic EoS, such as the Soave–Redlich–Kwong (SRK) and Peng–Robinson (PR) EoS \cite{Kontogeorgis2009}. 
+Another important class of EoS models is the Statistical Associating Fluid Theory (SAFT) based EoS, which has several variations, including the perturbed chain SAFT \cite{almasiEvaluationThermodynamicProperties2014, tumakakaThermodynamicModelingComplex2005} and SAFT-Variable Range \cite{lafitteComprehensiveDescriptionChemical2007, mccabeSAFTVRModellingPhase1999, pereiraIntegratedSolventProcess2011} etc.
+Some common AC models include the Non-random Two-liquid (NRTL) and the Universal Quasichemical (UNIQUAC) AC models \cite{Kontogeorgis2009}. 
 All of the above-named thermodynamic models have been successfully used for property predictions in a variety of applications; however, they usually require parameter fitting using component-specific experimental data, which are not available for new yet-to-be-synthesized molecules. 
 Therefore, the above methods are limited by the availability of experimental data and, thus, of little use for materials discovery tasks involving new or uncommon molecules. 
 Furthermore, these EoS and AC based models are typically only directly useful for predicting thermodynamic properties and not transport or interfacial properties which may be important for material design. 
-These EoS and AC models must be coupled with engineering heuristics that have limited accuracy or methods such as entropy scaling - which again requires further fitting to scarce or unavailable experimental data - to allow for predictions of transport and interfacial properties. 
+These EoS and AC models must be coupled with engineering heuristics that have limited accuracy or methods such as excess-entropy scaling \cite{dehlouzEntropyScalingBasedCorrelation2022, dyrePerspectiveExcessentropyScaling2018} - which again may require further fitting to scarce or unavailable experimental data - to allow for predictions of transport and interfacial properties. 
 
 How can we rapidly and reliably predict the thermodynamic, transport, interfacial, safety, environmental, and other important properties of new molecules without recourse to scarce or unavailable experimental data for materials discovery? Two broad classes of approaches stand out: group contribution (GC)- based methods and machine learning (ML)- based methods. 
 %GC Models
 GC-based methods involve molecular modeling of materials as an assembly of a finite number of structural units or molecular fragments. 
 Once the GC model has been parameterized using experimental data, property predictions can be made for new molecules based only on the type and number of structural units present in the molecule. 
 The unique advantage of GC models is that they can be parameterized using limited available experimental data and then used to predict properties of entirely new molecules, provided these new molecules are only made up of structural units present in the data for parameterizing the GC models. 
-Furthermore, these GC-based models have been successfully applied in predicting not only thermodynamic properties but also transport, interfacial, and other types of properties. Examples of GC-based EoS models include the Predictive Soave-Redlich-Kwong (PSRK),  GC-SAFT, SAFT-$\gamma$-mie models amongst others. Examples of GC-based activity coefficient models include the UNIQUAC Functional-group Activity Coefficients (UNIFAC) and the NRTL-segment activity coefficients models. 
+Furthermore, these GC-based models have been successfully applied in predicting not only thermodynamic properties but also transport, interfacial, and other types of properties \cite{gharagheiziGroupContributionModel2012, chagasCalculationInterfacialTension2021, ohExtensionGroupContribution2005, gardasGroupContributionMethods2009, ohGroupContributionModel1997}. 
+There are several thermodynamic models that are GC-based. 
+Examples of GC-based EoS models include the Predictive Soave-Redlich-Kwong (PSRK) \cite{nasrifarSaturatedLiquidDensity1998, liPredictionGasSolubilities2001},  GC-SAFT \cite{tamouzaApplicationBinaryMixtures2005, nguyenhuynhApplicationGCSAFTEOS2008, nguyenthiApplicationGroupContribution2005}, SAFT-$\gamma$-mie \cite{dufalPredictionThermodynamicProperties2014, haslamExpandingApplicationsSAFTg2020a,
+fayaz-torshiziCoarseGrainedMolecularSimulation2022,
+ervikBottledSAFTWeb2016} models amongst others. Examples of GC-based activity coefficient models include the UNIQUAC Functional-group Activity Coefficients (UNIFAC) \cite{fredenslundVaporLiquidEquilibriaUsing2012} and the NRTL-segment activity coefficients \cite{chenSolubilityModelingNonrandom2004} models. 
 These models have shown remarkable success in fully predictive modeling of pure component and mixture properties. However, since they are thermodynamic models, they are generally restricted to predicting thermodynamic properties if not coupled with other tools like MS or entropy scaling.
-There are other GC-based property prediction models that are neither EoS nor AC models. Examples of these models include the Joback and Reid (JR) GC method (which is notably popular), Lydersen method, the Marrero-Gani method, and the Wilson-Jasperson Method. These types of GC methods typically consist of a collection of several models or equations—one equation for one property—for direct and derivative-free computation of properties. Since property predictions using these types of GC models are derivative-free, they offer the added advantages of speed and ease of implementation over their thermodynamic model counterparts.
+There are other GC-based property prediction models that are neither EoS nor AC models. Examples of these models include the Joback and Reid \cite{jobackEstimationPureComponentProperties1987} (JR) GC method (which is notably popular), Lydersen method \cite{simonEstimationCriticalProperties1956}, the Marrero-Gani method, amongst others. These types of GC methods typically consist of a collection of several models or equations—one equation for one property—for direct and derivative-free computation of properties. Since property predictions using these types of GC models are derivative-free, they offer the added advantages of speed and ease of implementation over their thermodynamic model counterparts.
 Such GC methods have been successfully used to predict thermodynamic, transport, interfacial, and other types of properties. They are fast and relatively easy to implement. 
 However, the most accessible types of these GC methods, which are first-order GC models like the Joback and Reid GC method, are known to have significant systematic bias. 
 The more nuanced second-order GC methods, like the Marrero-Gani method, are more challenging to implement and sometimes only give a marginal improvement in predictive accuracy or even surprisingly worse predictions in some cases compared to the simpler JR GC method. 
 Furthermore, these GC methods generally do not have uncertainty estimates associated with their predictions, which is important for material screening.
 %ML Models
  An alternative class of methods to the GC-based methods for property predictions of new molecules is machine learning (ML) based methods. 
- There has been a surge in ML for property predictions using different kinds of ML models, including neural networks, support vector machines, Gaussian processes, random forests, etc. Typically, ML models require a large amount of data, which is not always available. 
+ There has been a surge in ML for property predictions using different kinds of ML models, including neural networks \cite{taskinenPredictionPhysicochemicalProperties2003}, support vector machines \cite{zhaoApplicationSupportVector2006, xueSupportVectorMachinesBased2004}, Gaussian processes \cite{obrezanovaGaussianProcessesMethod2007,
+pustokhinaDevelopingRobustModel2021,
+bishnoiScalableGaussianProcesses2021}, random forests \cite{palmerRandomForestModels2007}, etc. Typically, ML models require a large amount of data, which is not always available. 
  Furthermore, ML models rarely have high physical interpretability, unlike thermodynamic models and some GC models. 
  Furthermore, uncertainty propagation and estimation from complex ML models like deep neural networks can be cumbersome. 
  A certain type of ML method which have shown promise in low-quantity data applications and allows for easy and often reasonable prediction of uncertainties is Gaussian process regression (GPR) surrogate modeling. 
  Using a Gaussian process (GP) for property predictions is an established practice and offers easy and reliable predictive uncertainty estimates. However, one key consideration for using GPR or any ML model for property prediction is choosing the most appropriate input feature(s) for the ML model. The design of input features for ML models, referred to as feature engineering, can prove critical to their success. It is typical for ML models found in the literature to have tens or hundreds of input features, many of which are not easy to physically interpret and link with the target properties. Several ML models rely on fingerprint representations based on the SMILES strings of molecules. This is problematic for several reasons. Such ML models must necessarily be large and require a lot of training data (which is usually not available), as the input feature size depends on the input feature size of the largest molecule in the training data set. Furthermore, such models are amongst the least physically interpretable ML models. 
  Some other works in the literature have used molecular descriptors, which have been developed by practitioners in the quantitative structure-property relationship (QSPR) community for several decades. Currently, there are over two hundred (200) such descriptors accessible from the RDKit Python package. Selecting just the right combination of molecular descriptors, both in quantity and information content, for a given property prediction task can be challenging and requires significant expertise in QSPR modeling, chemistry, physics, and an in-depth knowledge of several of the more than 200 molecular descriptors. Furthermore, the right choice of QSPR-based molecular descriptors must necessarily vary from property to property. This further heightens the barrier and limits accessibility in adopting this approach for predicting the many diverse material properties that are often needed in material discovery tasks.
-Dinis et. al. showed that sigma profiles could be used as consistent molecular descriptors and input features to convolutional neural networks (CNNs). They showed excellent property predictions for several diverse properties using the same input features with a constant input feature size of fifty-one (51). This input feature size is much lower than those of SMILES-based fingerprint inputs but may be higher than those in ML models that use QSPR-based molecular descriptors as input features. Additionally, 51 features is generally a large amount in the context of GP modeling. Furthermore, the authors found that sigma profiles correlated highly with certain target properties like aqueous solubility, yielding high model performance metrics but less so to certain properties like refractive index and density.
+Dinis et. al. \cite{abranchesSigmaProfilesDeep2022} showed that sigma profiles could be used as consistent molecular descriptors and input features to convolutional neural networks (CNNs). They showed excellent property predictions for several diverse properties using the same input features with a constant input feature size of fifty-one (51). This input feature size is much lower than those of SMILES-based fingerprint inputs but may be higher than those in ML models that use QSPR-based molecular descriptors as input features. Furthermore, the authors found that sigma profiles correlated highly with certain target properties like aqueous solubility, yielding high model performance metrics but less so to certain properties like refractive index and density.
 
 In summary, some of the most widely used fully predictive approaches for property prediction of new molecules are GC-based or ML-based methods. Current GC-based methods are either not accurate enough and/or significantly complex to implement or, like thermodynamic GC models, not readily applicable to transport, interfacial, and other types of properties that may be of interest for materials discovery. On the other hand, most of the current ML methods in the literature either require a large amount of data that may not be available or use an inconsistent set of input features for different properties, which requires feature engineering expertise. They may also be highly complex models like CNNs or may not be as suitable for certain properties and usually do not provide easily accessible uncertainty estimates for predicted property values.
 
@@ -290,7 +308,7 @@ In this work, for each molecule, three properties or data are required for each 
 
 \subsubsection{Experimental Data Collection}
 
-The experimental data for training GP models were obtained primarily from the 105th edition of the CRC Handbook of Chemistry and Physics. A few experimental data for $\Delta H_{vap}$ were collected from Yaws' Critical Property Data for Chemical Engineers and Chemists as available in the Knovel database.
+The experimental data for training GP models were obtained primarily from the 105th edition of the CRC Handbook of Chemistry and Physics \cite{bookRumble2023}. A few experimental data for $\Delta H_{vap}$ were collected from Yaws' Critical Property Data for Chemical Engineers and Chemists \cite{yaws-critical-property} as available in the Knovel database.
 For each property, data points were collected for all molecules for which there was an intersection of available experimental data from the CRC Handbook of Chemistry and Physics and obtainable property predictions using the JR GC method.
 
 \begin{table}
@@ -319,8 +337,8 @@ For each property, data points were collected for all molecules for which there 
 Table \ref{tab:collected_data} shows the final amounts of collected data for each property in this work. $T_m$ had the highest number of data points for molecules whose melting temperature could be predicted using the JR GC model. $\Delta H_{vap}$ had the least. Some data in the CRC Handbook of Chemistry and Physics for $T_m$ and $T_b$ were not used as there were flags provided to indicate that those temperatures may not be the true melting or boiling temperatures as they could undergo decomposition or sublimation at those temperatures. In this work, we only used data for $T_m$ and $T_b$ that did not have any sublimation or decomposition flags.
 
 \subsubsection{Joback and Reid GC Predictions}
-The JR GC method is a first-order GC method and has equations and parameters for the six properties considered in this work. The equations for each property are presented in equations \ref{eq:boiling_temp} - \ref{eq:melting_temp}. The model parameters are available in the original work.
-The JR GC method was selected for this work due to its popularity, its ease of use \& its accessibility, and the availability of open-source software, like JRGUI, for automatic generation of JR GC predictions of molecules given their SMILES strings.
+The JR GC method is a first-order GC method and has equations and parameters for the six properties considered in this work. The equations for each property are presented in equations \ref{eq:boiling_temp} - \ref{eq:melting_temp}. The model parameters are available in the original work \cite{jobackEstimationPureComponentProperties1987}.
+The JR GC method was selected for this work due to its popularity, its ease of use \& its accessibility, and the availability of open-source software, like JRGUI \cite{shiJRguiPythonProgram2017}, for automatic generation of JR GC predictions of molecules given their SMILES strings.
 
 \begin{equation}
     T_b \, [\text{K}] = 198.2 + \sum n_{i} * T_{b,i}
@@ -361,15 +379,15 @@ The JR GC method works by dividing the molecule into predefined structural units
 
 The JR GC method is known to show significant systematic bias in property prediction, especially at high molecular weights, for $T_b$, for example. Furthermore, the JR GC method may not have parameters for certain structural units or molecular fragments present in some molecules. This means that the JR GC method will not be applicable to such molecules. Predictions using the JR GC method do not have uncertainty estimates associated with them. However, it is expected that the JR GC predictions will have a strong physically interpretable correlation with the true property values, which thus provides the rationale for using the JR GC predictions as an input feature to a corrector model. In the context of this work, the corrector model is a GP.
 
-In this work, the JRGUI software, an open-source, Python-based code, was used for the automatic computation of JR GC predictions for all properties in this work. To use JRGUI in an automatic mode, a set of SMILES strings for the molecules for which predicted property values are desired is required. 
-The SMILES strings were obtained by parsing the CAS registry numbers of the molecules in the CRC Handbook of Chemistry and Physics using PubChemPy, another open-source Python-based package for interfacing with the PubChem database of compounds. The PubChem database is a database with a listing for over a hundred million compounds and contains SMILES strings for all or almost all compounds it has an entry for. In this work, we assume that all or almost all molecules in the CRC Handbook of Chemistry and Physics will have an entry in the PubChem database and thus have its SMILES string available from PubChem.
+In this work, the JRGUI \cite{shiJRguiPythonProgram2017} software, an open-source, Python-based code, was used for the automatic computation of JR GC predictions for all properties in this work. To use JRGUI in an automatic mode, a set of SMILES strings for the molecules for which predicted property values are desired is required. 
+The SMILES strings were obtained by parsing the CAS registry numbers of the molecules in the CRC Handbook of Chemistry and Physics using PubChemPy \cite{PubChemPyDocumentationPubChemPy}, another open-source Python-based package for interfacing with the PubChem \cite{Kim2023} database of compounds. The PubChem database is a database with a listing for over a hundred million compounds and contains SMILES strings for all or almost all compounds it has an entry for. In this work, we assume that all or almost all molecules in the CRC Handbook of Chemistry and Physics will have an entry in the PubChem database and thus have its SMILES string available from PubChem.
 
-The JRGUI software also provides the values of over two hundred molecular descriptors from RDKit in addition to other output data. The molecular weight (MW) is one of the outputs from the JRGUI tool and was used as the source of MW data for this work. It should be noted that MW can be readily computed in the same fashion as any simple GC property by simply summing the molecular weights of the structural units in a molecule so that there is no need to use RDKit or any specialized tool.
+The JRGUI software also provides the values of over two hundred molecular descriptors from RDKit \cite{RDKit} in addition to other output data. The molecular weight (MW) is one of the outputs from the JRGUI tool and was used as the source of MW data for this work. It should be noted that MW can be readily computed in the same fashion as any simple GC property by simply summing the molecular weights of the structural units in a molecule so that there is no need to use RDKit or any specialized tool.
 
 \subsection{Data Pre-processing} \label{sec:preprocess}
 
 \subsubsection{Data Quality}
-We performed basic two-dimensional outlier detection analysis on the collected data to identify regions of the data that may exhibit unusual trends or behavior. We used the JR GC predictions and collected experimental data. We observed certain data points that showed significant deviations from the general trends in the JR GC predictions compared to experiments and flagged these points as 'outliers' with respect to the JR GC model. On further probing of these points, we identified three experimental $\Delta H_{vap}$ data for which the CRC Handbook of Chemistry and Physics had wrong data entries. We ascertained that the data entries for these molecules were wrong by comparing against data from the Yaws' Critical Property Data for Chemical Engineers and Chemists as available in the Knovel database and data from the National Institute of Standards and Technology (NIST) webbook. The NIST webbook and Yaws' Critical Property Data agreed while the CRC Handbook data were different for these three molecules. Furthermore, once the experimental $\Delta H_{vap}$ data for these three molecules were replaced with those from the Yaws' Critical Property Data, they ceased being flagged by our outlier detection algorithm. The other data points that were flagged as outliers for $\Delta H_{vap}$ were found to be due to limitations in the parameterization of the JR GC method. Further details, data, and figures about this are available in the supporting information (SI). 
+We performed basic two-dimensional outlier detection analysis on the collected data to identify regions of the data that may exhibit unusual trends or behavior. We used the JR GC predictions and collected experimental data. We observed certain data points that showed significant deviations from the general trends in the JR GC predictions compared to experiments and flagged these points as 'outliers' with respect to the JR GC model. On further probing of these points, we identified three experimental $\Delta H_{vap}$ data for which the CRC Handbook of Chemistry and Physics had wrong data entries. We ascertained that the data entries for these molecules were wrong by comparing against data from the Yaws' Critical Property Data for Chemical Engineers and Chemists as available in the Knovel database and data from the National Institute of Standards and Technology (NIST) \cite{informaticsNISTChemistryWebBook} webbook. The NIST webbook and Yaws' Critical Property Data agreed while the CRC Handbook data were different for these three molecules. Furthermore, once the experimental $\Delta H_{vap}$ data for these three molecules were replaced with those from the Yaws' Critical Property Data, they ceased being flagged by our outlier detection algorithm. The other data points that were flagged as outliers for $\Delta H_{vap}$ were found to be due to limitations in the parameterization of the JR GC method. Further details, data, and figures about this are available in the supporting information (SI). 
 
 
 \subsubsection{Analysis of Input Feature and Label Data}
@@ -614,8 +632,7 @@ In mathematics, a \textit{kernel} refers to a function that defines a similarity
  \end{gather}
 
  In this application, there are no parameters $\boldsymbol{\theta}$ to estimate in the low-fidelity model. Moreover, estimation of $\zeta(\cdot)$ is accomplished by estimating the parameters in the GP mean and covariance functions.
- \alltodo{please confirm Jobac model has no parameters that are being fit}.
-
+\kjnote{end text from KJ}
 
 
 
@@ -638,7 +655,7 @@ We determined in section XX that the discrepancy of the JR GC model for each pro
 
  We use the condition number to determine the numerical stability of our models. The condition number is an indication of how small perturbations in the inputs can affect the outputs \cite{Foster2009}. As a rule of thumb, the number of significant digits lost in addition to those from machine precision is proportional to the logarithmic scaled value of a condition number \cite{NumMathComput}. Ideally, a condition number should be as close to one as possible and a condition number that is much greater than one (in this case we used 500 as a cutoff) is ill-conditioned. That is, a small change in the inputs has significant impact on the output.
 
-\kjnote{end text from KJ}
+
 
 %Stratified sampling (Dinis)
 \subsubsection{Stratified sampling}
@@ -687,7 +704,7 @@ Figure \ref{fig:2D_JRGC_bias} shows the systematic bias of the JR GC predictions
     \label{fig:2D_JRGC_bias}
 \end{figure}
 
-This systematic bias is due to one of the flaws of the JR GC method, which assumes that structural units contribute to the value of these properties in a monotonous manner. Thus, we observe, for example, that the JR GC method predicts that several molecules would have $T_m$ values greater than 1500 $K$, which is not the case in nature. Molecules do not monotonously and boundlessly melt at higher temperatures as the structural units are added.
+This systematic bias is due to one of the flaws of the JR GC method, which assumes that structural units contribute to the value of these properties in a monotonous manner. Thus, we observe, for example, that the JR GC method predicts that several organic molecules would have $T_m$ values greater than 1500 $K$, which is not the case in nature. Molecules do not monotonously and boundlessly melt at higher temperatures as the structural units are added.
 The systematic bias of the JR GC predictions for $\Delta H_{vap}$ and $P_c$ is more nuanced. Unlike the other properties for which the JR GC method shows systematic bias that is generally correlated with molecular weight, the systematic bias of the JR GC method for $\Delta H_{vap}$ and $P_c$ is for specific classes of molecules.
 We found from our outlier detection analysis, presented in detail in the SI, that the JR GC method shows significant systematic bias in it's $\Delta H_{vap}$ predictions for highly fluorinated and highly nitrated molecules. In Figure \ref{fig:2D_JRGC_bias}, there are two points with conspicuously low JR GC $\Delta H_{vap}$ predictions. 
 
@@ -700,7 +717,7 @@ We found from our outlier detection analysis, presented in detail in the SI, tha
     \label{fig:JRGC_Hvap_bias_molecules}
 \end{figure}
 
-These two points correspond to molecules with moderate to high MW. The two molecules with this large underestimation in  $\Delta H_{vap}$ using the JR GC method are shown in Figure \ref{fig:JRGC_Hvap_bias_molecules} a and b. They are both highly fluorinated molecules. The group contribution of the fluorine group to $\Delta H_{vap}$ according to the JR GC method is -0.67 $kJ/mol$. This explains why, for highly fluorinated molecules, the JR GC method predicts very low values of $\Delta H_{vap}$ contrary to experimental or true values. The JR GC method could predict negative $\Delta H_{vap}$ values for sufficiently fluorinated molecules, which would be unphysical. Figure \ref{fig:JRGC_Hvap_bias_molecules} c shows another class of molecules for which the JR GC method has a large systematic bias in its $\Delta H_{vap}$ predictions. They are highly nitrated compounds like tetranitromethane shown in Figure \ref{fig:JRGC_Hvap_bias_molecules} c. The JR GC $\Delta H_{vap}$ predictions for tetranitromethane is 82.89 $kJ/mol$ and can be observed in Figure \ref{fig:2D_JRGC_bias} as the highest JR GC $\Delta H_{vap}$ prediction in our data. The JR GC method predicts that every $-NO_2$ structural unit in a molecule should contribute 16.738 $kJ/mol$ to the $\Delta H_{vap}$ of the molecule. This contribution is high and much higher than those of other structural units in the JR GC method parameter set for $\Delta H_{vap}$. This leads to an overestimation in $\Delta H_{vap}$ for highly nitrated molecules.
+These two points correspond to molecules with moderate to high MW. The two molecules with this large underestimation in  $\Delta H_{vap}$ using the JR GC method are shown in Figure \ref{fig:JRGC_Hvap_bias_molecules} a and b. They are both highly fluorinated molecules. The group contribution of the fluorine group to $\Delta H_{vap}$ according to the JR GC method is -0.67 $kJ/mol$. This explains why, for highly fluorinated molecules, the JR GC method predicts very low values of $\Delta H_{vap}$ contrary to experimental or true values. The JR GC method could predict negative $\Delta H_{vap}$ values for sufficiently fluorinated molecules, which would be unphysical. Figure \ref{fig:JRGC_Hvap_bias_molecules} c shows another class of molecules for which the JR GC method has a large systematic bias in its $\Delta H_{vap}$ predictions. They are highly nitrated compounds like tetranitromethane shown in Figure \ref{fig:JRGC_Hvap_bias_molecules} c. The JR GC $\Delta H_{vap}$ predictions for tetranitromethane is 82.89 $kJ/mol$ and can be observed in Figure \ref{fig:2D_JRGC_bias} as the highest JR GC $\Delta H_{vap}$ prediction in our data. The JR GC method predicts that every $-NO_2$ structural unit in a molecule should contribute 16.738 $kJ/mol$ to the $\Delta H_{vap}$ of the molecule. This contribution is high and much higher than those of most other structural units in the JR GC method parameter set for $\Delta H_{vap}$. This leads to an overestimation in $\Delta H_{vap}$ for highly nitrated molecules.
 A similar scenario is observed for JR GC $P_c$ predictions for highly brominated molecules.  
 
 
@@ -790,7 +807,7 @@ For every thermophysical property, the MAE \eqref{eq:MAE} and RMSE \eqref{eq:RMS
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{images/error_bar_chart_shared_yaxis.png}
-    \caption{Error vs. thermophysical property of selected GP models for (a) Joback and (b) hybrid (i.e., Joback model with discrepancy correction) models. Salmon (green) represents mean absolute error (root mean squared error). Solid colors (stripes) represent the training (testing) data.}
+    \caption{Error vs. thermophysical property of selected GP models for (a) Joback and (b) hybrid (i.e., Joback model with discrepancy correction) models. Salmon (green) represents mean absolute error (root mean squared error). Solid colors (stripes) represent the training (testing) data. \kjtodo{change Joback to JR and hybrid to JC GP}}
     \label{fig:enter-label}
 \end{figure}
 \subsubsection{Model Selection}
@@ -804,6 +821,9 @@ For every thermophysical property, the MAE \eqref{eq:MAE} and RMSE \eqref{eq:RMS
 
 \adnote{Which bar corresponds to the "baseline" GCGP model used throughout the paper?}
 
+
+
+
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{images/lml_bar_chart_Hvap.png}
@@ -812,27 +832,27 @@ For every thermophysical property, the MAE \eqref{eq:MAE} and RMSE \eqref{eq:RMS
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{images/lml_bar_chart_Pc.png}
-    \caption{Log evidence (i.e., marginal likelihood) vs. model architecture for critical pressure used in kernel sweep. The maximum log evidence is plotted in red.}
+    \caption{Log evidence (i.e., log marginal likelihood) vs. model architecture for critical pressure used in kernel sweep. The maximum log evidence is plotted in red.}
 \end{figure}
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{images/lml_bar_chart_Tb.png}
-    \caption{Log evidence (i.e., marginal likelihood) vs. model architecture for boiling temperature used in kernel sweep. The maximum log evidence is plotted in red.}
+    \caption{Log evidence (i.e., log marginal likelihood) vs. model architecture for boiling temperature used in kernel sweep. The maximum log evidence is plotted in red.}
 \end{figure}
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{images/lml_bar_chart_Tc.png}
-    \caption{Log evidence (i.e., marginal likelihood) vs. model architecture for critical temperature used in kernel sweep. The maximum log evidence is plotted in red.}
+    \caption{Log evidence (i.e., log marginal likelihood) vs. model architecture for critical temperature used in kernel sweep. The maximum log evidence is plotted in red.}
 \end{figure}
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{images/lml_bar_chart_Tm.png}
-    \caption{Log evidence (i.e., marginal likelihood) vs. model architecture for melting temperature used in kernel sweep. The maximum log evidence is plotted in red.}
+    \caption{Log evidence (i.e., log marginal likelihood) vs. model architecture for melting temperature used in kernel sweep. The maximum log evidence is plotted in red.}
 \end{figure}
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{images/lml_bar_chart_Vc.png}
-    \caption{Log evidence (i.e., marginal likelihood) vs. model architecture for critical volume used in kernel sweep. The maximum log evidence is plotted in red.}
+    \caption{Log evidence (i.e., log marginal likelihood) vs. model architecture for critical volume used in kernel sweep. The maximum log evidence is plotted in red.}
 \end{figure}
 To assess the numerical stability of the final models, the condition number was examined. \kjnote{I dont recommend extending this discussion in the main text. Instead, I recommend that we write a sentence saying condition numbers of $\mathbf{K}$ can be found in the SI. We can add a paragraph at the end of the Model Selection and Hyperparameter Estimation section explaining why the condition number matters for optimization.}
 \FloatBarrier
@@ -938,7 +958,7 @@ In this work, we chose the rational quadratic (RQ) kernel with a single length s
 %Barnabas to provide specific examples
 Although this work focuses on six properties and a Joback and Reid group contribution method, the technique for creating models is directly applicable to other properties and other GC methods. 
 %A GP model can be built using the same steps as in this work as long as the GC method can provide the property prediction. GC prediction and property data must be rigorously analyzed to determine appropriate features for the model. Their relationships should be analyzed to collect and apply a priori information including well-known physical correlations. With appropriate scaling, a model can then be trained and validated to produce improved accuracy results with uncertainty information.
-The GCGP method may be considered a tunable method for improved predictive accuracy. As an example, we observed in this work that the GCGP method gave the least performance in terms of predictive accuracy for $T_m$. This was mainly attributed to the extreme bias in the JR GC predictions of $T_m$ which was used as input to the corrector GP model. A simple way to improve the prediction of $T_m$ using the GCGP approach is to switch to a more accurate but still simple GC method for predicting $T_m$. Indeed, such a method already exists \cite{perezponceNewGroupContribution2013}. Alternatively, we can use the same structural unit definition as the JR GC method but design a more accurate GC model functional form and parameterize the more advanced GC model functional form using collected data. This likely more accurate GC model can then be used to obtain input GC predictions in the GCGP method. This later approach is more likely to lead to significant improvement in predictive accuracy for $T_m$. Molecules that cannot have their properties predicted due to the limitations of unavailable parameters in a given GC method can have their properties predicted by switching the GC method to another one that is able to predict their properties. The above recommendations are examples of how the GCGP method may be easily tuned to obtain even better predictive accuracy or extended to other properties and molecule types not considered in this work. 
+The GCGP method may be considered a tunable method for improved predictive accuracy. As an example, we observed in this work that the GCGP method gave the least performance in terms of predictive accuracy for $T_m$. This was mainly attributed to the extreme bias in the JR GC predictions of $T_m$ which was used as input to the corrector GP model. A simple way to improve the prediction of $T_m$ using the GCGP approach is to switch to a more accurate but still simple GC method for predicting GC $T_m$. Indeed, such a method already exists \cite{perezponceNewGroupContribution2013}. Alternatively, we can use the same structural unit definition as the JR GC method but design a more accurate GC model functional form and parameterize the more advanced GC model functional form using collected data. This likely more accurate GC model can then be used to obtain input GC predictions in the GCGP method. This later approach is more likely to lead to significant improvement in predictive accuracy for $T_m$. Molecules that cannot have their properties predicted due to the limitations of unavailable parameters in a given GC method can have their properties predicted by switching the GC method to another one that is able to predict their properties. The above recommendations are examples of how the GCGP method may be easily tuned to obtain even better predictive accuracy or extended to other properties and molecule types not considered in this work. 
 Furthermore, one opportunity for future contribution will be to extend the GCGP method to predict properties at varying conditions of temperature and possibly pressure. This may be achieved by adding temperature as an input feature to the GP and training against sufficient data to capture the temperature dependence of the target property. There are very likely several other and probably more effective ways to achieve this.
 It would be interesting to see what nuances may be encountered and how the GCGP method performs when applied to GC-based thermodynamic models.
 Another contribution that would be highly valuable is integrating the GCGP method with CAMD workflows. The improved predictive accuracies and easily accessible uncertainty estimates from the GCGP method could result in significant improvement in the reliability and robustness of CAMD workflows in identifying optimal molecules and processes for a variety of applications.
