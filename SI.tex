@@ -15,6 +15,7 @@
 \usepackage{verbatim}
 %% The amssymb package provides various useful mathematical symbols
 \usepackage{amssymb}
+\usepackage{subcaption}
 %% The amsthm package provides extended theorem environments
 %% \usepackage{amsthm}
 
@@ -35,6 +36,9 @@
 \usepackage{caption}
 \usepackage{arydshln}
 
+\usepackage{xr}
+\externaldocument{main}  % main without the .tex extension
+\newcommand{\siref}[1]{SI\eqref{#1}}
 
 
 
@@ -139,7 +143,7 @@ Model 2 and Model 3, represented by equations \eqref{Method_2} and \eqref{Method
 
 \begin{equation}
     \mathbf{y_{\text{exp}}} - \mathbf{y_{GC}} = GP \sim \mathcal{N}\left(0, K(\mathbf{M.W}) \right)
-    \label{Method_2}
+    \label{eq: Method_2}
 \end{equation}
 
 
@@ -164,6 +168,43 @@ The fifth GP model form (Model 5) in \eqref{Method_5} is a generalization of \eq
 
 
 % The five methods (4 above and the final method) were implemented to predict heat of vaporization ($H_{vap}$  $\frac{kJ}{mol}$), melting temperature ($T_m$ (K)), boiling temperature ($T_b$ ($K$)), and critical volume ($V_c$ ($\frac{cm^3}{mol}$), temperature ($T_c$ ($K$)), and pressure ($P_c$ ($bar$)). For the initial implementation a SE kernel with an isotropic length scale and a white kernel was used. The set of hyperparameters with the lowest log likelihood was used to make predictions. From our analysis, we concluded that \eqref{Method_2} was not very useful as molecular weight alone was not informative enough to describe the discrepancy. This was indicated by high MAPD values. \eqref{Method_4} and \eqref{Method_5} often performed similarly with \eqref{Method_1} performing marginally worse. In the case where there was a strong correlation between discrepancy and the input features, \eqref{Method_3} yielded the lowest MAPD values. A table of the preliminary results can be found in the SI.
+
+
+
+\begin{figure}
+     \centering
+     \begin{subfigure}[b]{0.75\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{images/lml_bar_chart_Hvap_True.png}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.75\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{images/lml_bar_chart_Pc_True.png}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.75\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{images/lml_bar_chart_Tb_True.png}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.75\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{images/lml_bar_chart_Tc_True.png}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.75\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{images/lml_bar_chart_Tm_True.png}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.75\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{images/lml_bar_chart_Vc_True.png}
+     \end{subfigure}
+     \caption{Log evidence (eq.~\eqref{eq: lml}) vs. model architecture 1-5 (eqs. \siref{eq: Method_1} - \siref{eq: Method_5}) for different isotropic kernels. For each thermophysical property, (a) heat of vaporization, $\Delta H_{\text{vap}}$, (b) critical pressure, $P_c$, (c) boiling temperature, $T_b$, (d) critical temperature, $T_c$, (e) melting temperature, $T_m$, and (f) critical column, $V_c$, the maximum log evidence value is bolded. The blue diagonal striped bars, green solid bars, and navy grid pattern bars represent the Mat\'ern kernel (eq.~\eqref{eq: maternkern}) parameterized by $\nu = 1/2, \, 3/2,$ and $5/2$, respectively. Pink spotted and mint horizontal striped bars represent the squared exponential (eq.~\eqref{eq: sekernel}) and rational quadratic (eq.~\eqref{eq: rationalquadkernel}) kernels, respectively. \textbf{anywhere you see a zero is a place where the result wasn't provided, its not actually zero}}
+     \label{fig: lmlbarchartaniso}
+\end{figure}
 
 \subsection{Kernel Function Screening}
 
