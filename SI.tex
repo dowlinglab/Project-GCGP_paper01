@@ -128,11 +128,11 @@
 %Talk about 5 model forms
 We implemented five separate GP model structures to improve the results of JR GC predictions. Four of the models require both the GC property predictions $\mathbf{y_{GC}}$ and molecular weights ($\mathbf{M.W}$) and one only requires ($\mathbf{M.W}$) as an input. Each model makes different assumptions about the relationship between the input features and experimental property data $\mathbf{y_{\text{exp}}}$. We denote $\mathbf{X} = [\mathbf{y_{GC}}, \mathbf{M.W}]$
 
-Model 1 described by equation \eqref{Method_1} represents the most na\"ive approach to GP modeling in which we attempt to model $\mathbf{y_{\text{exp}}}$ using $m=0$. This method is best suited for models where trends in the data are unknown or difficult to elucidate and rely on the kernel function to do fully describe trends in the data.
+Model 1 described by equation \eqref{eq: Method_1} represents the most na\"ive approach to GP modeling in which we attempt to model $\mathbf{y_{\text{exp}}}$ using $m=0$. This method is best suited for models where trends in the data are unknown or difficult to elucidate and rely on the kernel function to do fully describe trends in the data.
 
 \begin{equation}
     \mathbf{y_{\text{exp}}} \sim  GP = \mathcal{N}\left(\mathbf{y_{GC}}, K(\mathbf{X}) \right)
-    \label{Method_1}
+    \label{eq: Method_1}
 \end{equation}
 
 Model 2 and Model 3, represented by equations \eqref{Method_2} and \eqref{Method_3} respectively, attempt to model the discrepancy between the GC predictions and experimental data using a GP and are classified as traditional hybrid models. This method form is well-suited for properties where there is a clear correlation between the bias of the GC predictions and the experimental data. For a more robust implementation of this method, a mean function describing the bias with respect to input parameters should be added when clear. This model uses $m=0$, which reflects our belief that for GC models which are fairly accurate, bias should be negligible. The difference between \eqref{Method_2} and \eqref{Method_3} is that \eqref{Method_2} models discrepancy as a function of only $\mathbf{M.W}$.
@@ -159,7 +159,7 @@ The fifth GP model form (Model 5) in \eqref{Method_5} is a generalization of \eq
 
 \begin{equation}
     \mathbf{y_{\text{exp}}} \sim GP = \mathcal{N}\left( \beta_{0} \mathbf{M.W} + \beta_{1} \mathbf{y_{GC}} +\beta_{2} , K(\mathbf{X}) \right)
-    \label{Method_5}
+    \label{eq: Method_5}
 \end{equation}
 
 

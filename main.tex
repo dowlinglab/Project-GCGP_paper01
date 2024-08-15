@@ -99,6 +99,11 @@
 }
 \myexternaldocument{SI}
 
+%% KJ package, needed to reference equations in SI text
+\usepackage{xr}
+\externaldocument{SI}  % SI without the .tex extension
+\newcommand{\siref}[1]{SI\eqref{#1}}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Meta-data block
 %% ---------------
@@ -523,6 +528,8 @@ When deploying GPs for regression, (lack of) prior information of the latent fun
 
 \adnote{Which kernel did we use for the main model? Thoughts on just keeping the main kernel here and introducing the alternate kernels in the corresponding results section? Although this is a little unorthodox, it could greatly streamline the methods.}
 
+\kjnote{I introduced three kernels to support the model selection figure. They can be moved to wherever the primary authors think they fit best, I just need to reference them in my section.}
+
 In mathematics, a \textit{kernel} refers to a function that defines a similarity measure between pairs of points. In the context of GPs, a kernel is a positive-definite function that defines the covariance structure. For example, the squared exponential (SE) (i.e., Gaussian) kernel is given by
 \begin{gather}
      k_{\text{SE}}(\xvec_i,\xvec_j) = \sigma_f^2 \exp \left(-\frac{1}{2}\, \mathbf{r}^\intercal \,\boldsymbol{\Lambda}^{-1} \,\mathbf{r} \right), \label{eq: sekernel}
@@ -630,8 +637,7 @@ In mathematics, a \textit{kernel} refers to a function that defines a similarity
  \begin{gather}
      \zeta(\mathbf{x}) \sim \mathcal{GP}(\eta(\mathbf{x},\boldsymbol{\theta}) + m(\mathbf{x}), k(\mathbf{x}, \mathbf{x}'))
  \end{gather}
-
- In this application, there are no parameters $\boldsymbol{\theta}$ to estimate in the low-fidelity model. Moreover, estimation of $\zeta(\cdot)$ is accomplished by estimating the parameters in the GP mean and covariance functions.
+In this application, there are no physically-meaningful parameters $\boldsymbol{\theta}$ to estimate in the low-fidelity model. Moreover, estimation of $\zeta(\cdot)$ is accomplished by estimating the parameters in the GP mean and covariance functions.
 \kjnote{end text from KJ}
 
 
@@ -783,9 +789,7 @@ Similar results can be expected for $\Delta H_{vap}$ predictions for highly nitr
 Our GPs are not explicitly informed about the presence or absence of certain chemical moieties, yet they perform excellently well in correcting systematic bias that arises from the presence and quantity of these chemical moieties in molecules.
 
 
-\subsection{GC-GP Provides Uncertainty Estimates}
-\alltodo{I propose for this section, we present the model selection results first. This will help us conclude which GP is the best GP for each property, then we report the error bar chart for that modeling choice.}
-
+\subsection{Validation, Verification, and Uncertainty Quantification of GC-GP Predictions}
 \adnote{Below is a note BA left on August 4 in Overleaf. I copied it below to review when I print the manuscript on paper.}
 
 \banote{By error bar charts do you mean the plots showing the percentage of predicted values that are within a given number of standard deviations from true values?
@@ -799,64 +803,84 @@ We are using that information to show that the GCGP approach is robust to a vari
 
 \adnote{KJ is working on a figure for uncertainty estimates. We have some ideas.}
 
-\subsubsection{Error Analysis}
+\subsubsection{GC-GP is significantly more accurate than JR methods alone}
 
 \adnote{Move Figure \ref{fig:enter-label} to previous section. Also convert this into a two panel figure that constracts GCGP error and GC only error.}
 
-For every thermophysical property, the MAE \eqref{eq:MAE} and RMSE \eqref{eq:RMSE} were assessed for the model architecture described in \kjtodo{reference GP modeling section}
+For every thermophysical property, the MAE (eq.~\eqref{eq:MAE}) and RMSE (eq.~\eqref{eq:RMSE}) were assessed for both the JR model and GC-GP models. In order to assess model performance, these metrics were compared across training and testing datasets. Figure \ref{fig: errorbarchart} summarizes these findings.
+
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{images/error_bar_chart_shared_yaxis.png}
-    \caption{Error vs. thermophysical property of selected GP models for (a) Joback and (b) hybrid (i.e., Joback model with discrepancy correction) models. Salmon (green) represents mean absolute error (root mean squared error). Solid colors (stripes) represent the training (testing) data. \kjtodo{change Joback to JR and hybrid to JC GP}}
-    \label{fig:enter-label}
+    \caption{Error vs. thermophysical property of selected GP models for (a) JR and (b) GC-GP models. Salmon (green) represents MAE (RMSE). Solid colors (stripes) represent the training (testing) data.}
+    \label{fig: errorbarchart}
 \end{figure}
-\subsubsection{Model Selection}
 
+Figure \ref{fig: errorbarchart} shows that GC-GP models significantly reduced the error in JR predictions alone for all models. The only exception appears to be that the test error metrics in JR model (Fig. \ref{fig: errorbarchart} (a)) are marginally less than those of the GC-GP model for $\Delta H_{\text{vap}}$. The explanation for this behavior is straightforward: for both $\Delta H_{\text{vap}}$ and $P_c$, the JR model already makes fairly accurate predictions. As such, adding a GP can increase error since there is uncertainty in estimating the additional parameters in the GP. 
+
+Figure \ref{fig: errorbarchart} (b) shows that for all models except $P_c$ and $T_m$, there is more error in the test set than the training set. This trend is intuitive, as one would expect to see slightly more error in out-of-sample predictions. That being said, significantly higher error rates in out-of-sample predictions could be a result of overfitting. Further analysis is needed to make statements for or against this phenomena in this case study.
+
+\kjnote{I know I've made this a recommendation in meetings several times (see minutes), but I'll just say it one more time. These results would be more robust if we re-generated them with different seeds for a large enough sample of seeds (e.g., 100). This ensures that we didn't get lucky when we did stratified sampling. Ideally, we want the bars of the same color in the LHS plot to be even before we interpret those on the RHS. This bar chart would then report the empirical mean MAE and RMSE across these samples. This would also allow us to add error bars to the top of each bar, thereby accomplishing the uncertainty quantification objective of this paper. If this is not done, I recommend removing the paragraph above.}
+
+\subsubsection{Model selection provides a framework for building robust GC-GP models}
 \adnote{Move these plots to the SI. In the discussion above, we observe a handful of interesting issues with the GCGP models. For example, does the LOWER testing versus training error for Pc go away with the best alternative model?}
+\kjnote{Im not married to any of my section headings. Feel free to wordsmith or reshape the narrative as the primary authors see fit.}
 
 \adnote{Below is a note from BA in Overleaf on August 4}
 \banote{This subsubsection is not present in the outline for this paper for the results section. Please kindly remove all of this.}
 
-\adnote{What is the key to decipher the model name strings?}
+\adnote{What is the key to decipher the model name strings?} \kjnote{False means isotropic, True means anisotropic. The main text only looks at isotropic, the si text has anisotropic}
 
-\adnote{Which bar corresponds to the "baseline" GCGP model used throughout the paper?}
+\adnote{Which bar corresponds to the "baseline" GCGP model used throughout the paper?} \kjnote{Model 4}
 
+In order to assess the best performing GC-GP model architecture for each thermophysical property, the (log) evidence model selection criterion (eq.~\eqref{eq: lml}) was calculated. The interpretation of the (log) evidence is straightforward: for each thermophysical property, the model with the greatest (log) evidence is the best model at balancing the trade off between model bias (i.e., how well the model fits the data) and variance (i.e., model complexity). 
 
+Figure \ref{fig: lmlbarchart} shows the log evidence for each thermophysical property investigated (a)-(f). For five model architectures, five isotropic parameterizations of different kernel functions were assessed. The results for the anisotropic kernels can be found in the SI text \kjtodo{Add  reference}. On average, we found that anisotopic parameterizations of the kernel functions did not significantly impact results. As such, the discussion in the main text focuses solely on isotropic kernels. 
 
+Figure \ref{fig: lmlbarchart} shows that model two \kjtodo{reference si} is the worst performing model across all thermophysical properties. This result makes sense, as model two is not complex enough to be informative. Furthermore, model two is the only model that uses only one descriptor (molecular weight). Thus, molecular weight alone is not a good enough descriptor to model GC discrepancy. Taken as a whole, these results confirm our decision to include both molecular weight and GC prediction as descriptors.
+
+Figure \ref{fig: lmlbarchart} shows that model five (eq.~\siref{eq: Model_5}) is the best performing model for all cases except the melting temperature. This result is again explained by the structure of model five. Moreover, model five is the only model that includes a non-stationary mean function. As such, model five is the most flexible and informative model for 5/6 thermophysical properties considered.
+
+\kjnote{I'm not sure how to defend why model four was chosen over model five to generate the results in the main text. I'm also not sure how to explain why the RQ kernel was chosen since the Matern 3/2 kernel was the best performing kernel for 3/6 cases while the RQ kernel was the best performing in only 2/6 cases. I also cannot defend why the Matern 1/2 kernel was not considered for boiling temperature since I did not make this decision. I also cant support the claim that kernel choice doesn't matter, since the results show they are different, if only sometimes marginally.}
 
 \begin{figure}
-    \centering
-    \includegraphics[width=\linewidth]{images/lml_bar_chart_Hvap.png}
-    \caption{\alltodo{Primary authors, please help me figure out a better naming system for the x-axis of these plots. If possible, can we exclude some models so the plots are smaller? I'm not sure what the boolean flag is at the end of the results in the kernel sweep folder. We can make one subplot for all thermophysical properties once we narrow down which architectures we want to present}. Log evidence (i.e., marginal likelihood) vs. model architecture for heat of vaporization used in kernel sweep. The maximum log evidence is plotted in red.}
+     \centering
+     \begin{subfigure}[b]{0.75\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{images/lml_bar_chart_Hvap.png}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.75\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{images/lml_bar_chart_Pc.png}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.75\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{images/lml_bar_chart_Tb.png}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.75\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{images/lml_bar_chart_Tc.png}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.75\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{images/lml_bar_chart_Tm.png}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.75\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{images/lml_bar_chart_Vc.png}
+     \end{subfigure}
+     \caption{Log evidence (eq.~\eqref{eq: lml}) vs. model architecture 1-5 (eqs. \siref{eq: Method_1}-\siref{eq: Method_5}) for different isotropic kernels. For each thermophysical property, (a) heat of vaporization, $\Delta H_{\text{vap}}$, (b) critical pressure, $P_c$, (c) boiling temperature, $T_b$, (d) critical temperature, $T_c$, (e) melting temperature, $T_m$, and (f) critical column, $V_c$, the maximum log evidence value is bolded. The blue diagonal striped bars, green solid bars, and navy grid pattern bars represent the Mat\'ern kernel (eq.~\eqref{eq: maternkern}) parameterized by $\nu = 1/2, \, 3/2,$ and $5/2$, respectively. Pink spotted and mint horizontal striped bars represent the squared exponential (eq.~\eqref{eq: sekernel}) and rational quadratic (eq.~\eqref{eq: rationalquadkernel}) kernels, respectively. For boiling temperature (c), the Mat\'ern 1/2 kernel was not tested.
+     \alltodo{please explain why or provide this result}. \\
+     \kjnote{if the authors use the broken axes when models 6 is added, the y-axis labels will need to be centered manually}
+     \kjtodo{put a similar figure for anisotropic kernels in the SI}}
+     \label{fig: lmlbarchart}
 \end{figure}
-\begin{figure}
-    \centering
-    \includegraphics[width=\linewidth]{images/lml_bar_chart_Pc.png}
-    \caption{Log evidence (i.e., log marginal likelihood) vs. model architecture for critical pressure used in kernel sweep. The maximum log evidence is plotted in red.}
-\end{figure}
-\begin{figure}
-    \centering
-    \includegraphics[width=\linewidth]{images/lml_bar_chart_Tb.png}
-    \caption{Log evidence (i.e., log marginal likelihood) vs. model architecture for boiling temperature used in kernel sweep. The maximum log evidence is plotted in red.}
-\end{figure}
-\begin{figure}
-    \centering
-    \includegraphics[width=\linewidth]{images/lml_bar_chart_Tc.png}
-    \caption{Log evidence (i.e., log marginal likelihood) vs. model architecture for critical temperature used in kernel sweep. The maximum log evidence is plotted in red.}
-\end{figure}
-\begin{figure}
-    \centering
-    \includegraphics[width=\linewidth]{images/lml_bar_chart_Tm.png}
-    \caption{Log evidence (i.e., log marginal likelihood) vs. model architecture for melting temperature used in kernel sweep. The maximum log evidence is plotted in red.}
-\end{figure}
-\begin{figure}
-    \centering
-    \includegraphics[width=\linewidth]{images/lml_bar_chart_Vc.png}
-    \caption{Log evidence (i.e., log marginal likelihood) vs. model architecture for critical volume used in kernel sweep. The maximum log evidence is plotted in red.}
-\end{figure}
-To assess the numerical stability of the final models, the condition number was examined. \kjnote{I dont recommend extending this discussion in the main text. Instead, I recommend that we write a sentence saying condition numbers of $\mathbf{K}$ can be found in the SI. We can add a paragraph at the end of the Model Selection and Hyperparameter Estimation section explaining why the condition number matters for optimization.}
 \FloatBarrier
-
 
 \subsection{GCGP approach is robust across kernel and model structure choices} \label{sec:kern_sweep}
 
@@ -944,7 +968,7 @@ To assess the numerical stability of the final models, the condition number was 
     \label{tab:kern_sweep}
 \end{table}
 
-In Table \ref{tab:kern_sweep}, Mt12, Mt32, Mt52 mean the matern 1/2, matern 3/2, and matern 5/2 kernels. RQ(2) and RQ mean anisotropic and isotropic rational quadratic kernels respectively. RBF mean the radial basis function kernel. LML means the log-marginal likelihood.
+In Table \ref{tab:kern_sweep}, Mt12, Mt32, Mt52 mean the Mat\'ern 1/2, Mat\'ern 3/2, and Mat\'ern 5/2 kernels. RQ(2) and RQ mean anisotropic and isotropic rational quadratic kernels respectively. RBF mean the radial basis function kernel. LML means the log-marginal likelihood.
 Table \ref{tab:kern_sweep} shows that the GCGP method is robust to kernel choice and model structure. The primary difference between models 1, 4, and 5 is in the choice of mean functions. Model 1 has a zero mean function, model 4 has the JR GC predictions as its mean function, and model 5 has a linear function of MW and JR GC predictions with three additional trainable parameters as its mean function.
 We find that model 5, with three additional trainable parameters for its mean function, generally does not give significantly higher $R^2$ values on the testing sets compared to model 1 with a zero mean function and model 4 (the model form used in final implementation). Model form 4 is chosen for the final implementation as using the JR GC predictions as the mean function generally makes more physical sense than using a zero mean function. Furthermore, model 4 has a small number of trainable parameters compared to model 5.
 The LML, training, and testing $ R2$ values are also similar across various kernel choices in general. The differences between these metrics are generally too small to determine which kernel choice is the 'best' overall for modeling all properties in this work. Thus, we have chosen to maintain a single generally applicable kernel choice and model structure for the final implementation of the GCGP method in this work.
