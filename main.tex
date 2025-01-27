@@ -5,7 +5,7 @@
 %% The document class accepts keyval options, which should include
 %% the target journal and optionally the manuscript type.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\documentclass[journal=jacsat,manuscript=article]{achemso}
+\documentclass[journal=jacsat,manuscript=article, ]{achemso}
 \usepackage{amssymb}
 \usepackage{amsmath}
 \usepackage{comment}
@@ -55,6 +55,8 @@
 \usepackage{hyperref}
 \usepackage{array}
 \usepackage{tabularx}
+\usepackage{xr}
+\externaldocument{SI}
 
 \graphicspath{ {./images/} }
 %%%\usepackage{array}
@@ -126,10 +128,17 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage[symbol]{footmisc}
 \author{Barnabas P. Agbodekhe}
+\affiliation[University of Notre Dame]
+{Department of Chemical and Biomolecular Engineering, University of Notre Dame, Notre Dame, IN 46556, USA}
 \author{Montana N. Carlozo}
+\affiliation[University of Notre Dame]
+{Department of Chemical and Biomolecular Engineering, University of Notre Dame, Notre Dame, IN 46556, USA}
 \author{Dinis O. Abranches}
+\affiliation[University of Notre Dame]
+{CICECO - Aveiro Institute of Materials, Department of Chemistry, University of Aveiro, 3810-193 Aveiro, Portugal}
 \author{Kyla D. Jones}
 \author{Alexander W.~Dowling}
+\email{adowling@nd.edu}
 \author{Edward J. Maginn}
 \email{ed@nd.edu}
 %\phone{+123 (0)123 4445556}
@@ -144,7 +153,8 @@
 %% optional argument to \title.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \title[An \textsf{achemso}]
-  {Synergy Between Group Contribution and Gaussian Process Regression Models for Simple, Generalizable, and Accurate Thermophysical Property Prediction}
+  {Integrating Group Contribution Models with Gaussian Process Regression for Simple, Generalizable, and Accurate Thermophysical Property Prediction}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Some journals require a list of abbreviations or keywords to be
@@ -184,7 +194,8 @@
 %% if an abstract is not used by the target journal.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{abstract}
-Abstract
+Group contribution (GC) models are very powerful and popular models for property prediction. However, the most accessible and computationally efficient GC methods, like the Joback and Reid GC model, often show severe systematic bias. Furthermore, GC methods generally do not have uncertainty estimates associated with their predictions. This work details the development of a method for property prediction that integrates group contribution (GC) models with Gaussian process (GP) models. Predictions from the Joback and Reid GC methods with molecular weight are used as input features to a GP model, which learns and corrects the systematic bias in the GC predictions, resulting in highly accurate property predictions with reliable uncertainty estimates. The method was applied to six properties, namely, the normal boiling temperature ($T_b$), enthalpy of vaporization at normal boiling point ($\Delta H_{vap}$), critical pressure ($P_c$), critical molar volume ($V_c$), critical temperature ($T_c$), and normal melting temperature ($T_m$). Data from the CRC Handbook of Chemistry and Physics was used as experimental data to develop the models. The GCGP method was found to provide much-improved accuracy of the property predictions compared to the GC-only method. The uncertainty estimates were reasonable, and the GCGP method was robust to the choice of GP model architecture and kernel choice.
+
 \end{abstract}
 
 
@@ -204,7 +215,7 @@ Abstract
 \end{enumerate}
 
 \section{Introduction}
-
+\begin{comment}
 \adnote{AD, EM, and BA will work together to streamline the introduction. EM and AD have a lot of ideas of how to ensure this speaks to the target audience(s).
 
 Main points for introduction (based on AD and EM conversation):
@@ -214,9 +225,118 @@ Main points for introduction (based on AD and EM conversation):
     \item Group contribution methods are ``workhorse'' of CAMD, but show systematic bias
     \item Hybrid models are a simple and effective way to correct this systematic bias with modest data sets
 \end{enumerate}
-
 }
-\emnote{Intro way too long - we can shorten when we agree upon results. I can help so don't worry about it}
+\end{comment}
+
+The discovery of new materials is a cornerstone of sustainability research, particularly in addressing global challenges such as climate change, energy efficiency, environmental preservation, and health. 
+A timely and important example of this falls within the field of cooling and refrigeration. 
+Most current working fluids are hydrofluorocarbons (HFCs), developed to mitigate the ozone depletion problems associated with their chlorofluorocarbon predecessors. 
+Unfortunately, many HFCs have extremely high global warming potentials (GWPs). 
+The high GWPs of HFCs and high leak rates exacerbate global warming and undermine efforts to meet international climate goals. 
+As a result, international regulations, including the Kigali Amendment to the Montreal Protocol, are leading to the phase-out of high GWP refrigerants \cite{departmentofecologystateofwashingtonHydrofluorocarbons2023, usaepaReducingHydrofluorocarbonHFC2014, davenportNationsFightingPowerful2016, mcgrathClimateChangeMonumental2016, veldersLargeContributionProjected2009}.  
+The search for environmentally friendly alternatives has, therefore, become a critical area of research.
+Other areas of active research that require molecule discovery include small-molecule drug discovery, the design of environmentally benign solvents, and the development of energy storage materials.
+%Sustainable refrigerant molecules must balance multiple, often conflicting, criteria: low GWP and ozone depletion potential, high energy efficiency, low flammability and toxicity, and compatibility with existing technologies. 
+Discovering and developing new materials to meet these challenges require reliable property prediction. Experimental exploration of all possible molecules and properties needed for any materials discovery problem is often not feasible. Databases \cite{Kim2023, yaws-critical-property, bookRumble2023, Dortmund2024} of materials and some of their experimentally measured properties have been assembled for decades. However, these databases only contain a minuscule fraction of potentially relevant molecules. Furthermore, assuming large databases of potential molecules are available or developed for materials discovery, the required properties for assessing the suitability of materials are not always available \cite{mclindenLimitedOptionsLowglobalwarmingpotential2017}. Predictive computational tools are needed to streamline the molecule discovery process. 
+Computer-aided molecular design (CAMD) is a well-established molecular discovery method that integrates and automates considerations from the molecular to process scales in developing new materials and processes. It has key advantages over traditional database screening methods.
+However, one of the existing challenges to using CAMD lies in the availability and integration of fast and reliable property prediction methods in CAMD workflows \cite{adjimanProcessSystemsEngineering2021}. 
+%By enabling the efficient design of novel, sustainable refrigerants, CAMD contributes directly to mitigating climate impacts and promoting a more sustainable future.
+
+Group contribution (GC) models have long been used for chemical property prediction within CAMD and other material discovery tasks, particularly for estimating thermodynamic and transport properties \cite{gharagheiziGroupContributionModel2012, chagasCalculationInterfacialTension2021, ohExtensionGroupContribution2005, gardasGroupContributionMethods2009, ohGroupContributionModel1997}.
+GC models operate by decomposing molecular structures into predefined functional groups and assigning specific contributions or interaction parameters to each group based on experimental data. 
+
+Substantial effort has been made to develop GC-based thermodynamic models, including equation of state (EoS) and activity coefficient models.
+Examples of GC-based EoS models include the Predictive Soave-Redlich-Kwong (PSRK) \cite{nasrifarSaturatedLiquidDensity1998, liPredictionGasSolubilities2001},  GC-SAFT \cite{tamouzaApplicationBinaryMixtures2005, nguyenhuynhApplicationGCSAFTEOS2008, nguyenthiApplicationGroupContribution2005}, SAFT-$\gamma$-mie \cite{dufalPredictionThermodynamicProperties2014, haslamExpandingApplicationsSAFTg2020a,
+fayaz-torshiziCoarseGrainedMolecularSimulation2022,
+ervikBottledSAFTWeb2016} models, amongst others. Examples of GC-based activity coefficient models include the UNIQUAC Functional-group Activity Coefficients (UNIFAC). These GC-based EoS or AC models are of high utility in CAMD involving thermodynamic property prediction of mixtures across a wide range of temperatures, pressures, and compositions. However, implementing these models can be cumbersome, and their computational efficiency can be limited as their use often requires the evaluation of complex derivatives.
+
+An alternative class of GC methods is the class of semi-empirical GC models. These types of GC methods typically consist of several models or equations—one equation for one property—for direct and derivative-free computation of properties. 
+Notable examples of such semi-empirical GC models include the Joback and Reid (JR) method \cite{jobackEstimationPureComponentProperties1987}, the Lydersen method \cite{simonEstimationCriticalProperties1956}, and the Marrero-Gani method \cite{marreroGroupcontributionBasedEstimation2001b} amongst others \cite{constantinouNewGroupContribution1994}. These models are particularly useful for material screening tasks involving pure fluids. These methods can therefore be applied, at least at a preliminary stage, to most material screening and CAMD tasks. 
+Their simplicity and generalizability make them invaluable tools for screening chemical systems and designing processes without requiring extensive experimental datasets. 
+Since property predictions using these types of GC models are derivative-free, they offer the advantages of speed and ease of implementation compared to other methods. Compared to GC-based thermodynamic models, these types of GC models are also more generalizable for predicting more diverse properties (such as environmental or safety properties) of materials.
+However, as highlighted in recent studies, \cite{jirasekPredictionParametersGroup2023a} limitations in available group parameters and interaction data often restrict these models' predictive accuracy and scope. 
+Furthermore, the most accessible types of these GC methods, which are first-order GC models like the Joback and Reid GC method \cite{jobackEstimationPureComponentProperties1987}, are known to have significant systematic bias. 
+Notably, common GC models generally do not have uncertainty estimates associated with their predictions, which is essential for material screening. 
+
+The emergence of machine learning (ML) techniques has opened new avenues for addressing some of the limitations of GC approaches. 
+ML methods can predict the properties of molecules with high accuracy by leveraging large datasets and advanced algorithms like neural networks \cite{taskinenPredictionPhysicochemicalProperties2003}, support vector machines \cite{zhaoApplicationSupportVector2006, xueSupportVectorMachinesBased2004}, Gaussian processes \cite{obrezanovaGaussianProcessesMethod2007,
+pustokhinaDevelopingRobustModel2021,
+bishnoiScalableGaussianProcesses2021}, random forests \cite{palmerRandomForestModels2007}, and so on, enabling rapid virtual screening of chemical candidates. 
+%Within a CAMD framework, these predictions guide the selection and optimization of molecules that meet specific performance and sustainability criteria, significantly accelerating the discovery process. 
+However, ML models have several drawbacks. They typically require a large amount of data, which is not always available. 
+Furthermore, unlike traditional thermodynamic models and some GC models, ML models rarely have clear physical interpretability. 
+Furthermore, uncertainty propagation and estimation from complex ML models like deep neural networks can be cumbersome. 
+
+Despite these limitations, ML offers powerful tools for identifying patterns and correlations in complex, multidimensional datasets, which can be leveraged to extend the applicability and accuracy of GC models. 
+For instance, matrix completion methods have been used to predict missing group interaction parameters in thermodynamic GC models \cite{jirasekPredictionParametersGroup2023a}, demonstrating how data-driven approaches can fill gaps in traditional GC model parameterization.
+Gaussian process (GP) surrogate models are an ML method that has shown promise in low-quantity data applications. They allow for easy and often reasonable prediction of uncertainties.  
+In GP surrogate modeling, a probabilistic model is created to approximate complex functions by capturing uncertainty and providing predictions with confidence intervals. 
+The benefits of GPs include flexibility, robustness with small datasets, and interpretability, while drawbacks include high computational cost for large datasets and scalability issues as the dataset size grows.
+
+The present work aims to enable the reliable prediction of thermophysical properties by combining the strengths of simple semi-empirical GC methodologies and GP models.
+We use property predictions from a simple first-order GC method (the JR GC model), along with a readily accessible molecular property (molecular weight), as input to a GP. 
+The GC prediction often has significant systematic biases for several properties, which are then corrected by training the GP. 
+The idea is to obtain improved property predictions for any molecule that can be treated with a GC model along with an estimated uncertainty. By integrating the systematic framework of GC models with the predictive power of GP regression, we propose a hybrid approach that overcomes existing data limitations, improves predictive accuracy compared to GC-only methods, and provides uncertainty estimation while maintaining interpretability and computational efficiency.
+Our study evaluates the performance of this hybrid model against predictions using only the GC model. 
+The approach seeks to provide a versatile and robust framework for property prediction, facilitating the design and optimization of a wide range of chemical systems.
+
+\begin{comment}
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+EJM's version - modified to give the current version
+
+The discovery of new materials is a cornerstone of sustainability research, particularly in addressing global challenges such as climate change, energy efficiency, environmental preservation, and health. 
+A timely and important example of this falls within the field of cooling and refrigeration. 
+Most current working fluids are hydrofluorocarbons (HFCs), which were developed to mitigate the ozone depletion problems associated with their chlorofluorocarbon predecessors. 
+Unfortunately, many HFCs have extremely high global warming potentials (GWPs). 
+When combined with high leak rates, these HFCs exacerbate global warming and undermine efforts to meet international climate goals. 
+As a result, international regulations, including the Kigali Amendment to the Montreal Protocol, are leading to the phase-out of high GWP refrigerants \cite{departmentofecologystateofwashingtonHydrofluorocarbons2023, usaepaReducingHydrofluorocarbonHFC2014, davenportNationsFightingPowerful2016, mcgrathClimateChangeMonumental2016, veldersLargeContributionProjected2009}.  
+The search for environmentally friendly alternatives has therefore become a critical area of research. 
+Sustainable refrigerant molecules must balance multiple, often conflicting, criteria: low GWP and ozone depletion potential, high energy efficiency, low flammability and toxicity, and compatibility with existing technologies. 
+Meeting these demands requires not only experimental exploration but also predictive computational tools that can streamline the molecule discovery process. 
+These tools fall under the general field of computer-aided molecular design (CAMD). 
+CAMD relies on accurate and inexpensive property predictions to link molecular and process scales. 
+By enabling the efficient design of novel, sustainable refrigerants, CAMD contributes directly to mitigating climate impacts and promoting a more sustainable future.
+
+Group contribution (GC) models have long been used for chemical property prediction within CAMD, particularly for estimating thermodynamic and transport properties \cite{gharagheiziGroupContributionModel2012, chagasCalculationInterfacialTension2021, ohExtensionGroupContribution2005, gardasGroupContributionMethods2009, ohGroupContributionModel1997}.
+GC models operate by decomposing molecular structures into predefined functional groups and assigning specific contributions to each group based on experimental data. 
+Their simplicity and generalizability make them invaluable tools for screening chemical systems and designing processes without requiring extensive experimental datasets. 
+Notable examples of common GC models include the Joback and Reid (JR) method \cite{jobackEstimationPureComponentProperties1987}, the Lydersen method \cite{simonEstimationCriticalProperties1956}, and the Marrero-Gani method amongst others. 
+These types of GC methods typically consist of a collection of several models or equations—one equation for one property—for direct and derivative-free computation of properties. 
+Since property predictions using these types of GC models are derivative-free, they offer the advantages of speed and ease of implementation when compared to other methods. 
+However, as highlighted in recent studies, \cite{jirasekPredictionParametersGroup2023a} limitations in available group parameters and interaction data often restrict the predictive accuracy and scope of these models. 
+Importantly, GC methods generally do not have uncertainty estimates associated with their predictions, which is important for material screening. 
+
+The emergence of machine learning (ML) techniques has opened new avenues for addressing the limitations of traditional CAMD approaches. 
+ML methods can predict the properties of molecules with high accuracy by leveraging large datasets and advanced algorithms like neural networks \cite{taskinenPredictionPhysicochemicalProperties2003}, support vector machines \cite{zhaoApplicationSupportVector2006, xueSupportVectorMachinesBased2004}, Gaussian processes \cite{obrezanovaGaussianProcessesMethod2007,
+pustokhinaDevelopingRobustModel2021,
+bishnoiScalableGaussianProcesses2021}, random forests \cite{palmerRandomForestModels2007} and so on enabling rapid virtual screening of chemical candidates. 
+Within a CAMD framework, these predictions guide the selection and optimization of molecules that meet specific performance and sustainability criteria, significantly accelerating the discovery process. 
+However, ML models have several drawbacks. They typically require a large amount of data, which is not always available. 
+Furthermore, ML models rarely have clear physical interpretability, unlike traditional thermodynamic models and some GC models. 
+Furthermore, uncertainty propagation and estimation from complex ML models like deep neural networks can be cumbersome. 
+
+Despite these limitations, ML offers powerful tools for identifying patterns and correlations in complex, multidimensional datasets, which can be leveraged to extend the applicability and accuracy of GC models. 
+For instance, matrix completion methods have been used to predict missing group interaction parameters in thermodynamic GC models \cite{jirasekPredictionParametersGroup2023a} demonstrating how data-driven approaches can fill gaps in traditional GC model parameterization.
+Gaussian process (GP) surrogate models are a type of ML method that have shown promise in low-quantity data applications and allow for easy and often reasonable prediction of uncertainties.  
+In GP surrogate modeling, a probabilistic model is created to approximate complex functions by capturing uncertainty and providing predictions with confidence intervals. 
+The benefits of GPs include flexibility, robustness with small datasets, and interpretability, while drawbacks include high computational cost for large datasets and scalability issues as the dataset size grows.
+
+The present work aims to combine the strengths of GC methodologies and GP models to enhance the prediction of thermodynamic properties, using refrigerant molecules as a test case. 
+We use property predictions from a simple first-order GC method (the JR GC model) along with a readily accessible molecular property (molecular weight), as input to a GP. 
+The GC prediction often has significant systematic biases for several properties, which are then corrected by training the GP. 
+The idea is to obtain improved property predictions for any molecule that can be treated with a GC model along with an estimated uncertainty. By integrating the systematic framework of GC models with the predictive power of ML, we propose a hybrid approach that overcomes existing data limitations while maintaining interpretability and adding uncertainty estimation. 
+Our study evaluates the performance of this hybrid model against predictions using only the GC model. 
+The approach seeks to provide a versatile and robust framework for property prediction, facilitating the design and optimization of a wide range of chemical systems.
+
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+First version. 
+Commented out but not to be deleted
+
+
 
 %Reliable property prediction of materials is critical in many applications (Barnabas)
 The most pressing challenges facing humanity, as summarized in the seventeen sustainable development goals (SDGs), require innovation in materials and process development. 
@@ -257,7 +377,7 @@ Some common AC models include the Non-random Two-liquid (NRTL) and the Universal
 All of the above-named thermodynamic models have been successfully used for property predictions in a variety of applications; however, they usually require parameter fitting using component-specific experimental data, which are not available for new yet-to-be-synthesized molecules. 
 Therefore, the above methods are limited by the availability of experimental data and, thus, of little use for materials discovery tasks involving new or uncommon molecules. 
 Furthermore, these EoS and AC based models are typically only directly useful for predicting thermodynamic properties and not transport or interfacial properties which may be important for material design. 
-These EoS and AC models must be coupled with engineering heuristics that have limited accuracy or methods such as excess-entropy scaling \cite{dehlouzEntropyScalingBasedCorrelation2022, dyrePerspectiveExcessentropyScaling2018} - which again may require further fitting to scarce or unavailable experimental data - to allow for predictions of transport and interfacial properties. 
+These EoS and AC models must be coupled with engineering heuristics that have limited accuracy or methods such as excess-entropy scaling \cite{dehlouzEntropyScalingBasedCorrelation2022, dyrePerspectiveExcessentropyScaling2018} and density gradient theory - which again may require further fitting to scarce or unavailable experimental data - to allow for predictions of transport and interfacial properties. 
 
 How can we rapidly and reliably predict the thermodynamic, transport, interfacial, safety, environmental, and other important properties of new molecules without recourse to scarce or unavailable experimental data for materials discovery? Two broad classes of approaches stand out: group contribution (GC)- based methods and machine learning (ML)- based methods. 
 %GC Models
@@ -283,38 +403,37 @@ bishnoiScalableGaussianProcesses2021}, random forests \cite{palmerRandomForestMo
  Furthermore, ML models rarely have high physical interpretability, unlike thermodynamic models and some GC models. 
  Furthermore, uncertainty propagation and estimation from complex ML models like deep neural networks can be cumbersome. 
  A certain type of ML method which have shown promise in low-quantity data applications and allows for easy and often reasonable prediction of uncertainties is Gaussian process regression (GPR) surrogate modeling. 
- Using a Gaussian process (GP) for property predictions is an established practice and offers easy and reliable predictive uncertainty estimates. However, one key consideration for using GPR or any ML model for property prediction is choosing the most appropriate input feature(s) for the ML model. The design of input features for ML models, referred to as feature engineering, can prove critical to their success. It is typical for ML models found in the literature to have tens or hundreds of input features, many of which are not easy to physically interpret and link with the target properties. Several ML models rely on fingerprint representations based on the SMILES strings of molecules. This is problematic for several reasons. Such ML models must necessarily be large and require a lot of training data (which is usually not available), as the input feature size depends on the input feature size of the largest molecule in the training data set. Furthermore, such models are amongst the least physically interpretable ML models. 
+ Using a Gaussian process (GP) for property predictions is an established practice and offers easy and reliable predictive uncertainty estimates. However, one key consideration for using GPR or any ML model for property prediction is choosing the most appropriate input feature(s) for the ML model. The design of input features for ML models, referred to as feature engineering, can prove critical to their success. It is typical for ML models found in the literature to have tens or hundreds of input features, many of which are not easy to physically interpret and link with the target properties. Several ML models rely on fingerprint representations based on the SMILES strings of molecules. This is problematic for several reasons. Such ML models must necessarily be large and require a lot of training data (which is usually not available), as the standard input feature size of the final ML model depends on the input feature size of the largest molecule in the training data set. Furthermore, such models are amongst the least physically interpretable ML models. 
  Some other works in the literature have used molecular descriptors, which have been developed by practitioners in the quantitative structure-property relationship (QSPR) community for several decades. Currently, there are over two hundred (200) such descriptors accessible from the RDKit Python package. Selecting just the right combination of molecular descriptors, both in quantity and information content, for a given property prediction task can be challenging and requires significant expertise in QSPR modeling, chemistry, physics, and an in-depth knowledge of several of the more than 200 molecular descriptors. Furthermore, the right choice of QSPR-based molecular descriptors must necessarily vary from property to property. This further heightens the barrier and limits accessibility in adopting this approach for predicting the many diverse material properties that are often needed in material discovery tasks.
-Dinis et. al. \cite{abranchesSigmaProfilesDeep2022} showed that sigma profiles could be used as consistent molecular descriptors and input features to convolutional neural networks (CNNs). They showed excellent property predictions for several diverse properties using the same input features with a constant input feature size of fifty-one (51). This input feature size is much lower than those of SMILES-based fingerprint inputs but may be higher than those in ML models that use QSPR-based molecular descriptors as input features. Furthermore, the authors found that sigma profiles correlated highly with certain target properties like aqueous solubility, yielding high model performance metrics but less so to certain properties like refractive index and density.
+Dinis et. al. \cite{abranchesSigmaProfilesDeep2022} showed that sigma profiles could be used as consistent molecular descriptors and input features to convolutional neural networks (CNNs). The authors showed excellent property predictions for several diverse properties using the same input features with a constant input feature size of fifty-one (51). This input feature size is much lower than those of SMILES-based fingerprint inputs but may be higher than those in ML models that use QSPR-based molecular descriptors as input features. Furthermore, the authors found that sigma profiles correlated highly with certain target properties like aqueous solubility, yielding high model performance metrics but less so to certain properties like refractive index and density.
 
-In summary, some of the most widely used fully predictive approaches for property prediction of new molecules are GC-based or ML-based methods. Current GC-based methods are either not accurate enough and/or significantly complex to implement or, like thermodynamic GC models, not readily applicable to transport, interfacial, and other types of properties that may be of interest for materials discovery. On the other hand, most of the current ML methods in the literature either require a large amount of data that may not be available or use an inconsistent set of input features for different properties, which requires feature engineering expertise. They may also be highly complex models like CNNs or may not be as suitable for certain properties and usually do not provide easily accessible uncertainty estimates for predicted property values.
+In summary, some of the most widely used fully predictive approaches for property prediction of new molecules are GC-based or ML-based methods. Current GC-based methods are either not accurate enough and/or significantly complex to implement or, like thermodynamic GC models, not readily applicable to transport, interfacial, and other types of properties that may be of interest for materials discovery. On the other hand, most of the current ML methods in the literature either require a large amount of data that may not be available or use an inconsistent set of input features for different properties, which requires feature engineering expertise. They may also be highly complex models like CNNs or may not be as suitable for certain properties. Furthermore, most existing methods usually do not provide easily accessible uncertainty estimates for predicted property values.
 
-In this work, we propose a unique solution to the challenge of predicting the properties of new molecules that may be applied to any property of interest. Our approach offers promise as a fast, accurate, accessible, generalizable method that uses a consistent set of input features and model architecture, with a very small input feature size and importantly, with uncertainty estimates for the predicted properties.
-We integrate the unique strengths of GC-based methods with GPR to achieve this feat. For any given property \textbf{P}, we use property predictions from a simple first-order GC method, the JR GC model, which intrinsically has significant systematic biases for several properties, coupled with a highly accessible molecular property, the molecular weight (MW), as the two (2) input features to a GP, which is trained to predict the 'correct' value of the target property \textbf{P} in addition to GP predicted uncertainties.
+In this work, we propose a unique solution to the challenge of predicting the properties of new molecules that may be applied to any property and material of interest. Our approach offers promise as a fast, accurate, accessible, generalizable method that uses a consistent set of input features and model architecture, with a very small input feature size and importantly, with uncertainty estimates for the predicted properties.
+We integrate the unique strengths of GC-based methods with GPR to achieve this feat. For any given property \textbf{P}, we use property predictions from a simple first-order GC method, such as the JR GC model, which intrinsically has significant systematic biases for several properties, coupled with a highly accessible molecular property, the molecular weight (MW), as the two (2) input features to a GP, which is trained to predict the 'correct' value of the target property \textbf{P} in addition to GP predicted uncertainties.
 This highly accessible approach is easy to implement, generalizable, computationally inexpensive, gives accurate and reliable property predictions, and provides uncertainty estimates for predicted properties.
-The rest of this article details the data collection, preparation, and analysis stages of this work. We begin the results section by demonstrating and interpreting the systematic bias in the JR GC model using our collected and processed data. We then show that using a GP dramatically and consistently corrects the JR GC model's systematic bias and improves predictive accuracy while also obtaining reasonable uncertainty estimates for the GP-predicted properties. Finally, we show that this approach, which we henceforth refer to as the GCGP method, is robust to GP model architecture.
+The rest of this article details the data collection, preparation, and analysis stages of this work. We demonstrate and interprete the systematic bias in the JR GC model using our collected and processed data. We then show that using a GP dramatically and consistently corrects the JR GC model's systematic bias and improves predictive accuracy while also obtaining reasonable uncertainty estimates for the GP-predicted properties. Finally, we show that this approach, which we henceforth refer to as the GCGP method, is robust to GP model architecture.
+\end{comment}
 
 \section{Methods and Data}
 
-\adnote{Once the manuscript draft is near final, we should discuss if we should make an overall framework image to help summarize the methods/approach.}
-
-\adnote{AD, BA, and EM will work together to streamline the methods.}
-
-%\alltodo{standard in math is to remove equation numbers from all equations not referenced somewhere else in the text. Primary authors please either delete this comment if not standard for target journal or remind everyone to remove numbers from equations not referenced in the text at the end}
-
 \subsection{Data Collection and Preparation}
 
-Six properties, \textbf{P}, were modeled in this work to demonstrate various aspects of the GCGP method. The properties are the normal boiling temperature ($T_b$), enthalpy of vaporization at normal boiling point ($\Delta H_{vap}$), critical pressure ($P_c$), critical molar volume ($V_c$), critical temperature ($T_c$), and the normal melting temperature ($T_m$).
-These properties are important for several materials discovery tasks. $T_b$, for example, is used in several engineering correlations and models for predicting properties such as the enthalpy of vaporization at temperatures other than the normal boiling temperature. In the JR GC method, $T_b$ is used in computing $T_c$. $T_b$ is also commonly used in the calculation of the accentric factor of molecules which is highly correlated to other properties such as the liquid heat capacity. 
-$T_c$, $P_c$, and $V_c$ are important for the consideration of stability, safety, and determination of appropriate operating regions for new fluids. $\Delta H_{vap}$ is important for materials design tasks such as the refrigerant design problem. $\Delta H_{vap}$ is also used in computations of the enthalpy of vaporization at temperatures other than the normal boiling temperature. The enthalpy of vaporization at the evaporating temperature in a vapor-compression refrigeration cycle is a highly important consideration for refrigerant design as it affects the volumetric capacity of the refrigerant fluid. $\Delta H_{vap}$ is generally important for any material design task for applications involving phase change between the liquid and vapor phases.
+% \textbf{P}, 
+Six properties were modeled in this work. The properties are the normal boiling temperature ($T_b$), enthalpy of vaporization at normal boiling point ($\Delta H_{vap}$), critical pressure ($P_c$), critical molar volume ($V_c$), critical temperature ($T_c$), and the normal melting temperature ($T_m$).
+These properties are important for several materials discovery tasks. $T_b$, for example, is used in several engineering correlations and models to predict properties such as the enthalpy of vaporization at temperatures other than the normal boiling temperature. In the JR GC method, $T_b$ is used to compute $T_c$. $T_b$ is also commonly used to calculate the acentric factor of molecules, which is highly correlated to other properties such as the liquid heat capacity. 
+$T_c$, $P_c$, and $V_c$ are essential for the consideration of stability, safety, and determination of appropriate operating regions for new fluids. %$\Delta H_{vap}$ is important for materials design tasks such as the refrigerant design problem. $\Delta H_{vap}$ is also used in computations of the enthalpy of vaporization at temperatures other than the normal boiling temperature. 
+%The enthalpy of vaporization at the evaporating temperature in a vapor-compression refrigeration cycle is a highly important consideration for refrigerant design as it affects the volumetric capacity of the refrigerant fluid. 
+$\Delta H_{vap}$ is generally important for any material design task for applications involving phase change between the liquid and vapor phases. 
+$T_m$ is important for applications in which solid-liquid phase transitions may be important.
 Furthermore, these properties were selected as non-temperature-dependent properties to demonstrate the GCGP method. Future work could demonstrate the application of the GCGP method to temperature-dependent properties.
 
-In this work, for each molecule, three properties or data are required for each property. They are the experimental data or 'true data,' the JR GC model predictions, and the computed molecular weights (MW).
+ Three types of data are collected or computed for each molecule and property to build the complete datasets used in this work: experimental property data, the JR GC property predictions, and the molecular weights (MW).
 
 \subsubsection{Experimental Data Collection}
 
-The experimental data for training GP models were obtained primarily from the 105th edition of the CRC Handbook of Chemistry and Physics \cite{bookRumble2023}. A few experimental data for $\Delta H_{vap}$ were collected from Yaws' Critical Property Data for Chemical Engineers and Chemists \cite{yaws-critical-property} as available in the Knovel database.
-For each property, data points were collected for all molecules for which there was an intersection of available experimental data from the CRC Handbook of Chemistry and Physics and obtainable property predictions using the JR GC method.
+Unless otherwise noted, the experimental data for training GP models were obtained from the 105th edition of the CRC Handbook of Chemistry and Physics \cite{bookRumble2023}. As described later, a few experimental data for $\Delta H_{vap}$ were collected from Yaws' Critical Property Data for Chemical Engineers and Chemists \cite{yaws-critical-property}.
+For each property, data points were collected for all molecules that could be treated with the JR GC method and for which there was experimental data from the CRC Handbook of Chemistry and Physics.
 
 \begin{table}
     \centering
@@ -339,81 +458,130 @@ For each property, data points were collected for all molecules for which there 
     \label{tab:collected_data}
 \end{table}
 
-Table \ref{tab:collected_data} shows the final amounts of collected data for each property in this work. $T_m$ had the highest number of data points for molecules whose melting temperature could be predicted using the JR GC model. $\Delta H_{vap}$ had the least. Some data in the CRC Handbook of Chemistry and Physics for $T_m$ and $T_b$ were not used as there were flags provided to indicate that those temperatures may not be the true melting or boiling temperatures as they could undergo decomposition or sublimation at those temperatures. In this work, we only used data for $T_m$ and $T_b$ that did not have any sublimation or decomposition flags.
+Table \ref{tab:collected_data} shows the final amounts of collected data for each property in this work. $T_m$ had the highest number of data points for molecules whose melting temperature could be predicted using the JR GC model.
+$\Delta H_{vap}$ had the least. 
+Some data in the CRC Handbook of Chemistry and Physics for $T_m$ and $T_b$ were not used as there were flags provided to indicate that those temperatures may not be the true melting or boiling temperatures as the molecules could undergo decomposition or sublimation at those temperatures. 
+%In this work, we only used data for $T_m$ and $T_b$ that did not have any sublimation or decomposition flags.
 
 \subsubsection{Joback and Reid GC Predictions}
 The JR GC method is a first-order GC method and has equations and parameters for the six properties considered in this work. The equations for each property are presented in equations \ref{eq:boiling_temp} - \ref{eq:melting_temp}. The model parameters are available in the original work \cite{jobackEstimationPureComponentProperties1987}.
 The JR GC method was selected for this work due to its popularity, its ease of use \& its accessibility, and the availability of open-source software, like JRGUI \cite{shiJRguiPythonProgram2017}, for automatic generation of JR GC predictions of molecules given their SMILES strings.
 
 \begin{equation}
-    T_b \, [\text{K}] = 198.2 + \sum n_{i} * T_{b,i}
+    T_b \, [\text{K}] = 198.2 + \sum_{i=1}^{m} n_{i} \times T_{b,i}
     \label{eq:boiling_temp}
 \end{equation}
 
 
 \begin{equation}
-    H_{vap} \, [\text{kJ/mol}] = 15.30 + \sum n_{i} * H_{vap,i}
+    H_{vap} \, [\text{kJ/mol}] = 15.30 + \sum_{i=1}^{m} n_{i} \times H_{vap,i}
     \label{eq:enthalpy_vap}
 \end{equation}
 
 
 \begin{equation}
-    P_c \, [\text{bar}] = \left[ 0.113 + 0.0032 N_a - \sum n_{i} * P_{c,i} \right]^{-2}
+    P_c \, [\text{bar}] = \left[ 0.113 + 0.0032 N_a - \sum_{i=1}^{m} n_{i} \times P_{c,i} \right]^{-2}
     \label{eq:critical_pressure}
 \end{equation}
 
 \begin{equation}
-    V_c \, [\text{cm}^3/\text{mol}] = 17.5 + \sum n_{i} * V_{c,i}
+    V_c \, [\text{cm}^3/\text{mol}] = 17.5 + \sum_{i=1}^{m} n_{i} \times V_{c,i}
     \label{eq:critical_mol_vol}
 \end{equation}
 
 \begin{equation}
-    T_c \, [\text{K}] = T_b \left[ 0.584 + 0.965 \sum n_{i} * T_{c,i} - \left( \sum n_{i} * T_{c,i} \right)^2 \right]^{-1}
+    T_c \, [\text{K}] = T_b \left[ 0.584 + 0.965 \sum_{i=1}^{m} n_{i} \times T_{c,i} - \left( \sum_{i=1}^{m} n_{i} \times T_{c,i} \right)^2 \right]^{-1}
     \label{eq:critical_temperature}
 \end{equation}
 
 
 \begin{equation}
-    T_m \, [\text{K}] = 122.5 + \sum n_{i} * T_{m,i}
+    T_m \, [\text{K}] = 122.5 + \sum_{i=1}^{m} n_{i} \times T_{m,i}
     \label{eq:melting_temp}
 \end{equation}
 
-In the above equations, $n_{i}$ is the number of structural units of type $i$ in the molecule. $\textbf{P}_i$ is the JR GC parameter corresponding to a structural unit of type $i$ for property $\textbf{P}$. $\textbf{P}_i$ determines how the presence of any given structural unit changes or contributes to the property $\textbf{P}$, where $\textbf{P} \in [T_b, H_{vap}, P_c,V_c, T_c, T_m]$.
+In the above equations, $n_{i}$ is the number of structural units of type $i$ in the molecule. $m$ is the total number of groups for which there are parameters in the JR GC model.  ${P}_i$ is the JR GC parameter corresponding to a structural unit of type $i$ for property ${P}$.  ${P}_i$ determines how the presence of any given structural unit changes or contributes to the property ${P}$, where ${P} \in [T_b, H_{vap}, P_c,V_c, T_c, T_m]$.
 
-The JR GC method works by dividing the molecule into predefined structural units for which parameters are available in the JR GC method. The required property of the molecule is then predicted using the appropriate JR GC equation from equations \ref{eq:boiling_temp} - \ref{eq:melting_temp} with parameters from the JR GC parameter set for the specific property. Figure XX in the SI shows an example of how the JR GC method is used to compute properties.
+The JR GC method works by dividing the molecule into predefined structural units for which parameters are available in the JR GC method. 
+The required property of the molecule is then predicted using the appropriate JR GC equation from equations \ref{eq:boiling_temp} - \ref{eq:melting_temp} with parameters from the JR GC parameter set for the specific property. Figure \ref{fig:JR_GC_illustration} in the supporting information (SI) shows an example of how the JR GC method is used to compute properties.
 
-The JR GC method is known to show significant systematic bias in property prediction, especially at high molecular weights, for $T_b$, for example. Furthermore, the JR GC method may not have parameters for certain structural units or molecular fragments present in some molecules. This means that the JR GC method will not be applicable to such molecules. Predictions using the JR GC method do not have uncertainty estimates associated with them. However, it is expected that the JR GC predictions will have a strong physically interpretable correlation with the true property values, which thus provides the rationale for using the JR GC predictions as an input feature to a corrector model. In the context of this work, the corrector model is a GP.
+%The JR GC method is known to show significant systematic bias in property prediction, especially at high molecular weights, for $T_b$, for example. 
+%Furthermore, the JR GC method may not have parameters for certain structural units or molecular fragments present in some molecules. This means that the JR GC method will not be applicable to such molecules. 
+%Predictions using the JR GC method do not have uncertainty estimates associated with them. However, it is expected that the JR GC predictions will have a strong physically interpretable correlation with the true property values, which thus provides the rationale for using the JR GC predictions as an input feature to a corrector model. In the context of this work, the corrector model is a GP.
 
-In this work, the JRGUI \cite{shiJRguiPythonProgram2017} software, an open-source, Python-based code, was used for the automatic computation of JR GC predictions for all properties in this work. To use JRGUI in an automatic mode, a set of SMILES strings for the molecules for which predicted property values are desired is required. 
-The SMILES strings were obtained by parsing the CAS registry numbers of the molecules in the CRC Handbook of Chemistry and Physics using PubChemPy \cite{PubChemPyDocumentationPubChemPy}, another open-source Python-based package for interfacing with the PubChem \cite{Kim2023} database of compounds. The PubChem database is a database with a listing for over a hundred million compounds and contains SMILES strings for all or almost all compounds it has an entry for. In this work, we assume that all or almost all molecules in the CRC Handbook of Chemistry and Physics will have an entry in the PubChem database and thus have its SMILES string available from PubChem.
+In this work, the JRGUI \cite{shiJRguiPythonProgram2017} software, an open-source, Python-based code, was used for the automatic computation of JR GC predictions for all properties in this work. 
+To use JRGUI in an automatic mode, a set of SMILES strings for the molecules for which predicted property values are desired is required. 
+The SMILES strings were obtained by parsing the CAS registry numbers of the molecules in the CRC Handbook of Chemistry and Physics using PubChemPy \cite{PubChemPyDocumentationPubChemPy}, another open-source Python-based package for interfacing with the PubChem \cite{Kim2023} database of compounds. The PubChem database contains over a hundred million compounds and contains SMILES strings for all or almost all compounds it has an entry for. 
+In this work, we assume that all or almost all molecules in the CRC Handbook of Chemistry and Physics will have an entry in the PubChem database and thus have its SMILES string available from PubChem.
 
-The JRGUI software also provides the values of over two hundred molecular descriptors from RDKit \cite{RDKit} in addition to other output data. The molecular weight (MW) is one of the outputs from the JRGUI tool and was used as the source of MW data for this work. It should be noted that MW can be readily computed in the same fashion as any simple GC property by simply summing the molecular weights of the structural units in a molecule so that there is no need to use RDKit or any specialized tool.
+The JRGUI software also provides the values of over two hundred molecular descriptors from RDKit \cite{RDKit} in addition to other output data. The molecular weight (MW) is one of the outputs from the JRGUI tool and was used as the source of MW data for this work. 
+It should be noted that MW can be readily computed in the same fashion as some other properties from simple GC equations by simply summing the molecular weights of the structural units in a molecule so that there is no need to use RDKit or any specialized tool.
 
 \subsection{Data Pre-processing} \label{sec:preprocess}
 
 \subsubsection{Data Quality}
-We performed basic two-dimensional outlier detection analysis on the collected data to identify regions of the data that may exhibit unusual trends or behavior. We used the JR GC predictions and collected experimental data. We observed certain data points that showed significant deviations from the general trends in the JR GC predictions compared to experiments and flagged these points as 'outliers' with respect to the JR GC model. On further probing of these points, we identified three experimental $\Delta H_{vap}$ data for which the CRC Handbook of Chemistry and Physics had wrong data entries. We ascertained that the data entries for these molecules were wrong by comparing against data from the Yaws' Critical Property Data for Chemical Engineers and Chemists as available in the Knovel database and data from the National Institute of Standards and Technology (NIST) \cite{informaticsNISTChemistryWebBook} webbook. The NIST webbook and Yaws' Critical Property Data agreed while the CRC Handbook data were different for these three molecules. Furthermore, once the experimental $\Delta H_{vap}$ data for these three molecules were replaced with those from the Yaws' Critical Property Data, they ceased being flagged by our outlier detection algorithm. The other data points that were flagged as outliers for $\Delta H_{vap}$ were found to be due to limitations in the parameterization of the JR GC method. Further details, data, and figures about this are available in the supporting information (SI). 
+We performed basic two-dimensional outlier detection analysis on the collected data to identify regions of the data that may exhibit unusual trends or behavior. 
+We used the JR GC predictions and collected experimental data. We observed certain data points that showed significant deviations from the general trends in the JR GC predictions compared to experiments and flagged these points as 'outliers' with respect to the JR GC model. 
+On further probing of these points, we identified three experimental $\Delta H_{vap}$ data for which the CRC Handbook of Chemistry and Physics had wrong data entries. 
+We ascertained that the data entries for these molecules were wrong by comparing them against data from the Yaws' Critical Property Data for Chemical Engineers and Chemists \cite{yaws-critical-property} as available in the Knovel database and data from the National Institute of Standards and Technology (NIST) \cite{informaticsNISTChemistryWebBook} webbook. 
+The NIST webbook and Yaws' Critical Property Data agreed, while the CRC Handbook data were different for these three molecules. 
+Furthermore, once the experimental $\Delta H_{vap}$ data for these three molecules were replaced with those from the Yaws' Critical Property Data, they ceased being flagged by our outlier detection code. 
+The other data points that were flagged as outliers for $\Delta H_{vap}$ were found to be due to limitations in the parameterization of the JR GC method. Further details, data, and figures about this are available in the SI. 
 
 
-\subsubsection{Analysis of Input Feature and Label Data}
+\subsubsection{Data Analysis and Demonstration of Systematic Bias in JR GC Predictions}
 %Analysis of feature vs label data and standardization (Montana and Kyla)
-We begin the modeling creation process by thoroughly analyzing the trends in the data. Figures \ref{fig:Data_Vis_Disc} and \ref{fig:Data_Vis_Prop} demonstrate that the JR GC predictions and molecular weight are correlated with the experimental data for all properties of interest. Figure \ref{fig:Data_Vis_Disc} shows that the discrepancy between JR GC predictions and experimental data are zero and thus, linearly correlated for $\Delta H_{vap}$, $P_c$, $V_c$. This is desirable behavior as we would ideally like our JR GC model to be relatively unbiased. The JR GC models for $T_m$, $T_b$ and $T_c$ are much worse predictors of the experimental data and thus we observe a nonlinear trend indicated by nonzero trends in the discrepancy. Figure \ref{fig:Data_Vis_Prop} demonstrates correlation between molecular weight and the experimental data and JR GC predictions for $V_c$, $T_b$, and $T_m$. However the two-tail trend that we observe for the molecular weight correlations suggests that another descriptor should be added to fully explain the data. We observe that $\Delta H_{vap}$ does not have a strong correlation with molecular weight, and that $P_c$ exhibits a strong nonlinear trend suggesting that molecular weight is an excellent molecular descriptor for $P_c$ and subpar for $\Delta H_{vap}$. However, we note that multiple studies list a relationship between $\Delta H_{vap}$ and molecular weight and therefore conclude that molecular weight is an adequate molecular descriptor for all properties of interest. \mcnote{(todo: Barnabas add the studies you mentioned which support this)}
+We begin the modeling process by thoroughly analyzing the trends in the data. Figures \ref{fig:2D_JRGC_bias} and \ref{fig:3D_JRGC_bias} demonstrate that the JR GC predictions and molecular weight are correlated with the experimental data for all properties of interest. 
+Figure \ref{fig:2D_JRGC_bias} shows that the JR GC predictions and experimental data are fairly linearly correlated for $\Delta H_{vap}$, $P_c$, $V_c$. This is desirable behavior as we would ideally like our JR GC model to be relatively unbiased. 
+The JR GC models for $T_m$, $T_b$ , and $T_c$ are much worse predictors of the experimental data. Thus we observe a nonlinear trend indicated by nonzero trends in the discrepancy as shown in Figure \ref{fig:3D_JRGC_bias}. 
 
 \adnote{Move Figures \ref{fig:Data_Vis_Disc} and \ref{fig:Data_Vis_Prop} to SI.}
 
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
-    \includegraphics[width=\textwidth]{"./MW_vs_Disc.png"} %Add 6 figure 2D plots of GP Data
-    \caption{Data visualization for all properties of interest. For each subplot, the x-axis is the molecular weight, the y-axis is the discrepancy between the experimental and GC predicted property value.}
-    \label{fig:Data_Vis_Disc}
+    \includegraphics[width=1.00\linewidth]{images/2D_GC_bias_new.png}
+    \caption{2D visualization of JR GC predictions against experimental values.}
+    \label{fig:2D_JRGC_bias}
 \end{figure}
 
-\begin{figure}[H] %Move to SI
+
+Figure \ref{fig:3D_JRGC_bias} demonstrates a correlation between molecular weight and the experimental data and JR GC predictions for $V_c$, $T_b$, $T_c$, and $T_m$. 
+However the two-tail trend that we observe for the molecular weight correlations suggests that another descriptor should be added to fully explain the data. 
+
+
+\banote{I will probably not begin writing about using additional descriptors at this stage of the paper. 
+One of the most attractive messages of this paper is that GC-based predictions with MW alone are sufficient as molecular descriptors to be used as consistent input features to ML models for reasonably accurate property predictions. Limitations can be discussed at a much later stage (for example in results or future work section) of the paper. We should focus earlier on in the paper to strongly highlight the strengths of the method} 
+
+
+We observe that the discrepancy in $\Delta H_{vap}$ does not have a strong correlation with molecular weight (i.e. there is no clear discrepancy color gradient with changing MW), and that $P_c$ exhibits a strong nonlinear trend suggesting that molecular weight is an excellent molecular descriptor for $P_c$ and subpar for $\Delta H_{vap}$  (see Figures \ref{fig:Data_Vis_Prop} and \ref{fig:Data_Vis_Disc})
+%However,  we note that multiple studies list a relationship between $\Delta H_{vap}$ and molecular weight and therefore conclude that molecular weight is an adequate molecular descriptor for all properties of interest. \mcnote{(todo: Barnabas add the studies you mentioned which support this)}
+
+
+\begin{figure}[htbp]
     \centering
-    \includegraphics[width=\textwidth]{"./MW_vs_Prop.png"} %Add 6 figure 2D plots of GP Data
-    \caption{Data visualization for all properties of interest. For each subplot, the x-axis is the molecular weight, the y-axis is the experimental property value (orange) or GC predicted property value (blue).}
-    \label{fig:Data_Vis_Prop}
+    \includegraphics[width=1.00\linewidth]{images/3D_GC_bias_new.png}
+    \caption{3D visualization of JR GC predictions against experimental values and MW }
+    \label{fig:3D_JRGC_bias}
 \end{figure}
+
+The systematic bias in  $T_m$, $T_b$, and $T_c$ is due to one of the flaws of the JR GC method, which assumes that structural units contribute to the value of these properties in a monotonous manner. 
+Thus, we observe, for example, that the JR GC method predicts that several organic molecules would have $T_m$ values greater than 1500 $K$, which is not the case in nature. Molecules - even within the same family - do not monotonously and boundlessly melt at higher temperatures as they get bigger.
+The systematic bias of the JR GC predictions for $\Delta H_{vap}$ and $P_c$ is more nuanced. Unlike the other properties for which the JR GC method shows systematic bias that is generally correlated with molecular weight, the systematic bias of the JR GC method for $\Delta H_{vap}$ and $P_c$ is for specific classes of molecules.
+We found from our outlier detection analysis, presented in detail in the SI, that the JR GC method shows significant systematic bias in it's $\Delta H_{vap}$ predictions for highly fluorinated and highly nitrated molecules. In Figure \ref{fig:2D_JRGC_bias} there are two points (a and b) with conspicuously low JR GC $\Delta H_{vap}$ predictions.
+
+These two points correspond to molecules with moderate to high MW. The two molecules with this large underestimation in  $\Delta H_{vap}$ using the JR GC method are shown in Figure \ref{fig:JRGC_Hvap_bias_molecules} a and b. They are both highly fluorinated molecules. 
+The group contribution of the fluorine group to $\Delta H_{vap}$ according to the JR GC method is -0.67 $kJ/mol$. 
+This explains why, for highly fluorinated molecules, the JR GC method predicts very low values of $\Delta H_{vap}$ contrary to experimental or true values. 
+The JR GC method could predict negative $\Delta H_{vap}$ values for sufficiently fluorinated molecules, which would be unphysical. 
+Figure \ref{fig:JRGC_Hvap_bias_molecules} c shows another class of molecules for which the JR GC method has a large systematic bias in its $\Delta H_{vap}$ predictions. They are highly nitrated compounds like tetranitromethane shown in Figure \ref{fig:JRGC_Hvap_bias_molecules} c. 
+The JR GC $\Delta H_{vap}$ predictions for tetranitromethane is 82.89 $kJ/mol$ and can be observed in Figure \ref{fig:2D_JRGC_bias} as the highest JR GC $\Delta H_{vap}$ prediction (point c) in our data. 
+The JR GC method predicts that every $-NO_2$ structural unit in a molecule should contribute 16.738 $kJ/mol$ to the $\Delta H_{vap}$ of the molecule. 
+This contribution is much higher than those of most other structural units in the JR GC method parameter set for $\Delta H_{vap}$. This leads to an overestimation in $\Delta H_{vap}$ for highly nitrated molecules.
+A similar scenario is observed for JR GC $P_c$ predictions for highly brominated molecules (point d in Figure \ref{fig:2D_JRGC_bias}).  
+
+Figure \ref{fig:3D_JRGC_bias} also shows the surfaces in the 3D plots that were learned using GPs for each property. 
+%It also further helps to visualize the systematic bias of the JR GC method and how this bias is correlated with MW. We observe a strong correlation between the JR GC predictions discrepancy and MW for $T_m$, $T_b$, $T_c$, and $V_c$. 
+The surfaces in the 3D plots of Figure \ref{fig:3D_JRGC_bias} generally possess a navigable structure rather than random collections of points in 3D space. This provides additional justification for why GPs are suitable for learning these surfaces and have been adopted for this work.
 
 \subsection{GP Modeling}
 
@@ -439,9 +607,10 @@ We note that this model can be classified as a hybrid model \cite{koh} since the
     \end{matrix}\right).
 \end{gather}
 
-We note that from a purely modeling perspective, the best accuracy will be achieved by modeling each property separately with a different GP mean function and covariance matrix given the trends in the available data. However, this requires modeling expertise and given that much of the data range for each property with regards to molecular weight has already been explored, we opt to use one general model framework which is likely to capture all properties under study in this work and any future properties of interest. In the context of using JR GC predictions to train a GP model, we determined that the discrepancy of the JR GC model and experimental data is a function of molecular weight but that the relationship between the two was not always immediately obvious. However in all cases we expect that JR GC model and the experimental property data to be linearly proportional. As such, while we use both molecular weight and JR GC predictions as training data features, we implement a linear mean function which relies solely on the original JR GC predictions. We fix the hyperparameters associated with the mean function such that $\boldsymbol{\mu} = \Ygcvec$.  Other model forms which were considered can be found in SI section XX. 
+We note that from a purely modeling perspective, the best accuracy will be achieved by modeling each property separately with a different GP mean function and covariance matrix given the trends in the available data. However, this requires modeling expertise and given that much of the data range for each property with regards to molecular weight has already been explored, we opt to use one general model framework which is likely to capture all properties under study in this work and any future properties of interest. In the context of using JR GC predictions to train a GP model, we determined that the discrepancy of the JR GC model and experimental data is a function of molecular weight but that the relationship between the two was not always immediately obvious. However in all cases we expect that JR GC model and the experimental property data to be linearly proportional. As such, while we use both molecular weight and JR GC predictions as training data features, we implement a linear mean function which relies solely on the original JR GC predictions. We fix the hyperparameters associated with the mean function such that $\boldsymbol{\mu} = \Ygcvec$.  Other model forms which were considered can be found in the SI. 
 
-The covariance matrix, often called the kernel, indicates how GP features relate to each other and the smoothness of the feature. In this work, the rational quadratic (RQ) kernel is used since it accounts for varying amounts of smoothness in each dataset through hyperparameter $\alpha$. We also add a white kernel to account for uncertainty in the experimental data. The full kernel function for any two data points is defined by \eqref{kernel_final}. Mat\`ern $\frac{1}{2}$, Mat\`ern $\frac{3}{2}$, Mat\`ern $\frac{5}{2}$, and the SE kernels are examined in section XX and are defined in SI section (reference SI section).
+The covariance matrix, often called the kernel, indicates how GP features relate to each other and the smoothness of the feature. In this work, the rational quadratic (RQ) kernel is used since it accounts for varying amounts of smoothness in each dataset through hyperparameter $\alpha$. We also add a white kernel to account for uncertainty in the experimental data. The full kernel function for any two data points is defined by \eqref{kernel_final}. 
+The results of using other kernels such as Mat\`ern $\frac{1}{2}$, Mat\`ern $\frac{3}{2}$, Mat\`ern $\frac{5}{2}$, and the radial basis function (RBF) are examined in a later section. These kernels are defined in the SI.
 
 \begin{equation}
     k(\xvec_i,\xvec_j) = \sigma_f^2 \left(1 +\frac{1}{2 \alpha} \,\mathbf{r}^\intercal \,{\ell}^{-1} \,\mathbf{r} \right)^{-\alpha} + \sigma_w^2\delta_{i,j}
@@ -657,15 +826,27 @@ We determined in section XX that the discrepancy of the JR GC model for each pro
      \label{kernel_final}
  \end{equation} 
 
- GP models were implemented using GPflow \cite{Matthews2017GPflow:TensorFlow} (version \adnote{fill in}). The hyperparameter tuning was implemented using scipy.optimize \cite{Virtanen2020SciPyPython} (version: \adnote{fill in}) with the Limited-memory Broyden–Fletcher–Goldfarb–Shanno Bound (L-BFGS-B) algorithm to perform maximum likelihood estimation and was repeated ten times to avoid local hyperparameter solutions. On the first training pass, hyperparameters were all initialized at 1.0. On subsequent repeats, $\ell$ and $\alpha$ were uniformly selected from bounds $(0, 100]$ and $(0, 100]$ respectively. $\sigma^2_f$ was selected from a log-normal distribution with bounds $[0,1.0]$ and $\sigma_w$ was always initialized at $1.0$. A more nuanced method would be to initialize $\sigma_w$ as the scaled experimental uncertainty when available. Optimization bounds for $\alpha$ were set to $[10^{-5}, 10^2]$ and all other hyperparameters were optimized within bounds $[10^{-5}, 5\times 10^3]$.
+ GP models were implemented using GPflow \cite{Matthews2017GPflow:TensorFlow} (version \adnote{fill in}). The hyperparameter tuning was implemented using scipy.optimize \cite{Virtanen2020SciPyPython} (version: \adnote{fill in}) with the Limited-memory Broyden–Fletcher–Goldfarb–Shanno Bound (L-BFGS-B) algorithm to perform maximum likelihood estimation and was repeated ten times to avoid local hyperparameter solutions. On the first training pass, hyperparameters were all initialized at 1.0. On subsequent repeats, $\ell$ and $\alpha$ were uniformly selected from bounds $(0, 100]$ and $(0, 100]$ respectively. $\sigma^2_f$ was selected from a log-normal distribution with bounds $[0,1.0]$ and $\sigma_w$ was always initialized at $1.0$. A more nuanced method would be to initialize $\sigma_w$ as the scaled experimental uncertainty when available. Optimization bounds for $\alpha$ were set to $[10^{-5}, 5\times 10^3]$ and all other hyperparameters were optimized within bounds $[10^{-5}, 10^2]$.
 
  We use the condition number to determine the numerical stability of our models. The condition number is an indication of how small perturbations in the inputs can affect the outputs \cite{Foster2009}. As a rule of thumb, the number of significant digits lost in addition to those from machine precision is proportional to the logarithmic scaled value of a condition number \cite{NumMathComput}. Ideally, a condition number should be as close to one as possible and a condition number that is much greater than one (in this case we used 500 as a cutoff) is ill-conditioned. That is, a small change in the inputs has significant impact on the output.
+ 
+ \banote{I strongly suggest that we remove all reference(s) to condition numbers from this work. 
+ If we do mention it, we should do so with caution. For example, I do not think there is an objective basis for choosing a single condition number cutoff of 500 for all properties in this work. We have widely different data sizes and widely differing property ranges. 
+ 
+ If one computes the condition numbers of the GPs' covariance matrices after tuning, they are very high (like in the millions). If the initialization of the hyperparameters are done close to what the 'optimal' values should be (which is ideally what you want to do if you have that information), the condition numbers of the covariance matrices are very high.
+Furthermore, the condition numbers are generally bigger  (several thousands) for larger data sets like Tm and Tb.
+In the final results, for Tb, for example, the covariance matrix of the GP, which, when trained, gave the lowest training loss (and highest LML), had a condition number, I think, around or > 10,000. However, I am reasonably confident that we cannot rightly say the model is ill-conditioned.
+We compute the condition numbers before tuning the models.
+The values of the condition numbers are very sensitive to the initial values of the hyperparameters, particularly the white kernel variance hyperparameter. If one sets the initial value of the white kernel variance hyperparameter to a value corresponding to the estimated average experimental uncertainties, the condition numbers are anywhere from several hundreds of thousands to millions. However, the final LML and other model performance metrics remain similar to what is obtained with the default initial value of 1.0. I used this default initial value of 1.0 for the white kernel variance for all final GP training.
+I do not think there really is an objective basis for setting a condition number threshold of 500 for all properties in such a project dealing with real-world experimental data with values that span multiple orders of magnitude for some properties and more importantly, with largely different data set sizes for different properties. }
 
 
 
 %Stratified sampling (Dinis)
-\subsubsection{Stratified sampling}
-When splitting data into training and testing sets, an 80/20 split was used, and all features and labels were standardized to have zero mean and unit variance using the sci-kit-learn StandardScaler \cite{scikit-learn}. Feature-based stratified sampling was used to split the data.
+\subsection{Stratified sampling}
+When splitting data into training and testing sets, an 80/20 split was used. In the final model implementation, all features and labels were standardized to have zero mean and unit variance using the sci-kit-learn StandardScaler \cite{scikit-learn}. 
+Feature-based stratified sampling was used to split the data using an iterative stratification algorithm for multi-label data originally developed by Sechidis and co-workers \cite{sechidis2011stratification} and further developed and implemented in the Scikit-Multilearn Python library by Szymański and Kajdanowicz \cite{pmlr-v74-szymański17a}. 
+A random seed of 42 was used to ensure reproducibility of results across multiple training and retraining of the GPs in this work for all properties. The stratified sampling algorithm is robust to the choice of random seed used, and for several of the properties such as  $\Delta H_{vap}$, $T_m$, $T_b$, and $T_c$, using other random seeds did not change the train/test splits. Small changes in train/test splits and consequently in results were, however, observed for $V_c$ and $P_c$ when different random seeds were used. The results of using ten different random seeds in addition to random seed 42 (used for all final results) are summarized in Table \ref{tab:multiple_seeds} for $V_c$ and $P_c$.
 
 \subsection{Error Metrics}
 We use mean absolute error (MAE), mean absolute percent error (MAPE), coefficient of determination ($R^2$), and root mean squared error (RMSE) to quantify and critically analyze the error of our GP models. This section gives an overview of the definition of these error metrics. Note that in \eqref{eq:COD}, $\overline{y_{\text{exp}}}$ is the average value of $\mathbf{y}_{\text{exp}}$. 
@@ -697,100 +878,165 @@ We use mean absolute error (MAE), mean absolute percent error (MAPE), coefficien
 
 \section{Results and Discussion}
 
-\subsection{JR GC method has systematic bias and limited accuracy}
+%\subsection{JR GC method has systematic bias and limited accuracy}
 
 \adnote{Move Figures \ref{fig:2D_JRGC_bias} and \ref{fig:JRGC_Hvap_bias_molecules} into the introduction. This will help setup the main goal of the paper and reduce some redundancy.}
 
-Figure \ref{fig:2D_JRGC_bias} shows the systematic bias of the JR GC predictions when compared against experimental data. Deviations from the experimental data are most pronounced for $T_m$ and $T_b$, especially at higher molecular weights. Similar but less pronounced systematic deviation of JR GC predictions from experimental data is observed for $T_c$ and $V_c$.   
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1.1\linewidth]{images/2D_GC_bias.png}
-    \caption{Parity plot of experimental data against JR GC predictions.}
-    \label{fig:2D_JRGC_bias}
-\end{figure}
+%\begin{figure}[H]
+%    \centering
+%    \includegraphics[width=1.1\linewidth]{images/2D_GC_bias.png}
+%    \caption{Parity plot of experimental data against JR GC predictions.}
+%    \label{fig:2D_JRGC_bias}
+%\end{figure}
 
-This systematic bias is due to one of the flaws of the JR GC method, which assumes that structural units contribute to the value of these properties in a monotonous manner. Thus, we observe, for example, that the JR GC method predicts that several organic molecules would have $T_m$ values greater than 1500 $K$, which is not the case in nature. Molecules do not monotonously and boundlessly melt at higher temperatures as the structural units are added.
-The systematic bias of the JR GC predictions for $\Delta H_{vap}$ and $P_c$ is more nuanced. Unlike the other properties for which the JR GC method shows systematic bias that is generally correlated with molecular weight, the systematic bias of the JR GC method for $\Delta H_{vap}$ and $P_c$ is for specific classes of molecules.
-We found from our outlier detection analysis, presented in detail in the SI, that the JR GC method shows significant systematic bias in it's $\Delta H_{vap}$ predictions for highly fluorinated and highly nitrated molecules. In Figure \ref{fig:2D_JRGC_bias}, there are two points with conspicuously low JR GC $\Delta H_{vap}$ predictions. 
 
 \adnote{Likely move Figure \ref{fig:JRGC_Hvap_bias_molecules} to the SI.}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\linewidth]{images/Hvap_molecules_with_large_bias.png}
-    \caption{Molecules with large bias in JR GC $\Delta H_{vap}$ predictions}
-    \label{fig:JRGC_Hvap_bias_molecules}
-\end{figure}
-
-These two points correspond to molecules with moderate to high MW. The two molecules with this large underestimation in  $\Delta H_{vap}$ using the JR GC method are shown in Figure \ref{fig:JRGC_Hvap_bias_molecules} a and b. They are both highly fluorinated molecules. The group contribution of the fluorine group to $\Delta H_{vap}$ according to the JR GC method is -0.67 $kJ/mol$. This explains why, for highly fluorinated molecules, the JR GC method predicts very low values of $\Delta H_{vap}$ contrary to experimental or true values. The JR GC method could predict negative $\Delta H_{vap}$ values for sufficiently fluorinated molecules, which would be unphysical. Figure \ref{fig:JRGC_Hvap_bias_molecules} c shows another class of molecules for which the JR GC method has a large systematic bias in its $\Delta H_{vap}$ predictions. They are highly nitrated compounds like tetranitromethane shown in Figure \ref{fig:JRGC_Hvap_bias_molecules} c. The JR GC $\Delta H_{vap}$ predictions for tetranitromethane is 82.89 $kJ/mol$ and can be observed in Figure \ref{fig:2D_JRGC_bias} as the highest JR GC $\Delta H_{vap}$ prediction in our data. The JR GC method predicts that every $-NO_2$ structural unit in a molecule should contribute 16.738 $kJ/mol$ to the $\Delta H_{vap}$ of the molecule. This contribution is high and much higher than those of most other structural units in the JR GC method parameter set for $\Delta H_{vap}$. This leads to an overestimation in $\Delta H_{vap}$ for highly nitrated molecules.
-A similar scenario is observed for JR GC $P_c$ predictions for highly brominated molecules.  
 
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1.1\linewidth]{images/3D_gc_mw_exp.png}
-    \caption{3D surface plot of MW, JR GC predictions, and discrepancy of JR GC predictions from experimental data.}
-    \label{fig:3D_JRGC_MW_disc}
-\end{figure}
 
-\adnote{This idea goes into the introduction.} Figure \ref{fig:3D_JRGC_MW_disc} shows the surfaces that we learn using a GP for each property. It also further helps to visualize the systematic bias of the JR GC method and how this bias is correlated with MW. We observe a strong correlation between the JR GC predictions discrepancy and MW for $T_m$, $T_b$, $T_c$, and $V_c$. The surfaces in Figure \ref{fig:3D_JRGC_MW_disc} generally possess a navigable structure rather than random collections of points in 3D space. This provides additional justification for why GPs are suitable for learning these surfaces.
+%\begin{figure}[H]
+%    \centering
+%    \includegraphics[width=1.1\linewidth]{images/3D_gc_mw_exp.png}
+%    \caption{3D surface plot of MW, JR GC predictions, and discrepancy of JR GC predictions from experimental data.}
+%    \label{fig:3D_JRGC_MW_disc}
+%\end{figure}
+
+\adnote{This idea goes into the introduction.} 
 
 
 \subsection{GCGP method accurately predicts properties and corrects systematic bias}
 
-In this work, we used a GP to correct the systematic bias of the JR GC method. The results are presented in Figure \ref{fig:GCGP_final_results}. Figure XX in the SI show these results only for GP predicted values with 95 \% confidence interval error bars. Table XX in the SI shows the final values of the optimized GP hyperparameters for each property.
+In this work, we used a GP to correct the systematic bias of the JR GC method. The results are presented in Figure \ref{fig:GCGP_final_results}. 
+%Figure XX in the SI show these results only for GP predicted values with 95 \% confidence interval error bars. 
+Table \ref{tab:final_hyperparameters} in the SI shows the final values of the optimized GP hyperparameters for each property.
 Applying the GCGP method almost doubled (0.44 to 0.86) the coefficient of determination ($R^2$) between predictions and experimental values of the testing set for $T_b$. The MAE reduced from 28.8 $K$ for the JR GC predictions to 19.5 $K$ for the GCGP predictions. 
 Similarly, we also observed correction of systematic bias and significant improvement in predictive accuracy for $T_c$ as shown in Figure \ref{fig:GCGP_final_results}.
 
 \adnote{Refactor Figure \ref{fig:GCGP_final_results} into a full-page figure with 6 rows (properties) and two columns (GC versus GCGP). EM and AD are concerned the 'black blob' hides the main point.}
 
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
-    \includegraphics[width=1.1\linewidth]{images/GCGP_final_results.png}
-    \caption{GCGP corrections of systematic bias in JR GC model}
+    \includegraphics[width=1\linewidth]{images/Final_model_predictions_GC_GP_edited.png}
+    \caption{GCGP corrections of systematic bias in JR GC model. Red is JR GC, Blue is GCGP method results}
     \label{fig:GCGP_final_results}
 \end{figure}
 
+%\begin{figure}[H]
+%    \centering
+%    \includegraphics[width=1.1\linewidth]{images/GCGP_final_results.png}
+%    \caption{GCGP corrections of systematic bias in JR GC model}
+%    \label{fig:GCGP_final_results}
+%\end{figure}
+
  
-The largest correction in systematic bias was observed for the property for which the JR GC method had the highest systematic bias - $T_m$. The testing set $R^2$ was 0.71, which is not as high as that for the other properties modeled in this work. However, it is noteworthy that the $R^2$ for the JR GC predictions is -0.51, which is very poor. This very low $R^2$ value limits the predictive accuracy that can be obtained using the GCGP method. $T_m$ represents an extreme case scenario for the GCGP method. We see that even when the GC method, which is used as one of the two input features as well as the mean function of the GP, is extremely systematically biased, the GCGP method is still able to provide decent results. The MAE of the GCGP predictions for $T_m$ is about 42 $K$, which is almost half the MAE for the JR GC predictions with an MAE of about 79 $K$. Furthermore, the MAPE improved from 21.8 \% to 12.6 \%. The $T_m$ data collected from the CRC Handbook of Chemistry and Physics had several entries for which the $T_m$ values were exactly the same even for molecules with widely differing structural units, functional groups, and molecular weight. Of the about 6200 experimental $T_m$  values collected, over 4000 molecules shared the same value of $T_m$ with at least one other molecule. In some cases, more than ten molecules shared the same value of $T_m$. This unusual nature of the $T_m$ data makes it difficult for the corrector GP to learn and correct the systematic bias in the JR GC predictions for $T_m$. This also explains why the GP training $R^2$ is significantly lower than those for other properties as well as why the training and testing sets $R^2$ are similar for $T_m$. Table XX in the SI shows the effect of different settings of the white kernel variance on the model training metrics for $T_m$. In any case, the $T_m$ results show that the GCGP method provides a route to hugely improve the predictive accuracy of simple GC-based models, even (and especially) for scenarios when the GC models have extremely poor predictive performance. One other extreme scenario explored in this work is for the case when the GC models have high predictive accuracies with only a small observable systematic bias. $V_c$ is our example for this other extreme. The testing set $R^2$ for the JR GC prediction of $V_c$ is 0.98. The GCGP method could only give a similar $R^2$ for the testing set, and it may thus seem that there was no correction of bias gained by applying the GCGP method. However, a visual observation of the $V_c$ results in Figure \ref{fig:GCGP_final_results} shows that GCGP method indeed corrects the systematic bias in $V_c$, which is observable for molecules with high experimental $V_c$ values. This is more glaring from the training set results but can also be observed from the testing set results. The systematic deviations in $V_c$ in the testing set JR GC predictions became small random deviations after correction using a GP.
-$\Delta H_{vap}$ and $P_c$ represent special cases, as already discussed in the preceding section. The $\Delta H_{vap}$ results, as shown in Figure \ref{fig:GCGP_final_results}, may appear to suggest that the GCGP method did not provide any improvements in predictive accuracy and correction of systematic bias for the testing set. However, the systematic bias in the JR GC predictions for $\Delta H_{vap}$ for a given molecule is dependent on the presence and number of certain chemical moieties in the molecule. The systematic bias for $\Delta H_{vap}$ applied to highly fluorinated or highly nitrated molecules. There were only two highly fluorinated molecules that had the lowest JR GC $\Delta H_{vap}$ predictions and one highly nitrated molecule that had the highest JR GC $\Delta H_{vap}$ predictions in our data set. Our use of stratified sampling based on the input features ensured that the data for these three molecules were placed in the training set. To demonstrate that the GCGP method indeed learned and is able to correct for the unique chemical constituent based systematic bias for $\Delta H_{vap}$, we obtained additional experimental data for five highly fluorinated molecules from Yaws' Critical Property Data for Chemical Engineers and Chemists as available in the Knovel database.
-We obtained JR GC $\Delta H_{vap}$ predictions for these molecules and then applied the GCGP method to also predict $\Delta H_{vap}$ for the molecules with GCGP predicted uncertainties. The results are shown in Table \ref{tab:Hvap_pred_fluorinated_mols}
+The largest correction in systematic bias was observed for the property for which the JR GC method had the highest systematic bias - $T_m$. 
+The GCGP testing set $R^2$ was 0.71, which is not as high as that for the other properties modeled in this work. However, it is noteworthy that the $R^2$ for the JR GC predictions is a negative value of -0.51, which is very poor. 
+This extremely poor prediction of the JR GC method for $T_m$ limits the predictive accuracy that can be obtained using the GCGP method. $T_m$ represents an extreme case scenario for the GCGP method. 
+However, we observe, somewhat surprisingly, that even when the GC method, which is used as one of the two input features and the mean function of the GP, is extremely systematically biased, the GCGP method is still able to provide decent results. 
+The MAE of the GCGP predictions for $T_m$ is about 42 $K$, which is almost half the MAE for the JR GC predictions with an MAE of about 79 $K$. 
+Furthermore, the MAPE and $R^2$ values improved from 21.8 \% to 12.6 \% and -0.51 to 0.71, representing remarkable improvements. The $T_m$ data collected from the CRC Handbook of Chemistry and Physics had several entries for which the $T_m$ values were exactly the same, even for molecules with widely differing structural units, functional groups, and molecular weight. 
+Of the about 6200 experimental $T_m$  values collected, over 4000 molecules shared the same value of $T_m$ with at least one other molecule. 
+In some cases, more than ten molecules shared the same value of $T_m$. This unusual nature of the $T_m$ data makes it difficult for the corrector GP to learn and correct the systematic bias in the JR GC predictions for $T_m$. 
+This also explains why the GP training $R^2$ is significantly lower than those for other properties and why the training and testing sets $R^2$ (and performance metrics in general) are similar for $T_m$. 
+Table \ref{tab:white_kern_settings_and_Tm} in the SI shows the effect of different settings of the white kernel variance on the model training metrics for $T_m$. In any case, the $T_m$ results show that the GCGP method provides a route to hugely improve the predictive accuracy of simple GC-based models, even (and especially) for scenarios when the GC models have extremely poor predictive performance. One other extreme scenario explored in this work is for the case when the JR GC model has high predictive accuracies with only a small observable systematic bias. $V_c$ is our example for this other extreme. The testing set $R^2$ for the JR GC prediction of $V_c$ is 0.98. The GCGP method could only give a similar $R^2$ for the testing set, and it may thus seem that there was no correction of bias gained by applying the GCGP method. However, visual observation of the $V_c$ results in Figure \ref{fig:GCGP_final_results} shows that the GCGP method indeed corrects the systematic bias in $V_c$, which is observable for molecules with high experimental $V_c$ values. This is more glaring from the training set results but can also be observed from the testing set results. The systematic deviations in $V_c$ in the testing set JR GC predictions became small random deviations after correction using a GP.
+
+
+
+\subsection{GCGP is significantly more accurate than JR methods alone}
+
+\adnote{Move Figure \ref{fig:enter-label} to previous section. Also convert this into a two panel figure that constracts GCGP error and GC only error.}
+
+For every thermophysical property, the MAE (eq.~\eqref{eq:MAE}) and RMSE (eq.~\eqref{eq:RMSE}) were assessed for both the JR model and GCGP models. In order to assess model performance, these metrics were compared across training and testing datasets. Figure \ref{fig: errorbarchart} summarizes these findings.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{images/error_bar_chart_shared_yaxis.png}
+    \caption{Error vs. thermophysical property of selected GP models for (a) JR and (b) GC-GP models. Salmon (green) represents MAE (RMSE). Solid colors (stripes) represent the training (testing) data.}
+    \label{fig: errorbarchart}
+\end{figure}
+
+Figure  \ref{fig: errorbarchart} shows that GCGP models significantly reduced the error in JR GC predictions alone for all models. The only exception appears to be that the test error metrics in JR GC model (Fig. \ref{fig: errorbarchart} (a)) are marginally less than those of the GC-GP model for $\Delta H_{\text{vap}}$. 
+The explanation for this behavior is straightforward: for both $\Delta H_{\text{vap}}$ and $P_c$, the JR model already makes fairly accurate predictions. As such, adding a GP can increase error since there is uncertainty in estimating the additional parameters in the GP. 
+
+\banote{I think the explanation for the above should focus on the nature of the bias for $\Delta H_{vap}$ already discussed in a previous section and further buttressed in the subsequent subsection "GCGP Out-of-Sample Predictions are accurate". We should also perhaps leave $P_c$ out of the above sentence.}
+
+Figure \ref{fig: errorbarchart} (b) shows that for all models except $P_c$ and $T_m$, there is more error in the test set than in the training set. This trend is intuitive, as one would expect to see slightly more error in out-of-sample predictions. That being said, significantly higher error rates in out-of-sample predictions could be a result of overfitting. Further analysis is needed to make statements for or against this phenomena in this case study.
+
+\kjnote{I know I've made this a recommendation in meetings several times (see minutes), but I'll just say it one more time. These results would be more robust if we re-generated them with different seeds for a large enough sample of seeds (e.g., 100). This ensures that we didn't get lucky when we did stratified sampling. This bar chart would then report the empirical mean MAE and RMSE across these samples. This would also allow us to add error bars to the top of each bar, thereby accomplishing the uncertainty quantification objective of this paper. If this is not done, I recommend removing the paragraph above.}
+
+\banote{Doing the above poses the glaring and highly certain risk of information leakage between training and testing sets. The probability that every data point in the data set will end up being used in both training and testing across an ensemble of 100 random 80/20 splits is approximately 1.00. The reported error metrics would be meaningless if every data point was used repeatedly in overlapping training and testing splits. The testing metrics cannot then be said to be an independent assessment of the model's performance for 'unseen' data, especially when one considers that GPs are non-parametric models. The data is a part of the model. 
+
+We should keep in mind that in this work, we do not have a validation set that would have allowed us to do something like k-fold cross-validation to quantify uncertainties in reported model performance metrics for training and validation sets. It is a key principle in ML that the testing set (which must be unique and must not overlap in any way with training or validation data) be used only once after all model development is done for final model evaluation. 
+Dinis is an expert in detecting potential information leakage issues. I have had several conversations with him on the topic. I am sure he will have more to say about this. }
+
+\banote{I have added the below texts for results for $P_c$ using multiple random seeds - but of course without averaging over them}
+
+Table \ref{tab:multiple_seeds} shows that for most random seed choices, the training performance metrics are lower than the testing performance metrics, as expected. 
+The results for $P_c$ using random seed 42 shown in Figure ~\ref{fig: errorbarchart} with testing set error slightly lower than training error is more of a random artifact of a train/test split that places an unusually high number of molecules with high-error GCGP predictions in the training set compared to the testing set.
+
+
+\subsection{GCGP Out-of-Sample Predictions are accurate}
+$\Delta H_{vap}$ and $P_c$ represent special cases of bias in JR GC predictions, as already discussed in the preceding sections. 
+The $\Delta H_{vap}$ results, as shown in Figures \ref{fig:GCGP_final_results} and \ref{fig: errorbarchart}, may appear to suggest that the GCGP method did not provide any improvements in predictive accuracy and correction of systematic bias for the testing set. 
+However, the systematic bias in the JR GC predictions for $\Delta H_{vap}$ for a given molecule is dependent on the presence and number of certain chemical moieties in the molecule. 
+The systematic bias for $\Delta H_{vap}$ applies to highly fluorinated or highly nitrated molecules. There were only two highly fluorinated molecules that had the lowest JR GC $\Delta H_{vap}$ predictions and one highly nitrated molecule that had the highest JR GC $\Delta H_{vap}$ predictions in our data set. 
+Our use of stratified sampling based on the input features ensured that the data for these three molecules were placed in the training set. 
+To demonstrate that the GCGP method indeed learned and is able to correct for the unique chemical constituent-based systematic bias for $\Delta H_{vap}$, we obtained additional experimental data for five highly fluorinated molecules from Yaws' Critical Property Data for Chemical Engineers and Chemists as available in the Knovel database.
+We obtained JR GC $\Delta H_{vap}$ predictions for these molecules and then applied the GCGP method to also predict $\Delta H_{vap}$ for the molecules with GCGP predicted uncertainties. The results are shown in Figure \ref{fig:Hvap_pred_fluorinated_mols} with numerical values in Table \ref{tab:Hvap_pred_fluorinated_mols}
 
 \vspace{0.3cm}
 
-\begin{table}[H]
-\centering
-\begin{tabular}{p{2.9cm}p{1.8cm}p{1.6cm}p{1.5cm}p{1.6cm}p{1.6cm}p{1.6cm}p{1.6cm}} 
-Substance Name&  Molecular Formula&  CAS No.&  MW /$gmol^{-1}$&  JR GC $\Delta H_{vap}$ /$kJmol^{-1}$&  Exp. $\Delta H_{vap}$ /$kJmol^{-1}$&  GCGP $\Delta H_{vap}$ /$kJmol^{-1}$& GCGP Pred. Unc. /$kJmol^{-1}$ 
 
-%\hline 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{images/Hvap_highly_flourinated.png}
+    \caption{Comparison of GCGP and JR GC $\Delta H_{vap}$ predictions for highly fluorinated molecules. GCGP Pred. Unc. represent GP predicted 95 \% confidence intervals magnitude on the property predictions. Experimental data from Yaws' Critical Property Data for Chemical Engineers and Chemists \cite{yaws-critical-property}}
+    \label{fig:Hvap_pred_fluorinated_mols}
+\end{figure}
 
-\\
-         perfluorodecalin&  $C_{10}F_{18}$&  306-94-5&  462.08&  9.68&  35.80&  35.77& 12.45
-\\
-         perfluorononane&  $C_{9}F_{20}$&  375-96-2&  488.07&  7.62&  34.22&  35.84& 15.09
-\\
-         perfluoro-2-methylpentane&  $C_{6}F_{14}$&  355-04-4&  338.05&  9.74&  27.89&  25.73& 16.37
-\\
-         pentadecafluoro-octanoic acid&  $C_{8}HF_{15}O_{2}$&  335-67-1&  414.07&  29.24&  40.40&  41.34& 18.08
-\\
-         heptadecafluoro-nonanoic acid&  $C_{9}HF_{17}O_{2}$&  375-95-1&  464.08&  28.54&  43.03&  45.15& 19.30
-\\
-\end{tabular}
-\caption{Comparison of GCGP and JR GC $\Delta H_{vap}$ predictions for highly fluorinated molecules. GCGP Pred. Unc. represent GP predicted 95 \% confidence intervals magnitude on the property predictions}
-\label{tab:Hvap_pred_fluorinated_mols}
-\end{table}
 
 \adnote{Check number of significant digits in Table \ref{tab:Hvap_pred_fluorinated_mols}. EM pointed out we should not be reporting more significant digits past the uncertainty. AD suggests using $\pm$ symbol to help emphasize the GCGP has uncertainty.}
 
-Table \ref{tab:Hvap_pred_fluorinated_mols} shows how excellently the GCGP method corrects systematic bias and significantly improves predictive accuracy for $\Delta H_{vap}$ predictions for highly fluorinated molecules. \adnote{Can this become a new results subsection focused on out-of-sample predictions.} None of the five molecules in Table \ref{tab:Hvap_pred_fluorinated_mols} were present in the original $\Delta H_{vap}$ data set (both training and testing) used in this work. Furthermore, only two highly fluorinated (12 or more fluorine atoms in a molecule) were present in the original data, which were placed in the training set using feature-based stratified sampling. No highly fluorinated molecule was in the testing set in the original data set. Interestingly and almost surprisingly, the GP learned from only two data points and is able to correct the systematic bias in JR GC $\Delta H_{vap}$ predictions with high accuracy. This further underscores the power of the GCGP method. GP Predicted uncertainties are shown in Table \ref{tab:Hvap_pred_fluorinated_mols}. These predicted uncertainties are unsurprisingly higher than the average uncertainties in the training and testing set predictions for the original $\Delta H_{vap}$ data. However, these uncertainties are not available using the JR GC method only. The ability to conveniently obtain predicted uncertainties is another key gain from the GCGP method. 
-Similar results can be expected for $\Delta H_{vap}$ predictions for highly nitrated compounds and for $P_c$ predictions for highly brominated compounds. The GCGP method provides a small increase in predictive accuracy for $P_c$. However, similarly to $\Delta H_{vap}$, the limitation of the JR GC method for predicting $P_c$ is dependent on the presence and number of certain chemical moieties, specifically, Bromine atoms, in the molecule. As already demonstrated for $H_vap$ predictions for highly fluorinated compounds, the GCGP method can correct nuanced systematic bias associated with the presence of specific structural units in molecules. This is particularly interesting when we consider that unlike most ML methods in the literature, which use input features that encode in detail the chemical identity of molecules, our approach does not explicitly provide the chemical identity of molecules to the GPs. 
+Figure \ref{fig:Hvap_pred_fluorinated_mols} shows how excellently the GCGP method corrects systematic bias and significantly improves predictive accuracy for $\Delta H_{vap}$ predictions for highly fluorinated molecules. 
+
+\adnote{Can this become a new results subsection focused on out-of-sample predictions.} 
+
+None of the five molecules in Figure \ref{fig:Hvap_pred_fluorinated_mols} were present in the original $\Delta H_{vap}$ data set (both training and testing) used in this work. 
+Furthermore, only two highly fluorinated (12 or more fluorine atoms in a molecule) were present in the original data, which were placed in the training set using feature-based stratified sampling. 
+No highly fluorinated molecule was in the testing set in the original data set. Interestingly and almost surprisingly, the GP learned from only two data points and is able to correct the systematic bias in JR GC $\Delta H_{vap}$ predictions with high accuracy. 
+This further underscores the power of the GCGP method. GP predicted uncertainties are shown in Table \ref{tab:Hvap_pred_fluorinated_mols} with 95 \% confidence error bars visually represented in Figure \ref{fig:Hvap_pred_fluorinated_mols}. 
+These predicted uncertainties are unsurprisingly higher than the average uncertainties in the training and testing set predictions for the original $\Delta H_{vap}$ data. The high uncertainties are as result of the very limited data (only two data points) that the GP had to learn from to make predictions for the five out-of-sample highly-fluorinated molecules.
+However, these uncertainties are not available using the JR GC method only. The ability to conveniently obtain predicted uncertainties is another key gain from the GCGP method. 
+Similar results can be expected for $\Delta H_{vap}$ predictions for highly nitrated compounds and for $P_c$ predictions for highly brominated compounds. The GCGP method provides a small increase in predictive accuracy for $P_c$. 
+However, similarly to $\Delta H_{vap}$, the limitation of the JR GC method for predicting $P_c$ is dependent on the presence and number of certain chemical moieties, specifically, Bromine atoms, in the molecule. As already demonstrated for $\Delta H_{vap}$ predictions for highly fluorinated compounds, the GCGP method can correct nuanced systematic bias associated with the presence of specific structural units in molecules. 
+This is particularly interesting when we consider that unlike most ML methods in the literature, which use input features that encode in detail the chemical identity of molecules, our approach does not explicitly provide the chemical identity of molecules to the GPs. 
 Our GPs are not explicitly informed about the presence or absence of certain chemical moieties, yet they perform excellently well in correcting systematic bias that arises from the presence and quantity of these chemical moieties in molecules.
 
+\subsection{GCGP predicted 95 \% confidence intervals are reliable for unseen data}
 
-\subsection{Validation, Verification, and Uncertainty Quantification of GC-GP Predictions}
+Figure \ref{fig:percent_CI} shows the percentage of GCGP predictions that have their 95 \% confidence interval error bars overlapping with the experimental (or true) values for both the training and testing sets. We observe that for all properties, the percentage of data points whose 95 \% confidence intervals overlap with the experimental data points are greater than or approximately equal to 95 \%, with $P_c$ being the only exception with 93.81 \% of the training set predictions having their 95 \% confidence intervals overlapping with experiments.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1\linewidth]{images/percent_inside_95CI_plot.png}
+    \caption{Percentage of GCGP predictions that match with experimental data within predicted 95\% confidence interval}
+    \label{fig:percent_CI}
+\end{figure}
+
+ 
+A more interesting test of the reliability of the GP predicted uncertainties is how well the predicted uncertainties overlap with the 'true' values for unseen data (testing set). Remarkably, for all properties, the percentage of the testing set predictions with 95 \% confidence intervals overlapping with the experimental values is greater than 90 \%, with $V_c$ being the only exception. It should be noted, however, that the GCGP $V_c$ predictions for the test set have the highest predictive accuracy and the lowest predicted uncertainties compared to all other properties. Therefore, the predicted 95 \% confidence intervals from the GCGP method are reliable for unseen or new molecules and can be reasonably expected to have a greater than 90 \% empirical likelihood of representing the range of the true values even in the absence of experimental data.
+
+This is particularly important for materials screening of novel molecules for a range of applications using the GCGP method. We can predict properties and 95 \% confidence intervals that can be trusted to include the true value with an approximately (or even greater than) 90 \% likelihood based on empirical tests in this work.
+
+
+
+\subsection{GCGP approach is robust across kernel and model structure choices} \label{sec:kern_sweep}
+%\subsection{Validation, Verification, and Uncertainty Quantification of GC-GP Predictions}
 \adnote{Below is a note BA left on August 4 in Overleaf. I copied it below to review when I print the manuscript on paper.}
+
+
 
 \banote{By error bar charts do you mean the plots showing the percentage of predicted values that are within a given number of standard deviations from true values?
 
@@ -801,28 +1047,14 @@ We are using that information to show that the GCGP approach is robust to a vari
 
 \adnote{This is incorrect. We've discussed from the last ~1 month how LML (or BIC) provides a more principled approach for comparing models.}
 
+\banote{The crux of my point is "we are not using LML and other metrics from the kernel sweep for model selection". By this, I mean that it is not within the scope of this project or paper to do model selection to determine the 'best' model for each thermophysical property. This has been something that has been repeated by the primary authors so many times in meetings and other communications.  
+Based on heuristics and modeling judgment, which we all discussed and was accepted by the majority of collaborators on this project, we chose the final model for use for all properties in this work. The discussions about LML (or BIC) Prof. Dowling referenced - (these discussions came up about a month after we had already decided on a final model and were working on final results) - were originally about a more objective presentation of my kernel sweep results. We agreed that instead of using columns of training and testing R2, MAEs and MAPDs, we should have a column of LML values as LML values can be considered a more principled representation of a model's fit than R2 values. Furthermore, these LML values were intended to be used in results section 4 (not section 3) as a part of the kernel sweep results. Section 3 was about saying something about the quality of the uncertainty estimates from the GCGP method.
+I want to remind us again that the goal of the kernel sweep, as decided by the primary authors, was to demonstrate the robustness of the GCGP method to a variety of model/kernel architectures. At no point was it for model selection. If there was some discussion about using LML values from my kernel sweep results to select 'best models' for this work, I wasn't a part of it. Again, the sole purpose of the computed LML values and the kernel sweep efforts, in general, is to demonstrate the robustness of the GCGP method to a variety of model/kernel architectures, not model selection. All model comparisons done using the LML values should focus on the message that the GCGP method is robust to different model/kernel architectures, not model selection or choosing 'best' models, etc.}
+
 \adnote{KJ is working on a figure for uncertainty estimates. We have some ideas.}
 
-\subsubsection{GC-GP is significantly more accurate than JR methods alone}
 
-\adnote{Move Figure \ref{fig:enter-label} to previous section. Also convert this into a two panel figure that constracts GCGP error and GC only error.}
-
-For every thermophysical property, the MAE (eq.~\eqref{eq:MAE}) and RMSE (eq.~\eqref{eq:RMSE}) were assessed for both the JR model and GC-GP models. In order to assess model performance, these metrics were compared across training and testing datasets. Figure \ref{fig: errorbarchart} summarizes these findings.
-
-\begin{figure}
-    \centering
-    \includegraphics[width=\linewidth]{images/error_bar_chart_shared_yaxis.png}
-    \caption{Error vs. thermophysical property of selected GP models for (a) JR and (b) GC-GP models. Salmon (green) represents MAE (RMSE). Solid colors (stripes) represent the training (testing) data.}
-    \label{fig: errorbarchart}
-\end{figure}
-
-Figure \ref{fig: errorbarchart} shows that GC-GP models significantly reduced the error in JR predictions alone for all models. The only exception appears to be that the test error metrics in JR model (Fig. \ref{fig: errorbarchart} (a)) are marginally less than those of the GC-GP model for $\Delta H_{\text{vap}}$. The explanation for this behavior is straightforward: for both $\Delta H_{\text{vap}}$ and $P_c$, the JR model already makes fairly accurate predictions. As such, adding a GP can increase error since there is uncertainty in estimating the additional parameters in the GP. 
-
-Figure \ref{fig: errorbarchart} (b) shows that for all models except $P_c$ and $T_m$, there is more error in the test set than the training set. This trend is intuitive, as one would expect to see slightly more error in out-of-sample predictions. That being said, significantly higher error rates in out-of-sample predictions could be a result of overfitting. Further analysis is needed to make statements for or against this phenomena in this case study.
-
-\kjnote{I know I've made this a recommendation in meetings several times (see minutes), but I'll just say it one more time. These results would be more robust if we re-generated them with different seeds for a large enough sample of seeds (e.g., 100). This ensures that we didn't get lucky when we did stratified sampling. This bar chart would then report the empirical mean MAE and RMSE across these samples. This would also allow us to add error bars to the top of each bar, thereby accomplishing the uncertainty quantification objective of this paper. If this is not done, I recommend removing the paragraph above.}
-
-\subsubsection{Model selection provides a framework for building robust GC-GP models}
+5%\subsubsection{Model selection provides a framework for building robust GC-GP models}
 \adnote{Move these plots to the SI. In the discussion above, we observe a handful of interesting issues with the GCGP models. For example, does the LOWER testing versus training error for Pc go away with the best alternative model?}
 \kjnote{Im not married to any of my section headings. Feel free to wordsmith or reshape the narrative as the primary authors see fit.}
 
@@ -832,6 +1064,11 @@ Figure \ref{fig: errorbarchart} (b) shows that for all models except $P_c$ and $
 \adnote{What is the key to decipher the model name strings?} \kjnote{False means isotropic, True means anisotropic. The main text only looks at isotropic, the si text has anisotropic}
 
 \adnote{Which bar corresponds to the "baseline" GCGP model used throughout the paper?} \kjnote{Model 4}
+
+
+\newpage
+
+
 
 In order to assess the best performing GC-GP model architecture for each thermophysical property, the (log) evidence model selection criterion (eq.~\eqref{eq: lml}) was calculated. The interpretation of the (log) evidence is straightforward: for each thermophysical property, the model with the greatest (log) evidence is the best model at balancing the trade off between model bias (i.e., how well the model fits the data) and variance (i.e., model complexity). 
 
@@ -843,6 +1080,54 @@ Figure \ref{fig: lmlbarchart} shows that model five (eq.~\siref{eq: Method_5}) i
 
 \kjnote{I'm not sure how to defend why model four was chosen over model five to generate the results in the main text. I'm also not sure how to explain why the RQ kernel was chosen since the Matern 3/2 kernel was the best performing kernel for 3/6 cases while the RQ kernel was the best performing in only 2/6 cases. I also cannot defend why the Matern 1/2 kernel was not considered for boiling temperature since I did not make this decision. I also cant support the claim that kernel choice doesn't matter, since the results show they are different, if only sometimes marginally. Other authors may want to write a paragraph addressing these points before submitting.}
 
+%[htbp]
+\begin{figure}
+     \centering
+     \vspace{-50pt} 
+     \begin{subfigure}[b]{0.55\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{images/LML_plot_Hvap.png}
+     \end{subfigure} 
+     \hfill
+     \begin{subfigure}[b]{0.55\textwidth}
+         \vspace{-4pt}
+         \centering
+         \includegraphics[width=\textwidth]{images/LML_plot_Pc.png}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.55\textwidth}
+         \vspace{-4pt}
+         \centering
+         \includegraphics[width=\textwidth]{images/LML_plot_Tb.png}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.55\textwidth}
+         \vspace{-4pt}
+         \centering
+         \includegraphics[width=\textwidth]{images/LML_plot_Tc.png}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.55\textwidth}
+         \vspace{-4pt}
+         \centering
+         \includegraphics[width=\textwidth]{images/LML_plot_Tm.png}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.55\textwidth}
+         \vspace{-2pt}
+         \centering
+         \includegraphics[width=\textwidth]{images/LML_plot_Vc.png}
+     \end{subfigure}
+     \caption{Log evidence (eq.~\eqref{eq: lml}) vs. model architecture 1-4 (eqs. \siref{eq: Method_1}-\siref{eq: Method_5}). I = isotropic kernel, A = anisotropic kernel. (a) heat of vaporization, $\Delta H_{\text{vap}}$, (b) critical pressure, $P_c$, (c) boiling temperature, $T_b$, (d) critical temperature, $T_c$, (e) melting temperature, $T_m$, and (f) critical column, $V_c$.} 
+     \label{fig: lmlbarchart}
+\end{figure}
+\FloatBarrier
+
+
+
+\banote{I have commented out the former LML figure below}
+
+\begin{comment}
 \begin{figure}
      \centering
      \begin{subfigure}[b]{0.75\textwidth}
@@ -880,122 +1165,89 @@ Figure \ref{fig: lmlbarchart} shows that model five (eq.~\siref{eq: Method_5}) i
      \label{fig: lmlbarchart}
 \end{figure}
 \FloatBarrier
+\end{comment}
 
-\subsection{GCGP approach is robust across kernel and model structure choices} \label{sec:kern_sweep}
+
+
 
 \adnote{Shorten this down to one paragraph. Does the sensitivity analysis of kernel and model structure choices fix some of the oddities noted earlier? What is the main take away message from this section?}
 
-\begin{table}[htbp]
-    \centering
-    \begin{tabular}{l>{\centering\arraybackslash}p{1.0cm}>{\centering\arraybackslash}p{0.9cm}>{\centering\arraybackslash}p{0.9cm}>{\centering\arraybackslash}p{1.8cm}>{\centering\arraybackslash}p{0.9cm}>{\centering\arraybackslash}p{0.9cm}>{\centering\arraybackslash}p{1.8cm}>{\centering\arraybackslash}p{0.9cm}>{\centering\arraybackslash}p{0.9cm}>{\centering\arraybackslash}p{1.8cm}}
-          &&  \multicolumn{3}{c}{\textbf{Model 1}}&  \multicolumn{3}{c}{\textbf{Model 4}}&  \multicolumn{3}{c}{\textbf{Model 5}}\\
-  && Test $R^2$& Train $R^2$& LML& Test $R^2$& Train $R^2$& LML& Test $R^2$& Train $R^2$&LML
-\\
-  \textbf{$T_b$} &Mt12& 0.895& 0.953& -1122.618& 0.881& 0.953& -1123.100& 0.886& 0.957&-1113.437
-\\
-  &Mt32& 0.896& 0.903& -1202.503& 0.839& 0.902& -1205.319& 0.882& 0.907&-1184.224
-\\
-  &Mt52& 0.893& 0.897& -1219.688& 0.808& 0.897& -1223.621& 0.882& 0.901&-1197.708
-\\
-  &RBF& 0.888& 0.891& -1247.278& 0.783& 0.890& -1252.692& 0.880& 0.897&-1211.300
-\\
-  &RQ& 0.892& 0.907& -1209.425& 0.859& 0.908& -1207.450& 0.892& 0.991&-950.841
-\\
-  &RQ(2)& 0.892& 0.907& -1209.425& 0.860& 0.908& -1207.412& 0.893& 0.991&-949.739
-\vspace{0.23cm} \\
-  \textbf{$\Delta H_{vap}$} &Mt12& 0.823& 0.956& -130.712& 0.824& 0.956& -133.307& 0.824& 0.952&-124.982
-\\
-  &Mt32& 0.828& 0.925& -118.881& 0.827& 0.925& -121.832& 0.827& 0.927&-116.466
-\\
-  &Mt52& 0.830& 0.923& -118.483& 0.828& 0.922& -122.304& 0.829& 0.925&-114.786
-\\
-  &RBF& 0.821& 0.914& -122.182& 0.821& 0.913& -125.880& 0.832& 0.925&-113.634
-\\
-  &RQ& 0.832& 0.924& -118.556& 0.830& 0.924& -121.687& 0.832& 0.925&-113.605
-\\
-  &RQ(2)& 0.847& 0.919& -102.830& 0.850& 0.919& -105.169& 0.851& 0.919&-99.402  
-\vspace{0.23cm} \\
-  \textbf{$P_c$} &Mt12& 0.941& 0.957& -78.037& 0.942& 0.950& -66.534& 0.942& 0.949&-62.170
-\\
-  &Mt32& 0.945& 0.938& -61.249& 0.945& 0.938& -57.264& 0.945& 0.938&-56.134
-\\
-  &Mt52& 0.945& 0.937& -60.290& 0.945& 0.937& -55.354& 0.945& 0.937&-54.387
-\\
-  &RBF& 0.945& 0.937& -61.097& 0.945& 0.937& -54.133& 0.946& 0.937&-52.668
-\\
-  &RQ& 0.945& 0.937& -60.240& 0.945& 0.937& -54.133& 0.946& 0.937&-52.669
-\\
-          &RQ(2)&  0.944&  0.937&  -58.714&  0.945&  0.937&  -54.133&  0.946&  0.937& -52.664     
-\vspace{0.23cm} \\
-          \textbf{$V_c$} &Mt12&  0.982&  0.999&  613.446&  0.982&  0.999&  658.085&  0.982&  0.999& 660.683
-\\
-          &Mt32&  0.972&  0.998&  631.173&  0.976&  0.998&  662.275&  0.976&  0.999& 665.821
-\\
-          &Mt52&  0.981&  0.996&  606.056&  0.974&  0.998&  657.775&  0.975&  0.998& 662.298
-\\
-  &RBF& 0.984& 0.995& 599.129& 0.982& 0.996& 620.065& 0.982& 0.996&621.083
-\\
-  &RQ& 0.982& 0.996& 605.638& 0.978& 0.998& 662.185& 0.979& 0.998&665.027
-\\
-  &RQ(2)& 0.981& 0.996& 605.956& 0.981& 0.998& 664.668& 0.981& 0.998&667.604
-\vspace{0.23cm} \\
-  \textbf{$T_c$} &Mt12& 0.908& 0.972& -33.151& 0.907& 0.967& -21.828& 0.907& 0.966&-19.964
-\\
-  &Mt32& 0.897& 0.951& -18.218& 0.898& 0.952& -14.714& 0.898& 0.952&-14.226
-\\
-  &Mt52& 0.896& 0.950& -21.114& 0.896& 0.951& -15.356& 0.896& 0.951&-14.470
-\\
-  &RBF& 0.901& 0.942& -28.508& 0.898& 0.950& -19.174& 0.897& 0.951&-17.372
-\\
-  &RQ& 0.895& 0.951& -22.412& 0.895& 0.951& -15.877& 0.896& 0.951&-14.920
-\\
-  &RQ(2)& 0.897& 0.951& -21.634& 0.896& 0.951& -15.759& 0.896& 0.951&-14.736 
-\vspace{0.23cm} \\
-  \textbf{$T_m$} &Mt12& 0.711& 0.731& -4078.129& 0.710& 0.733& -4084.262& 0.712& 0.729&-4072.946
-\\ 
-  &Mt32& 0.710& 0.711& -4080.198& 0.709& 0.709& -4084.134& 0.711& 0.712&-4076.282
-\\
-          &Mt52&  0.709&  0.709&  -4087.603&  0.706&  0.706&  -4094.918&  0.711&  0.711& -4080.782
-\\
-          &RBF&  0.707&  0.705&  -4100.160&  0.701&  0.703&  -4110.552&  0.710&  0.710& -4091.815
-\\
-          &RQ&  0.711&  0.711&  -4085.540&  0.707&  0.710&  -4094.385&  0.711&  0.711& -4080.326
-\\
-          &RQ(2)&  0.711&  0.711&  -4085.038&  0.707&  0.709&  -4093.798&  0.711&  0.711& -4080.029
-    \end{tabular}
-    \caption{Abridged kernel choice and model structure sweep results.}
-    \label{tab:kern_sweep}
-\end{table}
+\banote{Updated kernel sweep results are ready and already in the GitHub repo for all 240 model/kernel combinations. I will collate them into an Excel file that will be available in the repo. 
 
-In Table \ref{tab:kern_sweep}, Mt12, Mt32, Mt52 mean the Mat\'ern 1/2, Mat\'ern 3/2, and Mat\'ern 5/2 kernels. RQ(2) and RQ mean anisotropic and isotropic rational quadratic kernels respectively. RBF mean the radial basis function kernel. LML means the log-marginal likelihood.
-Table \ref{tab:kern_sweep} shows that the GCGP method is robust to kernel choice and model structure. The primary difference between models 1, 4, and 5 is in the choice of mean functions. Model 1 has a zero mean function, model 4 has the JR GC predictions as its mean function, and model 5 has a linear function of MW and JR GC predictions with three additional trainable parameters as its mean function.
-We find that model 5, with three additional trainable parameters for its mean function, generally does not give significantly higher $R^2$ values on the testing sets compared to model 1 with a zero mean function and model 4 (the model form used in final implementation). Model form 4 is chosen for the final implementation as using the JR GC predictions as the mean function generally makes more physical sense than using a zero mean function. Furthermore, model 4 has a small number of trainable parameters compared to model 5.
-The LML, training, and testing $ R2$ values are also similar across various kernel choices in general. The differences between these metrics are generally too small to determine which kernel choice is the 'best' overall for modeling all properties in this work. Thus, we have chosen to maintain a single generally applicable kernel choice and model structure for the final implementation of the GCGP method in this work.
-Furthermore, we see that using automatic relevance determination (anisotropic kernels) does not significantly improve model performance.
-In this work, we chose the rational quadratic (RQ) kernel with a single length scale as a kernel that is generally applicable for all properties modeled in this work. The RQ kernel has a shape parameter which makes it flexible for use in modeling a variety of data with different or unclear smoothness trends. In summary, the GCGP method gives generally good performance for all properties irrespective of kernel choice. The choice of model structure may have a bigger impact on performance.  \textcolor{red}{Tables AA - ZZ} in the SI show the complete results of the effects of kernel choice and model structure on predictive performance. Model 2, which uses MW as the only input feature to a  GP that models the discrepancy with the JR GC predictions as the mean function, is seen to consistently have the poorest performance among all the model forms. Model 3, another discrepancy model but with a zero mean function and with MW and JR GC predictions as the two input features to the GP, shows comparable performance to models 1, 4, and 5. In summary, the GCGP method gives generally similar performance irrespective of kernel choice and mean function choice. However, the JR GC predictions must be used as one of the input features (and not just as the mean function as is the case for model 2) to obtain good performance.
+I have now implemented the proposed new 'model 6' and is represented as model 2 in this work.
+
+Figure 4 has been updated above.
+
+I will discuss these results, which have been visualized in part in Figure \ref{fig: lmlbarchart} above. This is my interpretation of the kernel sweep and LML results (which I generated) as aligned with the message that we agreed on in the August 13th meeting (and previous meetings) that we should communicate using those results.}
+
+The complete results of the assessment of the sensitivity of the GCGP method to kernel design and model structure are available in \href{https://github.com/MaginnGroup/GCGP/blob/master/kernel_sweep_code_and_results/kernel_sweep_combined_results.csv}{spreadsheet}  format in the \href{https://github.com/MaginnGroup/GCGP/tree/master}{GitHub} repository for this work. 
+The descriptions of the different model structures and kernel functions tested are provided in the `GP Models' and `Kernel Functions' subsections in the SI with equations \ref{eq: Method_1} - \ref{eq: Method_4} in the SI representing models 1 through 4 respectively. Model 3 is the final model implemented in this work. Equations \ref{se}, \ref{Matern}, and \ref{rq_kernel} in the SI represent the RBF, Mat\`ern, and RQ kernels, respectively.
+
+In assessing the sensitivity of the GCGP method to kernel design and model structure, we will focus our discussion on the log-marginal likelihood function (LML) defined in Equation \ref{eq: lml}. 
+We begin by noting that the formulation of the LML does not explicitly and fully account for model complexity that may arise due to differences in the number of parameters, both in the mean function and kernel function, especially for low-data scenarios, as we have in this work. 
+%The Bayesian Information Criteria (BIC) or Akaike Information Criteria (AIC) may be a better metric for model comparison in our work. 
+%However, we did not explore these metrics as it is neither our goal nor within the scope of this work to separately identify the `best' model for each and every property studied in this work. We have instead chosen and applied a general model structure and kernel architecture to all properties, with extensibility to other properties in mind.
+We have applied information from computed LML values, keeping in mind the limitation highlighted above, coupled with good modeling heuristics and judgment to select the model/kernel combination used in the final implementation. 
+We find that the GCGP method provides generally good and comparable predictive performance for all appropriate model/kernel combinations. 
+%We also demonstrate that our model/kernel choice for final implementation in this work represents the most generally applicable choice based on a guided use of computed LML values and modeling judgment.
+
+%We begin by providing rough estimates of the uncertainties in the computed LML values. This is to enable a more objective commentary on what LML values can be considered significantly and statistically different and those that should be considered equivalent or similar for purposes of model/kernel assessments. 
+Uncertainties in computed LML values may arise from randomness in train/test splits, randomness in kernel hyperparameter initialization during retrains, uncertainties in the optimized hyperparameters, and other factors. 
+For each property, we generated an ensemble of ten training sets from the data sets using 10 (randomly generated) random seeds. We computed LML values for the final model/kernel combination in this work and used these LML values to obtain a rough estimate of what may be considered a reasonable lower bound on the uncertainty in LML values for each property and model/kernel combination.  Not all properties showed sensitivity to the random seed choice for splitting the data using feature-based stratified splitting, so the effect of different splits couldn't be tested for these properties. 
+However, $V_c$ and $P_c$ showed sensitivity to the choice of random seed. Table \ref{tab:multiple_seeds} in the SI shows the results of how LML values change for different train/test splits for $V_c$ and $P_c$. Based on data in Table \ref{tab:multiple_seeds}, we consider a 2 \% relative error in the LML values as a reasonable lower bound on the average uncertainties associated with the final reported LML values. LML values within a 2 \% difference from each other are considered similar.
+%LML values for $V_c$ ranged from 586.40 to 671.39, with a standard deviation of 23.83. LML values for $P_c$ ranged from -31.22 to -53.31, with a standard deviation of 7.31. Based on these results, we chose a relative standard deviation of 2 \% as a reasonable lower bound on the average uncertainties associated with the LML values reported in the full LML kernel sweep results available on GitHub.
+%Tables \ref{tab:kern_sweep_Hvap} - \ref{tab:kern_sweep_Tm}. 
+ 
+Figure \ref{fig: lmlbarchart} shows LML values for anisotropic rational quadratic (RQ) kernels in comparison to isotropic RQ kernels.
+We find that the LML values for anisotropic kernels are similar with no significant improvement compared to those for isotropic kernels for all properties except $\Delta H_{vap}$, for which the anisotropic kernel has a significantly better LML, but at the cost of an additional trainable parameter.
+Similar results are observed for all other anisotropic kernels compared to their isotropic counterparts, irrespective of the kernel functional form. 
+Based on these results, we chose to implement the final model using isotropic kernels for all properties. 
+Furthermore, we note that good predictive performance is obtained for all properties irrespective of the anisotropy of the kernel choice, thus demonstrating the robustness of the GCGP method to choices related to kernel anisotropy. 
+
+Model 2 performed the worst of all four model forms, indicating that it is important to have the GC predictions as input to the GP models, as model 2 was the only model without the GC predictions as input features to the GP. Model 3 was found to give generally better LML values compared to model 1 for $P_c$, $V_c$, $T_c$, and to a limited extent $\Delta H_{vap}$  and similar LML values for the other properties. 
+Model 3 and Model 1 have the same number of trainable parameters. It is not surprising that Model 3 generally has better LML values than Model 1, considering that Model 3 has a more physically meaningful and intuitive mean function with no additional trainable parameters compared to Model 1, which has zero mean function.
+Model 4, with almost double the number of trainable parameters with three additional parameters compared to other models, had similar LML values compared to Model 3 for $T_m$, $V_c$, and $P_c$. Model 4 provides better LML values compared to Model 3 for the other three properties. 
+Considering the significantly greater complexity of model 4 with three additional trainable parameters while offering only a slight improvement in predictive performance over model 3 in general, we chose model 3 for the final model implementations.
+%We consider that model selection criteria like Bayesian information criteria (BIC) will heavily penalize the significantly higher number of parameters used in Model 4, leading to an overall preference for Model 3 over Model 4. 
+The GCGP method gives good predictive performance for all properties for Models 1, 3, and 4, as indicated by the generally good and comparable LML and $R^2$ values on both training and testing data for all of the model/kernel choice combinations using any of Models 1, 3 or 4. Model 2, which uses only MW as an input feature, is considered inadequate for the GCGP method.
+Finally, we find that given the selection of Model 3 and isotropic kernels for final model implementation, the RQ kernel with an additional trainable parameter known as the shape parameter $\alpha$, has more flexibility for modeling the range of properties studied in this work, irrespective of the smoothness (or roughness) of the surface to be learned.
+Table \ref{tab:kernel_comparisons} shows a comparison of isotropic kernels for Model 3 for all properties. The numbers represent the rank of the kernel based on LML values considering 2 \% differences as the criterion for judging one kernel as having a better LML than another for a given property. 
+The RQ kernel has the lowest overall sum of ranks (best score) with a value of 9, closely followed by the Matern kernels with $\nu$ of 3/2 and 5/2, which both had a sum of ranks value of 10. 
+%The RBF kernel had the worst score (highest sum of ranks). These results are not surprising considering the observed strong correlation between the input features and target labels, which sometimes follow a linear or a simple curve trend. The RQ kernel has an additional trainable parameter compared to the Matern kernels with $\nu$ of 3/2 and 5/2. 
+%However, in the interest of a highly generally applicable model/kernel design that will serve for modeling not only the properties considered in this work but also other properties and extensions of the GCGP method, we chose the RQ kernel for the final model implementations in this work. 
+The RQ kernel has a shape parameter, which makes it flexible for use in modeling a variety of data with different or unclear smoothness trends. This also makes the RQ kernel a more physically and mathematically justifiable kernel choice for modeling all properties in this work compared to a Matern kernel with $\nu$ of 3/2 for example, which is considered appropriate for functions that are singly differentiable. 
+Irrespective of kernel choice, the GCGP method generally gives good and comparable predictive performance.
+Therefore, the GCGP method is robust to kernel choice and design and also robust to model structure, with the exception of overly simplistic modeling choices like Model 2.
+
+
+
+\adnote{Merge this with next section, "Conclusions and Future Work"}
+
+\section{Conclusions}
+We have developed and demonstrated a property prediction method that integrates the strengths of GC-based molecular models for property predictions with GPR for high predictive accuracy with reasonable uncertainty estimates. 
+The GCGP method corrects systematic bias in GC-based property modeling and offers significant improvement in predictive accuracy over GC-only predictions. The GCGP approach is robust to the choice of GP kernels and model structure, provided the GC predictions are used as one of the input features to the GP. 
+Furthermore, the GCGP method has a high potential to be tunable to give even better predictive accuracies and can be conveniently extended to other properties, GC models, and molecule types not considered in this work. 
+The GCGP method developed in this work thus offers a fast, simple, reliable, generalizable, and tunable property prediction method that gives predicted uncertainties for the property predictions. 
+The GCGP method, therefore, offers a key tool for reliable property prediction for materials screening in material discovery tasks. 
+%Barnabas to provide specific examples
 
 
 \subsection{Extensibility and Opportunities for Future Work}
-\adnote{Merge this with next section, "Conclusions and Future Work"}
-
-%Barnabas to provide specific examples
 Although this work focuses on six properties and a Joback and Reid group contribution method, the technique for creating models is directly applicable to other properties and other GC methods. 
 %A GP model can be built using the same steps as in this work as long as the GC method can provide the property prediction. GC prediction and property data must be rigorously analyzed to determine appropriate features for the model. Their relationships should be analyzed to collect and apply a priori information including well-known physical correlations. With appropriate scaling, a model can then be trained and validated to produce improved accuracy results with uncertainty information.
-The GCGP method may be considered a tunable method for improved predictive accuracy. As an example, we observed in this work that the GCGP method gave the least performance in terms of predictive accuracy for $T_m$. This was mainly attributed to the extreme bias in the JR GC predictions of $T_m$ which was used as input to the corrector GP model. A simple way to improve the prediction of $T_m$ using the GCGP approach is to switch to a more accurate but still simple GC method for predicting GC $T_m$. Indeed, such a method already exists \cite{perezponceNewGroupContribution2013}. Alternatively, we can use the same structural unit definition as the JR GC method but design a more accurate GC model functional form and parameterize the more advanced GC model functional form using collected data. This likely more accurate GC model can then be used to obtain input GC predictions in the GCGP method. This later approach is more likely to lead to significant improvement in predictive accuracy for $T_m$. Molecules that cannot have their properties predicted due to the limitations of unavailable parameters in a given GC method can have their properties predicted by switching the GC method to another one that is able to predict their properties. The above recommendations are examples of how the GCGP method may be easily tuned to obtain even better predictive accuracy or extended to other properties and molecule types not considered in this work. 
+The GCGP method may be considered a tunable method for improved predictive accuracy. As an example, we observed in this work that the GCGP method gave the least performance in terms of predictive accuracy for $T_m$. This was mainly attributed to the extreme bias in the JR GC predictions of $T_m$ which was used as input to the corrector GP model. 
+A simple way to improve the prediction of $T_m$ using the GCGP approach is to switch to a more accurate but still simple GC method for predicting GC $T_m$. Indeed, such a method already exists \cite{perezponceNewGroupContribution2013}. 
+Alternatively, we can use the same structural unit definition as the JR GC method but design a more accurate GC model functional form and parameterize the more advanced GC model functional form using collected data. This likely more accurate GC model can then be used to obtain input GC predictions in the GCGP method. This latter approach is more likely to lead to significant improvement in predictive accuracy for $T_m$. 
+Molecules that cannot have their properties predicted due to the limitations of unavailable parameters in a given GC method can have their properties predicted by switching the GC method to another one that is able to predict their properties. 
+The above recommendations are examples of how the GCGP method may be easily tuned to obtain even better predictive accuracy or extended to other properties and molecule types not considered in this work. 
 Furthermore, one opportunity for future contribution will be to extend the GCGP method to predict properties at varying conditions of temperature and possibly pressure. This may be achieved by adding temperature as an input feature to the GP and training against sufficient data to capture the temperature dependence of the target property. There are very likely several other and probably more effective ways to achieve this.
 It would be interesting to see what nuances may be encountered and how the GCGP method performs when applied to GC-based thermodynamic models.
 Another contribution that would be highly valuable is integrating the GCGP method with CAMD workflows. The improved predictive accuracies and easily accessible uncertainty estimates from the GCGP method could result in significant improvement in the reliability and robustness of CAMD workflows in identifying optimal molecules and processes for a variety of applications.
-
-
-\section{Conclusions}
-We have developed and demonstrated a property prediction method that integrates the strengths of GC-based molecular models for property predictions with GPR for high predictive accuracy with reasonable uncertainty estimates. The GCGP method corrects systematic bias in GC-based property modeling and offers significant improvement in predictive accuracy over the GC-only predictions. The GCGP approach is robust to choice of GP kernels and model structure provided the GC predictions are used as one of the input features to the GP. Furthermore, the GCGP method has a high potential to be tunable to give even better predictive accuracies and can be conveniently extended to other properties, GC models, and molecule types not considered in this work. 
-The GCGP method developed in this work thus offers a fast, simple, reliable, generalizable, and tunable property prediction method that gives predicted uncertainties for the property predictions. The GCGP method therefore offers a key tool for reliable property prediction for materials screening in material discovery tasks. 
-Several opportunities exist for future contributions, such as integrating the GCGP method into CAMD workflows, applying the GCGP method to GC-based thermodynamic models and engineering correlations in general, and extending the method for predicting temperature and pressure-dependent properties as well as mixture properties.
-
+%Several opportunities exist for future contributions, such as integrating the GCGP method into CAMD workflows, applying the GCGP method to GC-based thermodynamic models and engineering correlations in general, and extending the method for predicting temperature and pressure-dependent properties as well as mixture properties.
 \adnote{More future work paragraph to here. Edit to tighten and remove redundancies.}
 
 
-\section{Nomenclature}
+%\section{Nomenclature}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% The "Acknowledgement" section can be given in all manuscript
@@ -1003,7 +1255,10 @@ Several opportunities exist for future contributions, such as integrating the GC
 %% environment, which will make the correct section or running title.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{acknowledgement}
-The authors acknowledge funding from the National Science Foundation (NSF) EFRI DChem: Next-generation Low Global Warming Refrigerants, Award no.~2029354. BA \& KJ acknowledge the Notre Dame Lucy Institute for Data and Society. BA acknowledges the Notre Dame Energy for graduate research fellowships. Computational resources were provided by the Center for Research Computing (CRC) at the University of Notre Dame. MC \& KJ acknowledge support from the Graduate Assistance in Areas of National Need fellowship from the Department of Education via grant number P200A210048, the National Science Foundation via Award numbers CBET-1917474 and EFRI-2029354, and the University of Notre Dame College of Engineering and Graduate School.  
+The authors acknowledge funding from the National Science Foundation (NSF) EFRI DChem: Next-generation Low Global Warming Refrigerants, Award no.~2029354. 
+EJM, AD, MC, and BA acknowledge support in part by the Engineering Research Centers Program of the NSF under NSF Cooperative Agreement No. xxxxxx. 
+DA acknowledges funds from the projects CICECO-Aveiro Institute of Materials, UIDP/50011/2020 (DOI 10.54499/UIDP/50011/2020) and LA/P/0006/2020 (DOI 10.54499/LA/P/0006/2020), financed by Portugal's national funds through the FCT/MCTES (PIDDAC).
+BA \& KJ acknowledge the Notre Dame Lucy Family Institute for Data and Society. BA acknowledges the Center for Sustainable Energy at Notre Dame, for graduate research fellowship. MC \& KJ acknowledge support from the Graduate Assistance in Areas of National Need fellowship from the Department of Education via grant number P200A210048, the National Science Foundation via Award numbers CBET-1917474 and EFRI-2029354, and the University of Notre Dame College of Engineering and Graduate School.  Computational resources were provided by the Center for Research Computing (CRC) at the University of Notre Dame.
 
 \end{acknowledgement}
 
@@ -1012,7 +1267,9 @@ The authors acknowledge funding from the National Science Foundation (NSF) EFRI 
 %% suppinfo environment.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{suppinfo}
-The Supporting Information is available free of charge.
+The Supporting Information is available free of charge and includes further information on data collection and preparation, data analysis, final model parameters, and additional results on a variety of tests conducted in this work.
+All codes and final results are also available on the project's \href{https://github.com/MaginnGroup/GCGP/tree/master}{GitHub} repository
+
 
 %Calculated properties, sample input scripts, and post-processing codes used in this work are available to the public on the project's \href{https://osf.io/t9265/}{Open Science Framework} and \href{https://github.com/MaginnGroup/Validation-of-HFC-FFs}{GitHub} repository at \\
 %https://osf.io/t9265/ and https://github.com/MaginnGroup/Validation-of-HFC-FFs, respectively.

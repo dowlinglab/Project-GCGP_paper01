@@ -50,10 +50,17 @@
 
 \usepackage[symbol]{footmisc}
 \author{Barnabas P. Agbodekhe}
-\author{Dinis O. Abranches}
+\affiliation[University of Notre Dame]
+{Department of Chemical and Biomolecular Engineering, University of Notre Dame, Notre Dame, IN 46556, USA}
 \author{Montana N. Carlozo}
+\affiliation[University of Notre Dame]
+{Department of Chemical and Biomolecular Engineering, University of Notre Dame, Notre Dame, IN 46556, USA}
+\author{Dinis O. Abranches}
+\affiliation[University of Notre Dame]
+{CICECO - Aveiro Institute of Materials, Department of Chemistry, University of Aveiro, 3810-193 Aveiro, Portugal}
 \author{Kyla D. Jones}
 \author{Alexander W.~Dowling}
+\email{adowling@nd.edu}
 \author{Edward J. Maginn}
 \email{ed@nd.edu}
 %\phone{+123 (0)123 4445556}
@@ -76,11 +83,12 @@
 
 \begin{figure}
     \centering
-    \includegraphics[width=1\linewidth]{images/GC_method_illustration.png}
+    \includegraphics[width=0.6\linewidth]{images/GC_method_illustration.png}
     \caption{Illustration of Joback and Reid (JR) GC method}
     \label{fig:JR_GC_illustration}
 \end{figure}
 
+Figure \ref{fig:JR_GC_illustration} shows how the JR GC model in particular (and simple GC models in general) works. Each molecular group has a contribution to the total property value of the molecule. The group contributions $T_{b,i}$ for the normal boiling temperature $T_b$ are obtained as parameters from the JR GC model \cite{jobackEstimationPureComponentProperties1987}.
 
 \subsection{Data Pre-processing}
 
@@ -94,6 +102,7 @@
 \end{figure}
 
 
+Figures \ref{fig:2D_outlier_analysis} and \ref{fig:outlier_scores} shows the results of outlier analysis on the entire datasets comparing predictions from the Joback and Reid (JR) GC method with experimental data. Either a power law or linear function (green line) was fitted to the JR GC predictions compared to experimental data, as shown in Figure \ref{fig:2D_outlier_analysis}. Two boundary lines (red lines) were then constructed representing two standard deviations of the JR GC predictions from the function fit line for each property.
 
 \begin{figure}[H]
     \centering
@@ -103,6 +112,7 @@
 \end{figure}
 
 
+Red points represent suspected outliers. These points were the focus of data quality checks. For all data points flagged by the We cross-checked the reported values in the CRC Handbook of Chemistry and Physics \cite{bookRumble2023} with values from Yaws' Critical Property Data for Chemical Engineers and Chemists \cite{yaws-critical-property} as available in the Knovel database. comparisons were also made with reported values in the National Institute of Standards and Technology (NIST) webbook as available. For all suspected outlier points, there was agreement between the CRC Handbook of Chemistry and Physics and  Yaws' Critical Property Data for Chemical Engineers and Chemists except for three molecules in the $\Delta H_{vap}$ dataset.
 
 
 \begin{figure}[H]
@@ -112,65 +122,123 @@
     \label{fig:molecules_with_erroneous_data}
 \end{figure}
 
+Figure \ref{fig:molecules_with_erroneous_data} shows the three molecules for which we consider the entries in the CRC Handbook of Chemistry and Physics to be incorrect.
+We compared the values from the CRC Handbook of Chemistry and Physics with those from Yaws' Critical Property Data for Chemical Engineers and Chemists and data from NIST webbook. For the three molecules shown in Figure \ref{fig:molecules_with_erroneous_data}, the reported values from Yaws' Critical Property Data for Chemical Engineers and Chemists and those from NIST agree with each other while those from the CRC Handbook of Chemistry and Physics are significantly different.  
+
+
+\begin{table}
+    \centering
+    \begin{tabular}{cccc}
+         Cas RN&  T /K&  $\Delta H_{vap}$ /$kJmol^{-1}$& Reference
+\\
+         96-48-0&  357&  51.8& \cite{wibergLactones2Enthalpies1991}\\
+         &  392&  49.5& \cite{wibergLactones2Enthalpies1991}\\
+         &  407&  48.2& \cite{stephensonHandbookThermodynamicsOrganic1987}\\
+         590-67-0&  355&  49.1& \cite{stephensonHandbookThermodynamicsOrganic1987}\\
+         464-49-3&  298.15&  55.3& \cite{vanroonGasChromatographicDetermination2002}\\
+    \end{tabular}
+    \caption{$\Delta H_{vap}$ values compiled by National Institute of Standards and Technology (NIST) for molecules with erroneous $\Delta$$H_{vap}$ data from CRC Handbook of Chemistry and Physics. The collated data from NIST and Yaws' critical properties handbook data agree and differ from those of the CRC Handbook of Chemistry and Physics}
+    \label{tab:NIST_Hvap_for_erroneous_CRC_Hvap}
+\end{table}
+
+Table \ref{tab:NIST_Hvap_for_erroneous_CRC_Hvap} shows data from NIST webbook as collated from the original references shown in Table \ref{tab:NIST_Hvap_for_erroneous_CRC_Hvap} for the three molecules shown in Figure \ref{fig:molecules_with_erroneous_data}.
+
+
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\linewidth]{images/Hvap_outlier_analysis_scores.png}
+    \includegraphics[width=1.0\linewidth]{images/Hvap_outlier_analysis_scores.png}
     \caption{$\Delta$$H_{vap}$  outlier analysis and scores after removing erroneous data from the CRC Handbook of Chemistry and Physics}
-    \label{fig:enter-label}
+    \label{fig:Hvap_outliers_removed}
+\end{figure}
+
+Figure \ref{fig:Hvap_outliers_removed} shows the outlier analysis results after the experimental data from the CRC Handbook of Chemistry and Physics for the three molecules in Figure \ref{fig:molecules_with_erroneous_data} have been replaced with those from Yaws' Critical Property Data for Chemical Engineers and Chemists. Interestingly, once the experimental data from the CRC Handbook of Chemistry and Physics for the three molecules in Figure \ref{fig:Hvap_outliers_removed} were replaced with the correct values from Yaws' Critical Property Data for Chemical Engineers and Chemists, the molecules were no longer flagged as outliers. 
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/Hvap_molecules_with_large_bias.png}
+    \caption{Molecules with large bias in JR GC $\Delta H_{vap}$ predictions}
+    \label{fig:JRGC_Hvap_bias_molecules}
+\end{figure}
+
+There were still however three other molecules that remained flagged as outliers and whose data from the CRC Handbook of Chemistry and Physics were shown to be most likely correct as they agree with data from NIST and Yaws' Critical Property Data for Chemical Engineers and Chemists.
+These three molecules are shown in Figure \ref{fig:JRGC_Hvap_bias_molecules}. It can be observed that these molecules are highly fluorinated or highly nitrated molecules. Detailed discussions have been provided in the main text about why the JR GC model significantly underestimate $\Delta H_{vap}$ for highly fluorinated molecules and overestimate $\Delta H_{vap}$ for highly nitrated molecules as shown in Figure \ref{fig:Hvap_outliers_removed}.
+
+\subsubsection{Analysis of feature vs label data }
+% All extra 2D-only plots Montana made except Y_gc vs Y_exp plots go here with a brief discussion. (Y_gc vs Y_exp plots here will be duplicating 2D color-coded results in subsection 1 of results) 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{"images/MW_vs_Disc.png"} %Add 6 figure 2D plots of GP Data
+    \caption{Data visualization for all properties of interest. For each subplot, the x-axis is the molecular weight, the y-axis is the discrepancy between the experimental and GC predicted property value.}
+    \label{fig:Data_Vis_Disc}
+\end{figure}
+
+\begin{figure}[H] %Move to SI
+    \centering
+    \includegraphics[width=\textwidth]{"images/MW_vs_Prop.png"} %Add 6 figure 2D plots of GP Data
+    \caption{Data visualization for all properties of interest. For each subplot, the x-axis is the molecular weight, the y-axis is the experimental property value (orange) or GC predicted property value (blue).}
+    \label{fig:Data_Vis_Prop}
 \end{figure}
 
 
 
 
 
-%\subsubsection{Analysis of feature vs label data (Montana and Kyla) }
-% All extra 2D-only plots Montana made except Y_gc vs Y_exp plots go here with a brief discussion. (Y_gc vs Y_exp plots here will be duplicating 2D color-coded results in subsection 1 of results) 
-
-
-\subsection{GP Model Screening}
+\subsection{GP Models} 
+\label{subsec:model_screening}
 %Talk about 5 model forms
-We implemented five separate GP model structures to improve the results of JR GC predictions. Four of the models require both the GC property predictions $\mathbf{y_{GC}}$ and molecular weights ($\mathbf{M.W}$) and one only requires ($\mathbf{M.W}$) as an input. Each model makes different assumptions about the relationship between the input features and experimental property data $\mathbf{y_{\text{exp}}}$. We denote $\mathbf{X} = [\mathbf{y_{GC}}, \mathbf{M.W}]$
+We implemented four separate GP model structures to improve the results of JR GC predictions. Three of the models (Models 1, 3, and 4) require both the GC property predictions $\mathbf{y_{GC}}$ and molecular weights ($\mathbf{M.W}$) and one (Model 2) only requires ($\mathbf{M.W}$) as an input. Each model makes different assumptions about the relationship between the input features and experimental property data $\mathbf{y_{\text{exp}}}$. We denote $\mathbf{X} = [\mathbf{y_{GC}}, \mathbf{M.W}]$
 
-Model 1 described by equation \eqref{eq: Method_1} represents the most na\"ive approach to GP modeling in which we attempt to model $\mathbf{y_{\text{exp}}}$ using $m=0$. This method is best suited for models where trends in the data are unknown or difficult to elucidate and rely on the kernel function to do fully describe trends in the data.
+Model 1 described by equation \eqref{eq: Method_1} represents the most na\"ive approach to GP modeling in which we attempt to model $\mathbf{y_{\text{exp}}}$ using $m=0$. This method is best suited for models where trends in the data are unknown or difficult to elucidate and rely on the kernel function to fully describe trends in the data.
+
 
 \begin{equation}
-    \mathbf{y_{\text{exp}}} \sim  GP = \mathcal{N}\left(\mathbf{y_{GC}}, K(\mathbf{X}) \right)
+    \mathbf{y_{\text{exp}}} \sim  GP = \mathcal{N}\left(0, K(\mathbf{X}) \right)
     \label{eq: Method_1}
 \end{equation}
 
-Model 2 and Model 3, represented by equations \eqref{Method_2} and \eqref{Method_3} respectively, attempt to model the discrepancy between the GC predictions and experimental data using a GP and are classified as traditional hybrid models. This method form is well-suited for properties where there is a clear correlation between the bias of the GC predictions and the experimental data. For a more robust implementation of this method, a mean function describing the bias with respect to input parameters should be added when clear. This model uses $m=0$, which reflects our belief that for GC models which are fairly accurate, bias should be negligible. The difference between \eqref{Method_2} and \eqref{Method_3} is that \eqref{Method_2} models discrepancy as a function of only $\mathbf{M.W}$.
+
+Models 2 and 3 are represented by equations \ref{eq: Method_2} and \ref{eq: Method_3}. 
+%attempt to model the discrepancy between the GC predictions and experimental data using a GP and are classified as traditional hybrid models. This method form is well-suited for properties where there is a clear correlation between the bias of the GC predictions and the experimental data. For a more robust implementation of this method, a mean function describing the bias with respect to input parameters should be added when clear. 
+These models use $m = \mathbf{y_{GC}}$.
+%which reflects our belief that for GC models which are fairly accurate, bias should be negligible. 
+The difference between equations \ref{eq: Method_2} and \ref{eq: Method_3} is that equation \ref{eq: Method_2} models $\mathbf{y_{\text{exp}}}$ as a function of only $\mathbf{M.W}$ while equation \ref{eq: Method_3} models $\mathbf{y_{\text{exp}}}$ as a function of both $\mathbf{y_{GC}}$ and $\mathbf{M.W}$.
 
 \begin{equation}
-    \mathbf{y_{\text{exp}}} - \mathbf{y_{GC}} = GP \sim \mathcal{N}\left(0, K(\mathbf{M.W}) \right)
+    \mathbf{y_{\text{exp}}} \sim GP = \mathcal{N}\left(\mathbf{y_{GC}}, K(\mathbf{M.W}) \right)
     \label{eq: Method_2}
 \end{equation}
 
-
-\begin{equation}
-    \mathbf{y_{\text{exp}}} - \mathbf{y_{GC}} = GP \sim \mathcal{N}\left(0, K(\mathbf{X}) \right)
-    \label{Method_3}
-\end{equation}
-
-The fourth GP model implementation (Model 4) in \eqref{Method_4} is the final model implementation which assumes $m = \mathbf{y_{GC}}$. This method is most suitable for property prediction data where $\mathbf{y_{GC}}$ is at least a somewhat faithful representation of $\mathbf{y_{\text{exp}}}$ and the relationship between $M.W$ and $\mathbf{y_{\text{exp}}}$ is unknown. We note that because $\mathbf{y_{GC}}$ is not a stochastic function, Method 4 and Method 3 are mathematically equivalent. Therefore, Method 4 is a hybrid model and equivalent to method 3. These models also produce the same results within a small numerical tolerance. 
-
 \begin{equation}
     \mathbf{y_{\text{exp}}} \sim  GP = \mathcal{N}\left(\mathbf{y_{GC}}, K(\mathbf{X}) \right)
-    \label{Method_4}
+    \label{eq: Method_3}
 \end{equation}
 
-The fifth GP model form (Model 5) in \eqref{Method_5} is a generalization of \eqref{Method_4} which includes tunable hyperparameters $A$ and $b$ in the mean function such that $m(\mathbf{x} \vert \mathbf{A},\mathbf{b}) = \mathbf{A}\mathbf{x} + \mathbf{b}$. This model is well suited for property predictions where the correlation of $M.W$ and $\mathbf{y_{\text{exp}}}$ is linear or when $\mathbf{y_{GC}}$ is a poor estimator of $\mathbf{y_{\text{exp}}}$. We note that because 
+In this work, Model 3 is the final model implementation. 
+%\begin{equation}
+%    \mathbf{y_{\text{exp}}} - \mathbf{y_{GC}} = GP \sim \mathcal{N}\left(0, K(\mathbf{X}) \right)
+%    \label{Method_3}
+%\end{equation}
+
+%The fourth GP model implementation (Model 3) in \eqref{Method_3} is the final model implementation which assumes $m = \mathbf{y_{GC}}$. 
+This method is most suitable for property prediction data where $\mathbf{y_{GC}}$ is at least a somewhat faithful representation of $\mathbf{y_{\text{exp}}}$ and the relationship between $M.W$ and $\mathbf{y_{\text{exp}}}$ is unknown. 
+%We note that because $\mathbf{y_{GC}}$ is not a stochastic function, Method 4 and Method 3 are mathematically equivalent. Therefore, Method 4 is a hybrid model and equivalent to method 3. These models also produce the same results within a small numerical tolerance. 
+
+The fourth GP model form (Model 4) in equation \ref{eq: Method_4} is a generalization of \ref{eq: Method_3} which includes tunable hyperparameters $A$ and $b$ in the mean function such that $m(\mathbf{x} \vert \mathbf{A},\mathbf{b}) = \mathbf{A}\mathbf{x} + \mathbf{b}$. This model is well suited for property predictions where the correlation of $M.W$ and $\mathbf{y_{\text{exp}}}$ is linear or when $\mathbf{y_{GC}}$ is a poor estimator of $\mathbf{y_{\text{exp}}}$. 
+%We note that because 
 
 \begin{equation}
     \mathbf{y_{\text{exp}}} \sim GP = \mathcal{N}\left( \beta_{0} \mathbf{M.W} + \beta_{1} \mathbf{y_{GC}} +\beta_{2} , K(\mathbf{X}) \right)
-    \label{eq: Method_5}
+    \label{eq: Method_4}
 \end{equation}
 
 
 % The five methods (4 above and the final method) were implemented to predict heat of vaporization ($H_{vap}$  $\frac{kJ}{mol}$), melting temperature ($T_m$ (K)), boiling temperature ($T_b$ ($K$)), and critical volume ($V_c$ ($\frac{cm^3}{mol}$), temperature ($T_c$ ($K$)), and pressure ($P_c$ ($bar$)). For the initial implementation a SE kernel with an isotropic length scale and a white kernel was used. The set of hyperparameters with the lowest log likelihood was used to make predictions. From our analysis, we concluded that \eqref{Method_2} was not very useful as molecular weight alone was not informative enough to describe the discrepancy. This was indicated by high MAPD values. \eqref{Method_4} and \eqref{Method_5} often performed similarly with \eqref{Method_1} performing marginally worse. In the case where there was a strong correlation between discrepancy and the input features, \eqref{Method_3} yielded the lowest MAPD values. A table of the preliminary results can be found in the SI.
 
 
-
+\begin{comment}
 \begin{figure}
      \centering
      \begin{subfigure}[b]{0.75\textwidth}
@@ -205,31 +273,34 @@ The fifth GP model form (Model 5) in \eqref{Method_5} is a generalization of \eq
      \caption{Log evidence (eq.~\eqref{eq: lml}) vs. model architecture 1-5 (eqs. \siref{eq: Method_1} - \siref{eq: Method_5}) for different isotropic kernels. For each thermophysical property, (a) heat of vaporization, $\Delta H_{\text{vap}}$, (b) critical pressure, $P_c$, (c) boiling temperature, $T_b$, (d) critical temperature, $T_c$, (e) melting temperature, $T_m$, and (f) critical column, $V_c$, the maximum log evidence value is bolded. The blue diagonal striped bars, green solid bars, and navy grid pattern bars represent the Mat\'ern kernel (eq.~\eqref{eq: maternkern}) parameterized by $\nu = 1/2, \, 3/2,$ and $5/2$, respectively. Pink spotted and mint horizontal striped bars represent the squared exponential (eq.~\eqref{eq: sekernel}) and rational quadratic (eq.~\eqref{eq: rationalquadkernel}) kernels, respectively. \textbf{anywhere you see a zero is a place where the result wasn't provided, its not actually zero}}
      \label{fig: lmlbarchartaniso}
 \end{figure}
+\end{comment}
 
-\subsection{Kernel Function Screening}
 
-Section XX in the main text are the results of examining the effect of different kernels. Here, we elaborate on the different kernels. For this section, $d(\mathbf{x}, \mathbf{x}^{\prime})$ is the euclidean distance between data $\mathbf{x}$ and $\mathbf{x}^{\prime}$.
+\subsection{Kernel Functions}
 
-The squared exponential kernel, also known as the radial basis function (RBF) is described by \eqref{se}. It assumes the underlying function is infinitely differentiable and is most useful for smooth functions.
+The results of the examination of the effect of different kernels are provided in the main text. Here, we elaborate on the different kernels. For this section, $d(\mathbf{x}, \mathbf{x}^{\prime})$ is the euclidean distance between data $\mathbf{x}$ and $\mathbf{x}^{\prime}$.
+
+The squared exponential kernel, also known as the radial basis function (RBF), is described by \eqref{se}. It assumes the underlying function is infinitely differentiable and is most useful for smooth functions.
 
 \begin{equation}
     k(\mathbf{x}, \mathbf{x}^{\prime}) = \exp\left(-\frac{d(\mathbf{x}, \mathbf{x}^{\prime})^2}{2\ell^2} \right)
     \label{se}
 \end{equation}
 
-The Mat\`ern kernels are defined by their smoothness, $\nu$, and length scale $\ell$. As $\nu \rightarrow \infty$ the Mat\`ern kernel becomes equivalent to the RBF kernel and is thus a generalization of the RBF kernel. The general form of the Mat\`ern kernel is provided in \eqref{Matern} where $K_\nu(\cdot)$ is the modified Bessel function and $\Gamma(\cdot)$ is the gamma function. This kernel is a particularly good choice for functions which are differentiable a certain number of times.
+The Mat\`ern kernels are defined by their smoothness, $\nu$, and length scale $\ell$. As $\nu \rightarrow \infty$ the Mat\`ern kernel becomes equivalent to the RBF kernel and is thus a generalization of the RBF kernel. The general form of the Mat\`ern kernel is provided in \eqref{Matern} where $K_\nu(\cdot)$ is the modified Bessel function and $\Gamma(\cdot)$ is the gamma function. Three Mat\`ern kernels with $\nu$ = 1/2, 3/2, and 5/2 where tested. The Mat\`ern kernels are a particularly good choice for functions that are differentiable a certain number of times.
 
 \begin{equation}
     k_\nu(\mathbf{x}, \mathbf{x}^{\prime}, \nu) = \frac{2^{1-\nu}}{\Gamma(\nu)} \left( \sqrt{2\nu} \frac{d(\mathbf{x}, \mathbf{x}^{\prime})}{\ell} \right)^\nu K_\nu \left( \sqrt{2\nu} \frac{d(\mathbf{x}, \mathbf{x}^{\prime})}{\ell} \right)
     \label{Matern}
 \end{equation}
 
-The rational quadratic kernel described by \eqref{rq_kernel} is a hybrid is infinitely mean-square differentiable \cite{Gramacy2020Surrogates:Sciences} and is a more general form of the RBF kernel. Because the parameter $\alpha$ can be tuned, this function is equipped to handle functions with varying levels of smoothness. This is the kernel function implemented in our final model.
+The rational quadratic kernel described by \eqref{rq_kernel} is a hybrid, is infinitely mean-square differentiable \cite{Gramacy2020Surrogates:Sciences} and is a more general form of the RBF kernel. Because the parameter $\alpha$ can be tuned, this function is equipped to handle functions with varying levels of smoothness. This is the kernel function implemented in our final model.
 
 \begin{equation}
     k(\mathbf{x}, \mathbf{x}^{\prime}) = \left(1 + \frac{d(\mathbf{x}, \mathbf{x}^{\prime})^2}{2\alpha l^2}\right)^{-\alpha}
     \label{rq_kernel}
 \end{equation}
+
 
 
 % The power exponential kernels are popular due to good numerical stability from better covariance matrix condition numbers. Particularly common is the Gaussian kernel, in which hyperparameter $\alpha$ is set to $\alpha = 2$ \cite{Gramacy2020Surrogates:Sciences}. 
@@ -246,15 +317,15 @@ Note, hyperparameters $\alpha$ and $\ell$ in these equations must be optimized b
 
 \section{Results and Discussion}
 
-\subsection{GC-GP hybrid models accurately predict properties and correct systematic bias}
+%\subsection{GC-GP hybrid models accurately predict properties and correct systematic bias}
 
 % plots with error bars
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1\linewidth]{images/2D_GCGP_pred_results_SI.png}
-    \caption{GCGP method results with 95 \% confidence error bars}
-    \label{fig:GCGP_with_error_bars}
-\end{figure}
+%\begin{figure}[H]
+%    \centering
+%    \includegraphics[width=1\linewidth]{images/2D_GCGP_pred_results_SI.png}
+%    \caption{GCGP method results with 95 \% confidence error bars}
+%    \label{fig:GCGP_with_error_bars}
+%\end{figure}
 
 
 
@@ -278,8 +349,8 @@ Note, hyperparameters $\alpha$ and $\ell$ in these equations must be optimized b
          $T_m$&  5.557&  0.021&  20.158&  0.294&  -4094.385
 \\
     \end{tabular}
-    \caption{Caption}
-    \label{tab:my_label}
+    \caption{Final values of the optimized GP hyperparameters for each property}
+    \label{tab:final_hyperparameters}
 \end{table}
 
 
@@ -289,11 +360,13 @@ Note, hyperparameters $\alpha$ and $\ell$ in these equations must be optimized b
 \begin{table}[H]
     \centering
     \begin{tabular}{ccccccc}
-         &  Train&  &  &  Test&  & 
+         &  &Train  &  &  &  Test& 
 \\
-         variance hyperparameter setting&  R2 &  MAPD&  MAE&  R2 &  MAPD& MAE
 \\
-         Start at 1e-5 and optimize&  0.71&  12.95&  42.08&  0.7&  13.3& 43.21
+         Variance hyperparameter setting&  $R^2$ &  MAPE&  MAE&  $R^2$ &  MAPE& MAE
+\\
+\\
+         Start at 1$e^{-5}$ and optimize&  0.71&  13.14&  42.45&  0.71&  12.56& 42.09
 \\
          Fix at value corresponding to 1 K &  0.98&  1.82&  6.02&  0.7&  13.06& 42.59
 \\
@@ -302,12 +375,101 @@ Note, hyperparameters $\alpha$ and $\ell$ in these equations must be optimized b
          This work&  0.71&  13.14&  42.45&  0.71&  12.56& 42.09
 \\
     \end{tabular}
-    \caption{Caption}
-    \label{tab:my_label}
+    \caption{Effect of different settings of the white kernel variance on the model training metrics for $T_m$. MAPE = Mean Absolute Percentage Error. MAE = Mean Absolute Error.}
+    \label{tab:white_kern_settings_and_Tm}
 \end{table}
 % Discussion and table showing effect of white noise kernel settings on Tm model training 
 
 
+
+\begin{table}[H]
+\centering
+\begin{tabular}{p{2.9cm}p{1.8cm}p{1.6cm}p{1.5cm}p{1.6cm}p{1.6cm}p{1.6cm}p{1.6cm}} 
+Substance Name&  Molecular Formula&  CAS No.&  MW /$gmol^{-1}$&  JR GC $\Delta H_{vap}$ /$kJmol^{-1}$&  Exp. $\Delta H_{vap}$ /$kJmol^{-1}$&  GCGP $\Delta H_{vap}$ /$kJmol^{-1}$& GCGP Pred. Unc. /$kJmol^{-1}$ 
+
+%\hline 
+
+\\
+         perfluorodecalin&  $C_{10}F_{18}$&  306-94-5&  462.08&  9.68&  35.80&  35.8& 9.4
+\\
+         perfluorononane&  $C_{9}F_{20}$&  375-96-2&  488.07&  7.62&  34.22&  35.8& 13.9
+\\
+         perfluoro-2-methylpentane&  $C_{6}F_{14}$&  355-04-4&  338.05&  9.74&  27.89&  25.7& 16.3
+\\
+         pentadecafluoro-octanoic acid&  $C_{8}HF_{15}O_{2}$&  335-67-1&  414.07&  29.24&  40.40&  41.3& 19.9
+\\
+         heptadecafluoro-nonanoic acid&  $C_{9}HF_{17}O_{2}$&  375-95-1&  464.08&  28.54&  43.03&  45.1& 22.7
+\\
+\end{tabular}
+\caption{Comparison of GCGP and JR GC $\Delta H_{vap}$ predictions for highly fluorinated molecules. GCGP Pred. Unc. represent GP predicted 95 \% confidence intervals magnitude on the property predictions. Experimental data from Yaws' Critical Property Data for Chemical Engineers and Chemists \cite{yaws-critical-property}}
+\label{tab:Hvap_pred_fluorinated_mols}
+\end{table}
+
+
+
+
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{>{\raggedright\arraybackslash}p{2.2cm}>{\raggedright\arraybackslash}p{1.20cm}>{\centering\arraybackslash}p{1.20cm}>{\centering\arraybackslash}p{1.10cm}>{\centering\arraybackslash}p{1.10cm}>{\centering\arraybackslash}p{1.10cm}>{\centering\arraybackslash}p{1.10cm}>{\centering\arraybackslash}p{1.10cm}>{\centering\arraybackslash}p{1.10cm}>{\centering\arraybackslash}p{1.10cm}>{\centering\arraybackslash}p{1.10cm}}
+          Property&Seed&  LML&  Test MAPE \%&  Train MAPE \%&  Test MAE *&  Train MAE *&  Test RMSE *&  Train RMSE *&  Test $R^2$& Train $R^2$
+\\
+          Pc&42&  -54.13&  4.81&  5.46&  1.86&  1.93&  2.82&  3.15&  0.945& 0.937
+\\
+          &670487&  -31.96&  5.85&  5.12&  2.14&  1.84&  3.30&  3.01&  0.922& 0.943
+\\
+          &116739&  -55.25&  5.07&  5.42&  2.04&  1.90&  3.07&  3.10&  0.942& 0.937
+\\
+          &26225&  -40.60&  5.54&  5.21&  1.99&  1.87&  3.14&  3.05&  0.930& 0.941
+\\
+ & 777572& -49.45& 5.41& 5.31& 2.14& 1.86& 3.16& 3.06& 0.938&0.939
+\\
+ & 288389& -44.29& 5.59& 5.28& 2.01& 1.90& 3.01& 3.10& 0.935&0.940
+\\
+ & 256787& -38.91& 5.62& 5.23& 2.12& 1.86& 3.18& 3.05& 0.929&0.941
+\\
+ & 234053& -38.86& 5.40& 5.30& 2.01& 1.89& 3.22& 3.04& 0.930&0.941
+\\
+          &146316&  -32.27&  6.55&  5.04&  2.28&  1.83&  3.42&  3.01&  0.924& 0.942
+\\
+          &772246&  -32.38&  5.95&  5.12&  2.23&  1.82&  3.36&  2.99&  0.919& 0.944
+\\
+          &107473&  -37.77&  6.24&  5.13&  2.09&  1.88&  3.06&  3.08&  0.929& 0.941
+\\
+          &&  &  &  &  &  &  &  &  & 
+
+\\
+          Vc&42&  662.19&  3.85&  2.28&  18.38&  8.42&  36.09&  11.56&  0.978& 0.998
+\\
+ & 670487& 665.87& 4.04& 2.32& 17.32& 8.82& 33.20& 12.27& 0.982&0.998
+\\
+ & 116739& 660.98& 3.96& 2.20& 19.70& 8.39& 46.82& 11.45& 0.972&0.998
+\\
+ & 26225& 643.63& 3.94& 1.89& 18.76& 7.22& 44.53& 10.18& 0.973&0.999
+\\
+ & 777572& 633.56& 3.98& 2.30& 19.57& 8.62& 38.14& 12.02& 0.982&0.998
+\\
+ & 288389& 662.09& 3.96& 2.37& 21.38& 8.79& 48.26& 12.29& 0.969&0.998
+\\
+ & 256787& 584.82& 3.64& 3.30& 17.58& 13.71& 43.31& 21.72& 0.972&0.994
+\\
+ & 234053& 666.94& 3.96& 2.25& 17.44& 8.59& 35.64& 11.80& 0.978&0.998
+\\
+ & 146316& 683.68& 3.76& 2.51& 20.68& 9.28& 48.93& 12.83& 0.961&0.998
+\\
+ & 772246& 622.69& 3.89& 2.32& 18.60& 8.56& 34.05& 12.02& 0.984&0.998
+\\
+ & 107473& 628.52& 3.59& 2.35& 15.86& 8.91& 31.74& 12.43& 0.985&0.998
+\\
+    \end{tabular}
+    \caption{Effects of Random Seed Choice for Train/Test Splits on Model Performance Metrics for Training and Testing Sets. Seed 42 was used for generating all final results in the main text. * means $bar$ or $cm^3/mol$ for $P_c$ or $V_c$ respectively.}
+    \label{tab:multiple_seeds}
+\end{table}
+
+
+
+
+\begin{comment}
 \subsection{GC-GP hybrid model performance is robust across kernel and structure choices (Barnabas) }
 % Six big tables showing model performance metrics across all model-kernel (50 in total) combinations for all properties - one per property
 %$\Delta H_{vap}$
@@ -392,10 +554,8 @@ Note, hyperparameters $\alpha$ and $\ell$ in these equations must be optimized b
   && & & & & & & & & &\\
     \end{tabular}
     \caption{Caption}
-    \label{tab:my_label}
+    \label{tab:kern_sweep_Hvap}
 \end{table}
-
-
 
 
 %%%%%%%%%%%%%%%%%% Pc
@@ -823,13 +983,128 @@ Note, hyperparameters $\alpha$ and $\ell$ in these equations must be optimized b
   && & & & & & & & & &\\
     \end{tabular}
     \caption{Caption}
-    \label{tab:my_label}
+    \label{tab:kern_sweep_Tm}
+\end{table}
+
+
+\begin{table}[htbp]
+    \centering
+    \begin{tabular}{l>{\centering\arraybackslash}p{1.0cm}>{\centering\arraybackslash}p{0.9cm}>{\centering\arraybackslash}p{0.9cm}>{\centering\arraybackslash}p{1.8cm}>{\centering\arraybackslash}p{0.9cm}>{\centering\arraybackslash}p{0.9cm}>{\centering\arraybackslash}p{1.8cm}>{\centering\arraybackslash}p{0.9cm}>{\centering\arraybackslash}p{0.9cm}>{\centering\arraybackslash}p{1.8cm}}
+          &&  \multicolumn{3}{c}{\textbf{Model 1}}&  \multicolumn{3}{c}{\textbf{Model 4}}&  \multicolumn{3}{c}{\textbf{Model 5}}\\
+  && Test $R^2$& Train $R^2$& LML& Test $R^2$& Train $R^2$& LML& Test $R^2$& Train $R^2$&LML
+\\
+  \textbf{$T_b$} &Mt12& 0.895& 0.953& -1122.618& 0.881& 0.953& -1123.100& 0.886& 0.957&-1113.437
+\\
+  &Mt32& 0.896& 0.903& -1202.503& 0.839& 0.902& -1205.319& 0.882& 0.907&-1184.224
+\\
+  &Mt52& 0.893& 0.897& -1219.688& 0.808& 0.897& -1223.621& 0.882& 0.901&-1197.708
+\\
+  &RBF& 0.888& 0.891& -1247.278& 0.783& 0.890& -1252.692& 0.880& 0.897&-1211.300
+\\
+  &RQ& 0.892& 0.907& -1209.425& 0.859& 0.908& -1207.450& 0.892& 0.991&-950.841
+\\
+  &RQ(2)& 0.892& 0.907& -1209.425& 0.860& 0.908& -1207.412& 0.893& 0.991&-949.739
+\vspace{0.23cm} \\
+  \textbf{$\Delta H_{vap}$} &Mt12& 0.823& 0.956& -130.712& 0.824& 0.956& -133.307& 0.824& 0.952&-124.982
+\\
+  &Mt32& 0.828& 0.925& -118.881& 0.827& 0.925& -121.832& 0.827& 0.927&-116.466
+\\
+  &Mt52& 0.830& 0.923& -118.483& 0.828& 0.922& -122.304& 0.829& 0.925&-114.786
+\\
+  &RBF& 0.821& 0.914& -122.182& 0.821& 0.913& -125.880& 0.832& 0.925&-113.634
+\\
+  &RQ& 0.832& 0.924& -118.556& 0.830& 0.924& -121.687& 0.832& 0.925&-113.605
+\\
+  &RQ(2)& 0.847& 0.919& -102.830& 0.850& 0.919& -105.169& 0.851& 0.919&-99.402  
+\vspace{0.23cm} \\
+  \textbf{$P_c$} &Mt12& 0.941& 0.957& -78.037& 0.942& 0.950& -66.534& 0.942& 0.949&-62.170
+\\
+  &Mt32& 0.945& 0.938& -61.249& 0.945& 0.938& -57.264& 0.945& 0.938&-56.134
+\\
+  &Mt52& 0.945& 0.937& -60.290& 0.945& 0.937& -55.354& 0.945& 0.937&-54.387
+\\
+  &RBF& 0.945& 0.937& -61.097& 0.945& 0.937& -54.133& 0.946& 0.937&-52.668
+\\
+  &RQ& 0.945& 0.937& -60.240& 0.945& 0.937& -54.133& 0.946& 0.937&-52.669
+\\
+          &RQ(2)&  0.944&  0.937&  -58.714&  0.945&  0.937&  -54.133&  0.946&  0.937& -52.664     
+\vspace{0.23cm} \\
+          \textbf{$V_c$} &Mt12&  0.982&  0.999&  613.446&  0.982&  0.999&  658.085&  0.982&  0.999& 660.683
+\\
+          &Mt32&  0.972&  0.998&  631.173&  0.976&  0.998&  662.275&  0.976&  0.999& 665.821
+\\
+          &Mt52&  0.981&  0.996&  606.056&  0.974&  0.998&  657.775&  0.975&  0.998& 662.298
+\\
+  &RBF& 0.984& 0.995& 599.129& 0.982& 0.996& 620.065& 0.982& 0.996&621.083
+\\
+  &RQ& 0.982& 0.996& 605.638& 0.978& 0.998& 662.185& 0.979& 0.998&665.027
+\\
+  &RQ(2)& 0.981& 0.996& 605.956& 0.981& 0.998& 664.668& 0.981& 0.998&667.604
+\vspace{0.23cm} \\
+  \textbf{$T_c$} &Mt12& 0.908& 0.972& -33.151& 0.907& 0.967& -21.828& 0.907& 0.966&-19.964
+\\
+  &Mt32& 0.897& 0.951& -18.218& 0.898& 0.952& -14.714& 0.898& 0.952&-14.226
+\\
+  &Mt52& 0.896& 0.950& -21.114& 0.896& 0.951& -15.356& 0.896& 0.951&-14.470
+\\
+  &RBF& 0.901& 0.942& -28.508& 0.898& 0.950& -19.174& 0.897& 0.951&-17.372
+\\
+  &RQ& 0.895& 0.951& -22.412& 0.895& 0.951& -15.877& 0.896& 0.951&-14.920
+\\
+  &RQ(2)& 0.897& 0.951& -21.634& 0.896& 0.951& -15.759& 0.896& 0.951&-14.736 
+\vspace{0.23cm} \\
+  \textbf{$T_m$} &Mt12& 0.711& 0.731& -4078.129& 0.710& 0.733& -4084.262& 0.712& 0.729&-4072.946
+\\ 
+  &Mt32& 0.710& 0.711& -4080.198& 0.709& 0.709& -4084.134& 0.711& 0.712&-4076.282
+\\
+          &Mt52&  0.709&  0.709&  -4087.603&  0.706&  0.706&  -4094.918&  0.711&  0.711& -4080.782
+\\
+          &RBF&  0.707&  0.705&  -4100.160&  0.701&  0.703&  -4110.552&  0.710&  0.710& -4091.815
+\\
+          &RQ&  0.711&  0.711&  -4085.540&  0.707&  0.710&  -4094.385&  0.711&  0.711& -4080.326
+\\
+          &RQ(2)&  0.711&  0.711&  -4085.038&  0.707&  0.709&  -4093.798&  0.711&  0.711& -4080.029
+    \end{tabular}
+    \caption{Abridged kernel choice and model structure sweep results.}
+    \label{tab:kern_sweep}
+\end{table}
+
+\end{comment}
+
+\begin{table}
+    \centering
+    \begin{tabular}{cccccc}
+         &  Mt12&  Mt32&  Mt52&  RBF& \textbf{RQ}
+\\
+        $T_m$ &  1&  1&  1&  1& 1
+\\
+         $T_b$ &  1&  2&  2&  5& 2
+\\
+         $T_c$  &  5&  1&  2&  4& 3
+\\
+         $V_c$  &  1&  1&  1&  5& 1
+\\
+         $P_c$ &  5&  4&  3&  1& 1
+\\
+         $H_{vap}$ &  5&  1&  1&  4& 1
+\\
+         \textbf{Total} &  18&  10&  10&  20& \textbf{9}
+\\
+    \end{tabular}
+    \caption{Kernel rankings for isotropic kernels with Model 3. Lowest total is best}
+    \label{tab:kernel_comparisons}
 \end{table}
 
 
 
-
-
-%\bibliography{refs}
+\bibliography{GCGP_refs}
 
 \end{document}
+
+
+%In Table \ref{tab:kern_sweep}, Mt12, Mt32, Mt52 mean the Mat\'ern 1/2, Mat\'ern 3/2, and Mat\'ern 5/2 kernels. RQ(2) and RQ mean anisotropic and isotropic rational quadratic kernels respectively. RBF mean the radial basis function kernel. LML means the log-marginal likelihood.
+%Table \ref{tab:kern_sweep} shows that the GCGP method is robust to kernel choice and model structure. The primary difference between models 1, 4, and 5 is in the choice of mean functions. Model 1 has a zero mean function, model 4 has the JR GC predictions as its mean function, and model 5 has a linear function of MW and JR GC predictions with three additional trainable parameters as its mean function.
+%We find that model 5, with three additional trainable parameters for its mean function, generally does not give significantly higher $R^2$ values on the testing sets compared to model 1 with a zero mean function and model 4 (the model form used in final implementation). Model form 4 is chosen for the final implementation as using the JR GC predictions as the mean function generally makes more physical sense than using a zero mean function. Furthermore, model 4 has a small number of trainable parameters compared to model 5.
+%The LML, training, and testing $ R2$ values are also similar across various kernel choices in general. The differences between these metrics are generally too small to determine which kernel choice is the 'best' overall for modeling all properties in this work. Thus, we have chosen to maintain a single generally applicable kernel choice and model structure for the final implementation of the GCGP method in this work.
+%Furthermore, we see that using automatic relevance determination (anisotropic kernels) does not significantly improve model performance.
+%In this work, we chose the rational quadratic (RQ) kernel with a single length scale as a kernel that is generally applicable for all properties modeled in this work. The RQ kernel has a shape parameter which makes it flexible for use in modeling a variety of data with different or unclear smoothness trends. In summary, the GCGP method gives generally good performance for all properties irrespective of kernel choice. The choice of model structure may have a bigger impact on performance.  \textcolor{red}{Tables AA - ZZ} in the SI show the complete results of the effects of kernel choice and model structure on predictive performance. Model 2, which uses MW as the only input feature to a  GP that models the discrepancy with the JR GC predictions as the mean function, is seen to consistently have the poorest performance among all the model forms. Model 3, another discrepancy model but with a zero mean function and with MW and JR GC predictions as the two input features to the GP, shows comparable performance to models 1, 4, and 5. In summary, the GCGP method gives generally similar performance irrespective of kernel choice and mean function choice. However, the JR GC predictions must be used as one of the input features (and not just as the mean function as is the case for model 2) to obtain good performance.
