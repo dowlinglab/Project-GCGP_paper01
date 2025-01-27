@@ -468,35 +468,35 @@ The JR GC method is a first-order GC method and has equations and parameters for
 The JR GC method was selected for this work due to its popularity, its ease of use \& its accessibility, and the availability of open-source software, like JRGUI \cite{shiJRguiPythonProgram2017}, for automatic generation of JR GC predictions of molecules given their SMILES strings.
 
 \begin{equation}
-    T_b \, [\text{K}] = 198.2 + \sum_{i=1}^{m} n_{i} \times T_{b,i}
+    T_b \, [\text{K}] = 198.2 + \sum_{i=1}^{\mathcal{G}} n_{i} \times T_{b,i}
     \label{eq:boiling_temp}
 \end{equation}
 
 
 \begin{equation}
-    H_{vap} \, [\text{kJ/mol}] = 15.30 + \sum_{i=1}^{m} n_{i} \times H_{vap,i}
+    H_{vap} \, [\text{kJ/mol}] = 15.30 + \sum_{i=1}^{\mathcal{G}} n_{i} \times H_{vap,i}
     \label{eq:enthalpy_vap}
 \end{equation}
 
 
 \begin{equation}
-    P_c \, [\text{bar}] = \left[ 0.113 + 0.0032 N_a - \sum_{i=1}^{m} n_{i} \times P_{c,i} \right]^{-2}
+    P_c \, [\text{bar}] = \left[ 0.113 + 0.0032 N_a - \sum_{i=1}^{\mathcal{G}} n_{i} \times P_{c,i} \right]^{-2}
     \label{eq:critical_pressure}
 \end{equation}
 
 \begin{equation}
-    V_c \, [\text{cm}^3/\text{mol}] = 17.5 + \sum_{i=1}^{m} n_{i} \times V_{c,i}
+    V_c \, [\text{cm}^3/\text{mol}] = 17.5 + \sum_{i=1}^{\mathcal{G}} n_{i} \times V_{c,i}
     \label{eq:critical_mol_vol}
 \end{equation}
 
 \begin{equation}
-    T_c \, [\text{K}] = T_b \left[ 0.584 + 0.965 \sum_{i=1}^{m} n_{i} \times T_{c,i} - \left( \sum_{i=1}^{m} n_{i} \times T_{c,i} \right)^2 \right]^{-1}
+    T_c \, [\text{K}] = T_b \left[ 0.584 + 0.965 \sum_{i=1}^{\mathcal{G}} n_{i} \times T_{c,i} - \left( \sum_{i=1}^{\mathcal{G}} n_{i} \times T_{c,i} \right)^2 \right]^{-1}
     \label{eq:critical_temperature}
 \end{equation}
 
 
 \begin{equation}
-    T_m \, [\text{K}] = 122.5 + \sum_{i=1}^{m} n_{i} \times T_{m,i}
+    T_m \, [\text{K}] = 122.5 + \sum_{i=1}^{\mathcal{G}} n_{i} \times T_{m,i}
     \label{eq:melting_temp}
 \end{equation}
 
@@ -585,11 +585,14 @@ The surfaces in the 3D plots of Figure \ref{fig:3D_JRGC_bias} generally possess 
 
 \subsection{GP Modeling}
 
-\adnote{Once the results are in place, AD will make a first pass at reconciling these two version of the GP section. The discussion in the results will drive what goes here versus in the SI.}
+We start by establishing notation. Define the dataset $\mathcal{D}_p = \{(\Ygc[i], \text{M.W}_i), \yexp[i])\}_{i=1}^n$ for all molecules $n$ and each property $p \in \{H_{vap}, P_c, T_c, T_b ,T_M, V_c\}$ of interest. We define the vector $\yexpvec = [\Ygc[i] | \forall ~ i \in \{1,...,n\}]$ for each property, where $p$ is dropped for convenience. Similar, we define the input feature vector $\xvec_i = [\Ygc[i], \text{M.W}_i]$ which are stacked vertically to form the input feature matrix $\mathbf{X}$. Our goal is to train ML models to predict $\Ygcvec$ based on the inputs $\mathbf{X}$.
 
-%Introduction to a kernel function and mean and variance predictions
-\mcnote{GP Introduction. A short alternative to KJ's description below. Can be updated to match KJ notation and "GPs in the context of this work" if wanted}
-To describe a Gaussian Process (GP), consider a dataset $D = \{(\xvec_i, \yexp[i]\}) \vert \xvec_i \in \mathbb{R}^d, \text{ and } \yexp[i] \in \mathbb{R}, \forall \, i \in \{1,. . ., n\}$ with inputs $\mathbf{X}$ and outputs $\yexpvec[]$. Here $\xvec$ represents the GC model predictions ($\Ygcvec$) and molecular weight ($\textbf{M.W}$) for all molecules $n$, and $\yexpvec$ represents the experimental predictions for any property \textbf{P}. If we assume that experimental data noise is independent and identically distributed with zero mean and constant variance, $\sigma_{\yexp[i]}^2$,it follows that $\yexp[i] = f(\xvec_i) + \epsilon$ where the noise is defined by $\epsilon \sim \mathcal{N}(0,\sigma_{\yexp[i]}^2)$. The GP then seeks to estimate $\yexp[i] = f(\xvec_i) + \epsilon$ as a normal distribution with mean function, $m(\xvec_i)$ for $m(\xvec_i): \mathbb{R}^d \rightarrow \mathbb{R}$, and covariance matrix, $k(\xvec_i, \xvec_i^{\prime})$ for $k: \mathbb{R}^d \times \mathbb{R}^d \rightarrow \mathbb{R}$ \cite{Frazier2018AOptimization}. We then define our GP model for all $\mathbf{X}$:
+% Consider a dataset $\mathcal{D} = \{(\xvec_i, \yexp[i]\}) \vert \xvec_i \in \mathbb{R}^d, \text{ and } \yexp[i] \in \mathbb{R}, \forall \, i \in \{1,. . ., n\}$ with inputs $\mathbf{X}$ and outputs $\yexpvec[]$. Here the vector $\xvec$ contains the GC model predictions ($\Ygcvec$) and molecular weight ($\textbf{M.W}$) for all molecules $n$. The vector $\yexpvec$ represents experimentally measured physical properties. Our goal is to train ML models to predict $\Ygcvec$ based on the inputs $\xvec$.
+
+
+\begin{comment}
+
+predictions for any property \textbf{P}. If we assume that experimental data noise is independent and identically distributed with zero mean and constant variance, $\sigma_{\yexp[i]}^2$,it follows that $\yexp[i] = f(\xvec_i) + \epsilon$ where the noise is defined by $\epsilon \sim \mathcal{N}(0,\sigma_{\yexp[i]}^2)$. The GP then seeks to estimate $\yexp[i] = f(\xvec_i) + \epsilon$ as a normal distribution with mean function, $m(\xvec_i)$ for $m(\xvec_i): \mathbb{R}^d \rightarrow \mathbb{R}$, and covariance matrix, $k(\xvec_i, \xvec_i^{\prime})$ for $k: \mathbb{R}^d \times \mathbb{R}^d \rightarrow \mathbb{R}$ \cite{Frazier2018AOptimization}. We then define our GP model for all $\mathbf{X}$:
 \begin{gather*}
      \yexpvec \sim \mathcal{GP} = \mathcal{N}(\boldsymbol{\mu}, \mathbf{K})
 \end{gather*}
@@ -668,6 +671,9 @@ GP models were implemented using GPflow \cite{Matthews2017GPflow:TensorFlow}. In
 \mcnote{I have commented out KJs explanation and consolidated the GP methods to <3 pages at Barnabas's request. See above.}
 \kjnote{Thanks for commenting this out as opposed to deleting. Happy to help make this shorter. When this is sent to the PI's, can you guys include what I wrote as an addendum or leave it in blue? AD can help us merge the sections. Thank you!}
 \adnote{I uncommented this part from KJ so I can read and merge together.}
+
+\end{comment}
+
 \subsubsection{Gaussian Process Basics}
 A stochastic process is a (infinite) collection of random variables indexed by a set $\{\xvec\}$. A Gaussian process (GP) is a stochastic process where any finite number of random variables have a joint Gaussian distribution. Let $\xvec_i \in \reals^d$ denote an index and $f: \reals^d \rightarrow \reals$ denote a random variable that is indexed by $\xvec$ (i.e., the stochastic process). A GP is specified by a mean function
  \begin{gather}
@@ -693,13 +699,13 @@ In Bayesian nonparametrics, a GP is used as a prior for a random variable indexe
 
 \subsubsection{Model Selection and Kernels}
 
-When deploying GPs for regression, (lack of) prior information of the latent function is encoded through the mean and covariance functions. \kjtodo{write a sentence here about the mean function} This section focuses on how to choose stationary kernel functions for modeling the covariance of the GP that are common in application literature \kjtodo{references needed}. For a more generalized perspective on classes of kernel functions, the interested reader is referred to \citeauthor{Genton} \cite{Genton}.
+When deploying GPs for regression, (lack of) prior information of the latent function is encoded through the mean and covariance functions. \kjtodo{write a sentence here about the mean function} This section focuses on how to choose stationary kernel functions for modeling the covariance of the GP that are common in application literature \kjtodo{references needed}. See \citeauthor{Genton} \cite{Genton} for a more generalized perspective on classes of kernel functions.
 
-\adnote{Which kernel did we use for the main model? Thoughts on just keeping the main kernel here and introducing the alternate kernels in the corresponding results section? Although this is a little unorthodox, it could greatly streamline the methods.}
+%\adnote{Which kernel did we use for the main model? Thoughts on just keeping the main kernel here and introducing the alternate kernels in the corresponding results section? Although this is a little unorthodox, it could greatly streamline the methods.}
 
-\kjnote{I introduced three kernels to support the model selection figure. They can be moved to wherever the primary authors think they fit best, I just need to reference them in my section.}
+%\kjnote{I introduced three kernels to support the model selection figure. They can be moved to wherever the primary authors think they fit best, I just need to reference them in my section.}
 
-In mathematics, a \textit{kernel} refers to a function that defines a similarity measure between pairs of points. In the context of GPs, a kernel is a positive-definite function that defines the covariance structure. For example, the squared exponential (SE) (i.e., Gaussian) kernel is given by
+\adnote{I would like input from others... should we descibe the alternate kernels here or move all of this discussion to the SI?} In mathematics, a \textit{kernel} refers to a function that defines a similarity measure between pairs of points. In the context of GPs, a kernel is a positive-definite function that defines the covariance structure. For example, the squared exponential (SE) (i.e., Gaussian) kernel is given by
 \begin{gather}
      k_{\text{SE}}(\xvec_i,\xvec_j) = \sigma_f^2 \exp \left(-\frac{1}{2}\, \mathbf{r}^\intercal \,\boldsymbol{\Lambda}^{-1} \,\mathbf{r} \right), \label{eq: sekernel}
  \end{gather}
@@ -765,7 +771,7 @@ In mathematics, a \textit{kernel} refers to a function that defines a similarity
  Note that this is the predictive distribution for $\mathbf{f}_*$. The predictive distribution for $\mathbf{y}_*$ can be obtained by adding $\sigma_n^2\, \mathbf{I}$ to the covariance in \eqref{eq: gppredict}.
 
  \subsubsection{Hyperparameter Estimation and Criteria for Model Selection}
- As shown in the \alltodo{Model Selection and Kernels section, rename if you change this name}, the behavior of mean and kernel functions are somewhat dictated by their parameters $\boldsymbol{\theta} = (\sigma_n, \sigma_f, \lambda_1,\dots,\lambda_d)^\intercal$. If the elements of $\boldsymbol{\theta}$ are not chosen by the practitioner, they must be inferred from the sample data $\mathcal{D}$. Furthermore, one might be interested in comparing the performance of several GP models and selecting the best performing model. The evidence (i.e., marginal likelihood) accomplishes both objectives.
+ The behavior of mean and kernel functions are influenced by their parameters $\boldsymbol{\theta} = (\sigma_n, \sigma_f, \lambda_1,\dots,\lambda_d)^\intercal$. If the elements of $\boldsymbol{\theta}$ are not chosen by the practitioner, they must be inferred from the sample data $\mathcal{D}$. Furthermore, one might be interested in comparing the performance of several GP models and selecting the best performing model. The evidence (i.e., marginal likelihood) accomplishes both objectives.
 
  The evidence is given by
  \begin{gather*}
@@ -783,10 +789,9 @@ In mathematics, a \textit{kernel} refers to a function that defines a similarity
  \begin{gather}
      \hat{\boldsymbol{\theta}} := \arg \min_{\boldsymbol{\theta}} \, \frac{n}{2}\log{2\pi} + \frac{1}{2}\log{|\mathbf{K} + \sigma_n^2 \,\mathbf{I}|} +  \frac{1}{2}\,(\mathbf{y}-\boldsymbol{\mu})^\intercal \, (\mathbf{K} + \sigma_n^2 \,\mathbf{I})^{-1}\,(\mathbf{y}-\boldsymbol{\mu}). \label{eq: lml}
  \end{gather}
- The terms in \eqref{eq: lml} aid in model selection as follows. The first component is the normalization constant, the second component is the model complexity penalty, and the third component is the model first to the data. A smaller model fit term indicates better model fit. The determinant of the covariance matrix reflects the area or volume of the function space covered by the model. Thus, the larger (smaller) the determinant, the greater (lesser) the complexity of the model. Thus, \eqref{eq: lml} balances the tradeoff between minimizing complexity and maximizing model fit.
- \kjnote{end of proposed text on GP modeling}
+ The terms in \eqref{eq: lml} aid in model selection as follows. The first component is the normalization constant, the second component is the model complexity penalty, and the third component is the model first to the data. A smaller model fit term indicates better model fit. The determinant of the covariance matrix reflects the area or volume of the function space covered by the model. Thus, the larger (smaller) the determinant, the greater (lesser) the complexity of the model. Thus, \eqref{eq: lml} balances the trade-off between minimizing complexity and maximizing model fit.
 
-
+\begin{comment}
  \subsubsection{Hybrid Modeling}
  \alltodo{Feel free to move this section wherever it fits best}
  \kjnote{begin text from KJ}\\
@@ -808,7 +813,7 @@ In mathematics, a \textit{kernel} refers to a function that defines a similarity
  \end{gather}
 In this application, there are no physically-meaningful parameters $\boldsymbol{\theta}$ to estimate in the low-fidelity model. Moreover, estimation of $\zeta(\cdot)$ is accomplished by estimating the parameters in the GP mean and covariance functions.
 \kjnote{end text from KJ}
-
+\end{comment}
 
 
 
@@ -817,17 +822,23 @@ In this application, there are no physically-meaningful parameters $\boldsymbol{
 
 \adnote{EM really liked this section as it helped solidify the abstract ideas in the context of the paper goal.}
 
-In this work, we define $\mathcal{D} = \{(\Ygc[i], \text{M.W}_i), \yexp[i])\}_{i=1}^n$ for all molecules $n$ and any property of interest $y \in [H_{vap}, P_c, T_c, T_b ,T_M, V_c]$. We define $\Ygc[i] \text{ } \forall \text{ } i\in n$ as JR GC model predictions, $\text{M.W}_i \text{ } \forall \text{ } i\in n$ as the molecular weights, and $\yexp[i] \text{ } \forall \text{ } i\in n$ as the experimental values. We begin by noting that from a modeling perspective, the best accuracy will be achieved by analyzing trends in the available data and setting the GP mean and covariance functions to capture those trends. However, this requires modeling expertise and given that much of the data range for each property with regards to molecular weight has already been explored, we opt to use one general model framework which is likely to capture all properties under study in this work and any future properties of interest. The effect of model form on our results is examined in section \ref{sec:kern_sweep}.
+% \adnote{Integrate this paragraph thoughout this section.} We begin by noting that from a modeling perspective, the best accuracy will be achieved by analyzing trends in the available data and setting the GP mean and covariance functions to capture those trends. However, this requires modeling expertise and given that much of the data range for each property with regards to molecular weight has already been explored, we opt to use one general model framework which is likely to capture all properties under study in this work and any future properties of interest. The effect of model form on our results is examined in section \ref{sec:kern_sweep}.
 
-We determined in section XX that the discrepancy of the JR GC model for each property of interest and experimental property data is a function of molecular weight but that the relationship between the two was not always immediately obvious. However in all cases we expect that JR GC model and the experimental property data to be linearly proportional. As such, while we use both molecular weight and JR GC predictions as training data features, we implement a linear mean function which relies solely on the original JR GC predictions. We fix the hyperparameters associated with the mean function such that $m(\xvec) = \Ygcvec$ where $\Ygc[i] \text{ } \forall \text{ } i\in n$ are the JR GC model predictions for $n$ molecules and any property of interest $y$. This mean function is especially appropriate when the JR GC models faithfully represent the trend of experimental data. Other model forms which were considered can be found in SI section XX. We choose the rational quadratic (RQ) kernel as the base kernel function for the GP models of every property to account for varying levels of smoothness. We add a white kernel with variance $\sigma_w$ to the RQ kernel to account for uncertainty in the experimental data such that the final covariance function used in this work is defined by \eqref{kernel_final}. 
+Our goal is to develop GPR models that capture the trends shown in Figure \ref{fig:3D_JRGC_bias}. We postulate the JR GC predictions are a reasonable approximation for the experimental physical properties measurements and thus assume a linear mean function. Thus through this mean function choice, our GPR models can be thought of as a hybrid model,\cite{eugene2023learning} where the GPR kernel corrects for discrepancy between the JR GC prediction and the experimental data. We choose the rational quadratic (RQ) kernel as the base kernel function for the GP models of every property to account for varying levels of smoothness. We add a white kernel with variance $\sigma_w$ to the RQ kernel to account for uncertainty in the experimental data such that the final covariance function used in this work is defined by \eqref{kernel_final}. 
 
  \begin{equation}
      k(\xvec_i,\xvec_j) = \sigma_f^2 \left(1 +\frac{1}{2 \alpha} \,\mathbf{r}^\intercal \,\boldsymbol{\Lambda}^{-1} \,\mathbf{r} \right)^{-\alpha} + \sigma_w^2\delta_{i,j} 
      \label{kernel_final}
- \end{equation} 
+ \end{equation}
 
- GP models were implemented using GPflow \cite{Matthews2017GPflow:TensorFlow} (version \adnote{fill in}). The hyperparameter tuning was implemented using scipy.optimize \cite{Virtanen2020SciPyPython} (version: \adnote{fill in}) with the Limited-memory Broyden–Fletcher–Goldfarb–Shanno Bound (L-BFGS-B) algorithm to perform maximum likelihood estimation and was repeated ten times to avoid local hyperparameter solutions. On the first training pass, hyperparameters were all initialized at 1.0. On subsequent repeats, $\ell$ and $\alpha$ were uniformly selected from bounds $(0, 100]$ and $(0, 100]$ respectively. $\sigma^2_f$ was selected from a log-normal distribution with bounds $[0,1.0]$ and $\sigma_w$ was always initialized at $1.0$. A more nuanced method would be to initialize $\sigma_w$ as the scaled experimental uncertainty when available. Optimization bounds for $\alpha$ were set to $[10^{-5}, 5\times 10^3]$ and all other hyperparameters were optimized within bounds $[10^{-5}, 10^2]$.
 
+% \adnote{Remove this paragraph after incorporating the main ideas into the paragraph above.} We determined in section XX that the discrepancy of the JR GC model for each property of interest and experimental property data is a function of molecular weight but that the relationship between the two was not always immediately obvious. However in all cases we expect that JR GC model and the experimental property data to be linearly proportional. As such, while we use both molecular weight and JR GC predictions as training data features, we implement a linear mean function which relies solely on the original JR GC predictions. We fix the hyperparameters associated with the mean function such that $m(\xvec) = \Ygcvec$ where $\Ygc[i] \text{ } \forall \text{ } i\in n$ are the JR GC model predictions for $n$ molecules and any property of interest $y$. This mean function is especially appropriate when the JR GC models faithfully represent the trend of experimental data. Other model forms which were considered can be found in SI section XX.  
+
+In the supporting information, we describe several alternate kernel functions and GPR model structures. For completeness, we compare these model alternatives, but ultimately find the single model structure, described above, performs reasonably well for all all six physically properties. Thus, for simplicity, all of the results in the main text focus on this single model structure (linear mean function, RQ kernel) unless otherwise explicitly noted.
+
+ GP models were implemented using GPflow \cite{Matthews2017GPflow:TensorFlow} (version \adnote{fill in}). The hyperparameter tuning was implemented using scipy.optimize \cite{Virtanen2020SciPyPython} (version: \adnote{fill in}) with the Limited-memory Broyden–Fletcher–Goldfarb–Shanno Bound (L-BFGS-B) algorithm to perform maximum likelihood estimation and was repeated ten times to avoid local hyperparameter solutions. On the first training pass, hyperparameters were all initialized at 1.0. On subsequent repeats, $\ell$ and $\alpha$ were uniformly selected from bounds $(0, 100]$ and $(0, 100]$ respectively. $\sigma^2_f$ was selected from a log-normal distribution with bounds $[0,1.0]$ and $\sigma_w$ was always initialized at $1.0$. A more nuanced method would be to initialize $\sigma_w$ as the scaled experimental uncertainty when available. Optimization bounds for $\alpha$ were set to $[10^{-5}, 5\times 10^3]$ and all other hyperparameters were optimized within bounds $[10^{-5}, 10^2]$. We checked the condition number of the kernel matrix $\mathbf{K}$ to ensure the GP models were reasonably scaled.
+
+\begin{comment}
  We use the condition number to determine the numerical stability of our models. The condition number is an indication of how small perturbations in the inputs can affect the outputs \cite{Foster2009}. As a rule of thumb, the number of significant digits lost in addition to those from machine precision is proportional to the logarithmic scaled value of a condition number \cite{NumMathComput}. Ideally, a condition number should be as close to one as possible and a condition number that is much greater than one (in this case we used 500 as a cutoff) is ill-conditioned. That is, a small change in the inputs has significant impact on the output.
  
  \banote{I strongly suggest that we remove all reference(s) to condition numbers from this work. 
@@ -839,7 +850,7 @@ In the final results, for Tb, for example, the covariance matrix of the GP, whic
 We compute the condition numbers before tuning the models.
 The values of the condition numbers are very sensitive to the initial values of the hyperparameters, particularly the white kernel variance hyperparameter. If one sets the initial value of the white kernel variance hyperparameter to a value corresponding to the estimated average experimental uncertainties, the condition numbers are anywhere from several hundreds of thousands to millions. However, the final LML and other model performance metrics remain similar to what is obtained with the default initial value of 1.0. I used this default initial value of 1.0 for the white kernel variance for all final GP training.
 I do not think there really is an objective basis for setting a condition number threshold of 500 for all properties in such a project dealing with real-world experimental data with values that span multiple orders of magnitude for some properties and more importantly, with largely different data set sizes for different properties. }
-
+\end{comment}
 
 
 %Stratified sampling (Dinis)
